@@ -1,97 +1,110 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS, SPACING, FONT_FAMILY, FONT_SIZE } from '../constants/theme';
+import { Screen } from '../components/ui/Screen';
+import { TextField } from '../components/ui/TextField';
+import { Button } from '../components/ui/Button';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
-  const { login, isLoading } = useAuth();
+  const [password, setPassword] = useState('');
+  const { signIn, isLoading } = useAuth();
+
+  const handleLogin = () => {
+    if (!email || !password) return; // Simple validation
+    signIn(email);
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <Screen style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>LSTNR</Text>
-        <Text style={styles.subtitle}>Music. Markets. Culture.</Text>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="enter@email.com"
-            placeholderTextColor={COLORS.textSecondary}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
-
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={() => login(email)}
-          disabled={isLoading || !email}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={COLORS.background} />
-          ) : (
-            <Text style={styles.buttonText}>Enter</Text>
-          )}
-        </TouchableOpacity>
+        <Text style={styles.subtitle}>Welcome back.</Text>
       </View>
-    </SafeAreaView>
+      
+      <View style={styles.form}>
+        <TextField
+          label="Email"
+          placeholder="enter@email.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <TextField
+          label="Password"
+          placeholder="••••••••"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        
+        <TouchableOpacity style={styles.forgot}>
+          <Text style={styles.forgotText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <Button 
+          label="Enter" 
+          onPress={handleLogin} 
+          isLoading={isLoading}
+          style={styles.button}
+        />
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account? </Text>
+          <TouchableOpacity>
+            <Text style={styles.link}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Screen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    flex: 1,
-    padding: SPACING.l,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: COLORS.primary,
-    marginBottom: SPACING.s,
-    letterSpacing: -2,
-  },
-  subtitle: {
-    fontSize: FONT_SIZE.l,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xl * 2,
-  },
-  inputContainer: {
+  header: {
     marginBottom: SPACING.xl,
   },
-  label: {
-    color: COLORS.text,
-    marginBottom: SPACING.s,
-    fontSize: FONT_SIZE.s,
-    fontWeight: 'bold',
+  title: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 48,
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
   },
-  input: {
-    backgroundColor: COLORS.surface,
-    padding: SPACING.m,
-    borderRadius: BORDER_RADIUS.m,
-    color: COLORS.text,
+  subtitle: {
+    fontFamily: FONT_FAMILY.body,
     fontSize: FONT_SIZE.m,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    color: COLORS.textSecondary,
+  },
+  form: {
+    marginBottom: SPACING.xl,
+  },
+  forgot: {
+    alignSelf: 'flex-end',
+    marginBottom: SPACING.xl,
+  },
+  forgotText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZE.s,
+    fontFamily: FONT_FAMILY.body,
   },
   button: {
-    backgroundColor: COLORS.primary,
-    padding: SPACING.m,
-    borderRadius: BORDER_RADIUS.full,
-    alignItems: 'center',
+    marginBottom: SPACING.xl,
   },
-  buttonText: {
-    color: COLORS.background,
-    fontWeight: 'bold',
-    fontSize: FONT_SIZE.m,
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  footerText: {
+    color: COLORS.textSecondary,
+    fontFamily: FONT_FAMILY.body,
+  },
+  link: {
+    color: COLORS.text,
+    fontFamily: FONT_FAMILY.bodyBold,
   },
 });

@@ -3,9 +3,15 @@ import { COLORS } from '../constants/theme';
 export interface User {
   id: string;
   name: string;
-  username: string;
+  handle: string;
   avatar: string;
   balance: number;
+  // Added fields for Auth Flow
+  email?: string;
+  bio?: string;
+  joinedAt?: string;
+  followers?: number;
+  following?: number;
 }
 
 export interface Artist {
@@ -33,9 +39,14 @@ export interface Market {
 export const MOCK_USER: User = {
   id: 'u1',
   name: 'Alex Rivera',
-  username: '@arivera',
+  handle: '@arivera',
   avatar: 'https://i.pravatar.cc/300?u=u1',
   balance: 1250.50,
+  email: 'alex@example.com',
+  bio: 'Music explorer.',
+  joinedAt: '2023-01-01T00:00:00Z',
+  followers: 120,
+  following: 45,
 };
 
 export const MOCK_ARTISTS: Artist[] = [

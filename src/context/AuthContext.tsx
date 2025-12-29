@@ -1,43 +1,164 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, getUser } from '../services/mockApi';
+import * as SecureStore from 'expo-secure-store';
+import { User } from '../services/mockApi';
+import { AuthService } from '../services/authService';
+
+export type AuthMethod = 'email' | 'whatsapp';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string) => Promise<void>;
-  logout: () => void;
+  splashLoading: boolean;
+  
+  // Auth Flow State
+  authIdentifier: string;
+  setAuthIdentifier: (val: string) => void;
+  authMethod: AuthMethod;
+  setAuthMethod: (val: AuthMethod) => void;
+  userExists: boolean;
+  
+  // Actions
+  checkUserExists: (identifier: string) => Promise<boolean>;
+  requestOtp: () => Promise<void>;
+  verifyOtp: (code: string) => Promise<boolean>;
+  createAccount: (name: string, password?: string) => Promise<void>;
+  signIn: (password?: string) => Promise<void>;
+  logout: () => Promise<void>;
+  
   onboarded: boolean;
-  completeOnboarding: () => void;
+  completeOnboarding: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ONBOARDING_KEY = 'lstnr_onboarding_completed';
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [splashLoading, setSplashLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
 
-  const login = async (email: string) => {
+  // Flow State
+  const [authIdentifier, setAuthIdentifier] = useState('');
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
+  const [userExists, setUserExists] = useState(false);
+
+  useEffect(() => {
+    loadStorageData();
+  }, []);
+
+  const loadStorageData = async () => {
+    try {
+      // 1. User Session
+      const savedUser = await AuthService.getSession();
+      if (savedUser) {
+        setUser(savedUser);
+      }
+
+      // 2. Onboarding State
+      const hasOnboarded = await SecureStore.getItemAsync(ONBOARDING_KEY);
+      // Ensure strict boolean parsing
+      setOnboarded(hasOnboarded === 'true');
+      
+    } catch (e) {
+      console.error('Failed to load storage data', e);
+    } finally {
+      setTimeout(() => {
+        setSplashLoading(false);
+      }, 1000);
+    }
+  };
+
+  const checkUserExists = async (identifier: string): Promise<boolean> => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(async () => {
-      const mockUser = await getUser();
-      setUser({ ...mockUser, name: email.split('@')[0] }); // distinct mock
+    try {
+      const result = await AuthService.lookupUserByIdentifier(identifier);
+      setUserExists(result.exists);
+      setAuthIdentifier(identifier);
+      return result.exists;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const logout = () => {
+  const requestOtp = async () => {
+    setIsLoading(true);
+    try {
+      await AuthService.sendOtp(authIdentifier);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyOtp = async (code: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      return await AuthService.verifyOtp(authIdentifier, code);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createAccount = async (name: string, password?: string) => {
+    setIsLoading(true);
+    try {
+      const newUser = await AuthService.createAccount({
+        identifier: authIdentifier,
+        name,
+        password
+      });
+      setUser(newUser);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signIn = async (password?: string) => {
+    setIsLoading(true);
+    try {
+      const loggedInUser = await AuthService.signIn(authIdentifier, password);
+      setUser(loggedInUser);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    await AuthService.logout();
     setUser(null);
-    setOnboarded(false);
   };
 
-  const completeOnboarding = () => {
+  const completeOnboarding = async () => {
     setOnboarded(true);
+    await SecureStore.setItemAsync(ONBOARDING_KEY, 'true');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, onboarded, completeOnboarding }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      splashLoading, 
+      
+      authIdentifier,
+      setAuthIdentifier,
+      authMethod,
+      setAuthMethod,
+      userExists,
+      
+      checkUserExists,
+      requestOtp,
+      verifyOtp,
+      createAccount,
+      signIn,
+      logout, 
+      
+      onboarded, 
+      completeOnboarding 
+    }}>
       {children}
     </AuthContext.Provider>
   );

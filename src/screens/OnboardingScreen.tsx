@@ -1,57 +1,90 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
+import { COLORS, SPACING, FONT_FAMILY, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const INTERESTS = ['Pop', 'Electronic', 'Hip Hop', 'Indie', 'R&B', 'Rock', 'K-Pop', 'Latin'];
+/* 
+  Restored UI with Safe Architecture:
+  - Uses direct SafeAreaView (no custom wrappers)
+  - Uses verified props for transforms
+*/
+
+const STEPS = ['UserType', 'Interests', 'Artists', 'Permissions'];
+
+const USER_TYPES = [
+  { id: 'artist', label: 'Independent\nArtist', rotate: '-5deg' },
+  { id: 'fan', label: 'Curious\nFan', rotate: '0deg' },
+  { id: 'label', label: 'Record\nLabel', rotate: '5deg' },
+];
 
 export const OnboardingScreen = () => {
   const { completeOnboarding } = useAuth();
-  const [selected, setSelected] = useState<string[]>([]);
+  const [step, setStep] = useState(0);
+  const [userType, setUserType] = useState<string | null>(null);
 
-  const toggleInterest = (interest: string) => {
-    if (selected.includes(interest)) {
-      setSelected(selected.filter(i => i !== interest));
-    } else {
-      setSelected([...selected, interest]);
-    }
+  const handleNext = () => {
+    if (!userType) return;
+    completeOnboarding();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>What moves you?</Text>
-        <Text style={styles.subtitle}>Select genres to customize your feed.</Text>
-      </View>
+      <View style={styles.headerSpacer} />
+      
+      <View style={styles.centerContent}>
+        <Text style={styles.heroTitle}>Which user best{'\n'}describes you?</Text>
+        <Text style={styles.heroSubtitle}>Invest in their story, earn in their success.</Text>
+        
+        <View style={styles.cardsContainer}>
+          {USER_TYPES.map((type) => {
+            const isSelected = userType === type.id;
+            return (
+              <TouchableOpacity
+                key={type.id}
+                activeOpacity={0.9}
+                onPress={() => setUserType(type.id)}
+                style={[
+                  styles.userTypeCard,
+                  { transform: [{ rotate: type.rotate }] },
+                  isSelected && styles.userTypeCardSelected
+                ]}
+              >
+                <Text style={[styles.userTypeLabel, isSelected && { color: COLORS.white }]}>
+                  {type.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-      <ScrollView contentContainerStyle={styles.grid}>
-        {INTERESTS.map((interest) => (
-          <TouchableOpacity
-            key={interest}
-            style={[
-              styles.chip,
-              selected.includes(interest) && styles.chipSelected
-            ]}
-            onPress={() => toggleInterest(interest)}
-          >
-            <Text style={[
-              styles.chipText,
-              selected.includes(interest) && styles.chipTextSelected
-            ]}>
-              {interest}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+        <View style={styles.selectionIndicator}>
+          {userType ? (
+            <>
+              <Text style={styles.selectedTypeTitle}>
+                {USER_TYPES.find(t => t.id === userType)?.label.replace('\n', ' ')}
+              </Text>
+              <Text style={styles.selectedTypeSub}>This is selected</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.dash}>-</Text>
+              <Text style={styles.selectedTypeSub}>None selected yet</Text>
+            </>
+          )}
+        </View>
+      </View>
 
       <View style={styles.footer}>
         <TouchableOpacity 
-          style={[styles.button, selected.length === 0 && styles.buttonDisabled]}
-          onPress={completeOnboarding}
-          disabled={selected.length === 0}
+          style={[
+            styles.primaryButton, 
+            !userType && styles.buttonDisabled
+          ]}
+          onPress={handleNext}
+          disabled={!userType}
         >
-          <Text style={styles.buttonText}>Get Started</Text>
+          <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -63,61 +96,98 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    padding: SPACING.l,
-    marginTop: SPACING.xl,
+  headerSpacer: {
+    height: 60,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: COLORS.text,
+  centerContent: {
+    flex: 1,
+    paddingHorizontal: SPACING.m,
+  },
+  heroTitle: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 42,
+    color: COLORS.white,
     marginBottom: SPACING.s,
+    lineHeight: 46,
   },
-  subtitle: {
+  heroSubtitle: {
+    fontFamily: FONT_FAMILY.body,
     fontSize: FONT_SIZE.m,
     color: COLORS.textSecondary,
+    marginBottom: SPACING.xxl,
   },
-  grid: {
+  cardsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: SPACING.l,
-    gap: SPACING.m,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 180,
+    marginTop: SPACING.l,
+    gap: 12,
   },
-  chip: {
-    paddingVertical: SPACING.s,
-    paddingHorizontal: SPACING.l,
-    borderRadius: BORDER_RADIUS.full,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  userTypeCard: {
+    width: 100,
+    height: 130,
     backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.l,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  chipSelected: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  userTypeCardSelected: {
+    borderColor: COLORS.white,
+    borderWidth: 2,
+    backgroundColor: '#2A2A2A',
   },
-  chipText: {
-    color: COLORS.text,
-    fontSize: FONT_SIZE.m,
+  userTypeLabel: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    textTransform: 'uppercase',
   },
-  chipTextSelected: {
-    color: COLORS.background,
-    fontWeight: 'bold',
+  selectionIndicator: {
+    alignItems: 'center',
+    marginTop: 60, 
+    height: 60,
+  },
+  selectedTypeTitle: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 24,
+    color: COLORS.white,
+    marginBottom: 4,
+  },
+  dash: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 24,
+    color: COLORS.white,
+    marginBottom: 4,
+  },
+  selectedTypeSub: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   footer: {
     padding: SPACING.l,
+    paddingBottom: 40,
   },
-  button: {
+  primaryButton: {
     backgroundColor: COLORS.primary,
-    padding: SPACING.l,
-    borderRadius: BORDER_RADIUS.full,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   buttonDisabled: {
-    opacity: 0.5,
+    backgroundColor: '#331010', 
+    opacity: 1, 
   },
   buttonText: {
-    color: COLORS.background,
-    fontWeight: 'bold',
-    fontSize: FONT_SIZE.l,
+    fontFamily: FONT_FAMILY.header,
+    color: COLORS.white,
+    fontSize: 18,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });
