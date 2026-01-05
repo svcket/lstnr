@@ -9,6 +9,8 @@ import { AuthEntryScreen } from '../screens/AuthEntryScreen';
 import { OtpScreen } from '../screens/OtpScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { CreateAccountScreen } from '../screens/CreateAccountScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import { ResetPasswordScreen } from '../screens/ResetPasswordScreen';
 
 const Stack = createStackNavigator();
 
@@ -26,7 +28,7 @@ export default function RootNavigator() {
         screenOptions={{
            headerShown: false,
            presentation: 'card',
-           animationEnabled: false,
+           animation: 'none',
         }}
       >
         <Stack.Screen name="Landing" component={LandingScreen} />
@@ -35,13 +37,39 @@ export default function RootNavigator() {
           component={AuthEntryScreen} 
           options={{
             presentation: 'transparentModal',
-            animationEnabled: true,
+            animation: 'fade',
             cardOverlayEnabled: true,
           }}
         />
         <Stack.Screen name="Otp" component={OtpScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{
+            presentation: 'transparentModal',
+            animation: 'fade',
+            cardOverlayEnabled: true,
+          }}
+        />
         <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+        <Stack.Screen 
+          name="ForgotPassword" 
+          component={ForgotPasswordScreen} 
+          options={{
+            presentation: 'transparentModal',
+            animation: 'fade',
+            cardOverlayEnabled: true,
+          }}
+        />
+        <Stack.Screen 
+          name="ResetPassword" 
+          component={ResetPasswordScreen} 
+          options={{
+            presentation: 'transparentModal',
+            animation: 'fade',
+            cardOverlayEnabled: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

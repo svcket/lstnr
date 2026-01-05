@@ -1,110 +1,461 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, Text, StyleSheet, TextInput, TouchableOpacity, 
+  KeyboardAvoidingView, Platform, Dimensions, TouchableWithoutFeedback, Keyboard,
+  FlatList
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
-import { COLORS, SPACING, FONT_FAMILY, FONT_SIZE } from '../constants/theme';
-import { Screen } from '../components/ui/Screen';
-import { TextField } from '../components/ui/TextField';
-import { Button } from '../components/ui/Button';
+import { Ionicons } from '@expo/vector-icons';
+import { COUNTRIES } from '../constants/countries';
+
+const { width, height } = Dimensions.get('window');
 
 export const LoginScreen = () => {
-  const [email, setEmail] = useState('');
+  const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const { signIn, isLoading, setAuthIdentifier } = useAuth();
+  
+  // Get prefilled identifier from params
+  const prefillIdentifier = route.params?.identifier || '';
+  
+  const [identifier, setIdentifier] = useState(prefillIdentifier);
   const [password, setPassword] = useState('');
-  const { signIn, isLoading } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [error, setError] = useState('');
+  const [authMethod, setAuthMethod] = useState<'email' | 'whatsapp'>('email');
+  
+  // Country picker state
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find(c => c.code === '+234' && c.label === 'NG') || COUNTRIES[0]
+  );
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
 
-  const handleLogin = () => {
-    if (!email || !password) return; // Simple validation
-    signIn(email);
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardWillShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const isFormValid = identifier.length > 0 && password.length > 0;
+
+  const handleLogin = async () => {
+    if (!isFormValid) return;
+    setError('');
+    
+    const fullIdentifier = authMethod === 'whatsapp' 
+      ? `${selectedCountry.code}${identifier}` 
+      : identifier;
+    
+    try {
+      setAuthIdentifier(fullIdentifier);
+      await signIn(password);
+    } catch (e) {
+      setError('Invalid credentials. Please try again.');
+    }
+  };
+
+  const handleClose = () => {
+    // Navigate to Get Started page (auth slide)
+    navigation.navigate('Landing', { slide: 2 });
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword', { identifier });
+  };
+
+  const renderCountryPicker = () => {
+    if (!showCountryPicker) return null;
+    return (
+      <View style={styles.countryPickerDropdown}>
+        <FlatList
+          data={COUNTRIES}
+          keyExtractor={(item) => item.label + item.code}
+          style={{ maxHeight: 300 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              style={styles.countryItem}
+              onPress={() => {
+                setSelectedCountry(item);
+                setShowCountryPicker(false);
+              }}
+            >
+              <Text style={styles.countryItemText}>{item.flag} {item.name} ({item.code})</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
   };
 
   return (
-    <Screen style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>LSTNR</Text>
-        <Text style={styles.subtitle}>Welcome back.</Text>
-      </View>
-      
-      <View style={styles.form}>
-        <TextField
-          label="Email"
-          placeholder="enter@email.com"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextField
-          label="Password"
-          placeholder="••••••••"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        
-        <TouchableOpacity style={styles.forgot}>
-          <Text style={styles.forgotText}>Forgot Password?</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={handleClose}>
+        <View style={styles.overlay} />
+      </TouchableWithoutFeedback>
 
-        <Button 
-          label="Enter" 
-          onPress={handleLogin} 
-          isLoading={isLoading}
-          style={styles.button}
-        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+      >
+        <View style={[
+          styles.modalContent,
+          !isKeyboardVisible ? { paddingBottom: height * 0.45 } : {}
+        ]}>
+          <View style={styles.handleBar} />
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity>
-            <Text style={styles.link}>Sign Up</Text>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+               <Ionicons name="close" size={24} color="#666" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Continue Email or WhatsApp</Text>
+            <View style={{ width: 40 }} /> 
+          </View>
+
+          {/* Toggle */}
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity 
+              activeOpacity={1}
+              style={[styles.toggleBtn, authMethod === 'email' && styles.toggleBtnActive]}
+              onPress={() => {
+                setAuthMethod('email');
+                setIdentifier('');
+                setError('');
+                setShowCountryPicker(false);
+              }}
+            >
+              <Text style={[styles.toggleText, authMethod === 'email' && styles.toggleTextActive]}>Email address</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              activeOpacity={1}
+              style={[styles.toggleBtn, authMethod === 'whatsapp' && styles.toggleBtnActive]}
+              onPress={() => {
+                setAuthMethod('whatsapp');
+                setIdentifier('');
+                setError('');
+                setShowCountryPicker(false);
+              }}
+            >
+              <Text style={[styles.toggleText, authMethod === 'whatsapp' && styles.toggleTextActive]}>WhatsApp number</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Identifier Input */}
+          <View style={[styles.inputGroup, { zIndex: 10 }]}>
+            <Text style={styles.label}>
+              {authMethod === 'email' ? 'Email address' : 'WhatsApp number'}
+            </Text>
+            <View style={styles.inputWrapper}>
+              {authMethod === 'whatsapp' && (
+                <TouchableOpacity 
+                  style={styles.countryCodeButton}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setShowCountryPicker(!showCountryPicker);
+                  }}
+                >
+                  <Text style={styles.countryCodeText}>{selectedCountry.flag} {selectedCountry.code}</Text>
+                  <Ionicons name="chevron-down" size={16} color="#666" />
+                </TouchableOpacity>
+              )}
+              
+              <TextInput
+                style={[styles.input, authMethod === 'whatsapp' && styles.inputWithPrefix]}
+                placeholder={authMethod === 'email' ? 'name@example.com' : '800 123 4567'}
+                placeholderTextColor="#555"
+                value={identifier}
+                onChangeText={setIdentifier}
+                autoCapitalize="none"
+                keyboardType={authMethod === 'email' ? 'email-address' : 'phone-pad'}
+                autoCorrect={false}
+                onFocus={() => setShowCountryPicker(false)}
+              />
+              
+              {authMethod === 'email' && identifier.length > 0 && (
+                <View style={styles.iconRight}>
+                  <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+                </View>
+              )}
+              
+              {renderCountryPicker()}
+            </View>
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.inputGroup}>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>Password</Text>
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text style={styles.forgotLink}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your password"
+                placeholderTextColor="#555"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                returnKeyType="go"
+                onSubmitEditing={handleLogin}
+              />
+              <TouchableOpacity 
+                style={styles.iconRight}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          {/* Login Button */}
+          <TouchableOpacity 
+            style={[styles.loginButton, !isFormValid && styles.disabledButton]}
+            onPress={handleLogin}
+            disabled={!isFormValid || isLoading}
+          >
+            <Text style={styles.loginText}>
+              {isLoading ? 'Logging in...' : 'Login'}
+            </Text>
           </TouchableOpacity>
+
+          {/* Create Account Fallback */}
+          <TouchableOpacity 
+            style={styles.fallbackButton}
+            onPress={() => navigation.navigate('AuthEntry')}
+          >
+            <Text style={styles.fallbackText}>
+              Don't have an account? <Text style={styles.fallbackLink}>Create account</Text>
+            </Text>
+          </TouchableOpacity>
+          
+          <View style={{ height: isKeyboardVisible ? 20 : 40 }} />
         </View>
-      </View>
-    </Screen>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  keyboardAvoid: {
+    width: '100%',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#111',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: SPACING.l,
+    paddingTop: 12,
+    paddingBottom: 40,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#222',
+  },
+  handleBar: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#333',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   header: {
-    marginBottom: SPACING.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  closeButton: {
+    width: 40, 
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#1A1A1A',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontFamily: FONT_FAMILY.header,
-    fontSize: 48,
-    color: COLORS.primary,
-    marginBottom: SPACING.xs,
+    color: '#FFF',
+    fontSize: 18,
+    textAlign: 'center',
   },
-  subtitle: {
-    fontFamily: FONT_FAMILY.body,
-    fontSize: FONT_SIZE.m,
-    color: COLORS.textSecondary,
-  },
-  form: {
-    marginBottom: SPACING.xl,
-  },
-  forgot: {
-    alignSelf: 'flex-end',
-    marginBottom: SPACING.xl,
-  },
-  forgotText: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZE.s,
-    fontFamily: FONT_FAMILY.body,
-  },
-  button: {
-    marginBottom: SPACING.xl,
-  },
-  footer: {
+  toggleContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 25,
+    padding: 4,
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: '#333',
   },
-  footerText: {
-    color: COLORS.textSecondary,
+  toggleBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toggleBtnActive: {
+    backgroundColor: '#FFFFFF',
+  },
+  toggleText: {
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 14,
+    color: '#666',
+  },
+  toggleTextActive: {
+    color: '#000000',
+    fontFamily: FONT_FAMILY.header,
+  },
+  inputGroup: {
+    marginBottom: 24,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  label: {
+    color: '#666',
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  forgotLink: {
+    color: COLORS.primary,
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 14,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 10,
+  },
+  input: {
+    height: 56,
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 28,
+    paddingHorizontal: 20,
+    paddingRight: 50,
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 16,
+    backgroundColor: 'transparent',
+    flex: 1,
+  },
+  inputWithPrefix: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    flex: 1,
+  },
+  iconRight: {
+    position: 'absolute',
+    right: 20,
+  },
+  countryCodeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 56,
+    paddingLeft: 20,
+    paddingRight: 10,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRightWidth: 0,
+    borderTopLeftRadius: 28,
+    borderBottomLeftRadius: 28,
+    gap: 4,
+  },
+  countryCodeText: {
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 16,
+  },
+  countryPickerDropdown: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    backgroundColor: '#222',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+    padding: 0,
+    width: 250,
+    height: 300,
+    zIndex: 100,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  countryItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  countryItemText: {
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+  },
+  errorText: {
+    color: '#FF4444',
+    fontSize: 12,
+    marginBottom: 16,
+    marginLeft: 12,
     fontFamily: FONT_FAMILY.body,
   },
-  link: {
-    color: COLORS.text,
-    fontFamily: FONT_FAMILY.bodyBold,
+  loginButton: {
+    height: 56,
+    backgroundColor: COLORS.primary,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  loginText: {
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 16,
+  },
+  fallbackButton: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  fallbackText: {
+    color: '#888',
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+  },
+  fallbackLink: {
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.header,
   },
 });

@@ -112,9 +112,8 @@ export const AuthEntryScreen = () => {
   };
 
   const handleClose = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
+    // Navigate to Get Started page (auth slide)
+    navigation.navigate('Landing', { slide: 2 });
   };
 
   return (
@@ -312,13 +311,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   toggleText: {
-    fontFamily: FONT_FAMILY.body,
+    fontFamily: FONT_FAMILY.header,
     fontSize: 14,
     color: '#666',
   },
   toggleTextActive: {
     color: '#000000',
-    fontFamily: FONT_FAMILY.bodyBold,
+    fontFamily: FONT_FAMILY.header,
   },
   inputContainer: {
     marginBottom: 30,
@@ -435,6 +434,6 @@ const styles = StyleSheet.create({
   },
   fallbackLink: {
     color: '#FFF',
-    fontFamily: FONT_FAMILY.bodyBold,
+    fontFamily: FONT_FAMILY.header,
   },
 });

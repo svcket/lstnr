@@ -25,7 +25,7 @@ export const ProfileScreen = () => {
                 <View style={styles.profileCard}>
                     <Image source={{ uri: user?.avatar }} style={styles.avatar} />
                     <Text style={styles.name}>{user?.name}</Text>
-                    <Text style={styles.handle}>{user?.username}</Text>
+                    <Text style={styles.handle}>@{user?.handle}</Text>
                     <TouchableOpacity style={styles.editBtn}>
                         <Text style={styles.editBtnText}>Edit Profile</Text>
                     </TouchableOpacity>

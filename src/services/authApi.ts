@@ -24,3 +24,22 @@ export const verifyOtp = async (identifier: string, code: string): Promise<{ suc
   }
   return { success: false };
 };
+
+// Password Reset Flow
+export const requestPasswordReset = async (email: string): Promise<{ success: boolean }> => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Always succeed for mock
+  return { success: true };
+};
+
+export const verifyResetCode = async (email: string, code: string): Promise<boolean> => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  // Mock: Code "0000" is valid for password reset
+  return code === '0000';
+};
+
+export const resetPassword = async (email: string, code: string, newPassword: string): Promise<{ success: boolean }> => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Mock: Always succeed if code was previously verified
+  return { success: true };
+};

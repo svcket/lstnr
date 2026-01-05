@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,8 +43,19 @@ const DURATION = 5000; // 5 seconds per slide
 
 export const LandingScreen = () => {
   const navigation = useNavigation<any>();
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const route = useRoute<any>();
+  
+  // Support navigating directly to a specific slide (e.g., auth slide)
+  const initialSlide = route.params?.slide ?? 0;
+  const [currentSlide, setCurrentSlide] = useState(initialSlide);
   const progress = useRef(new Animated.Value(0)).current;
+
+  // Reset slide when route params change (e.g., coming from close button)
+  useEffect(() => {
+    if (route.params?.slide !== undefined) {
+      setCurrentSlide(route.params.slide);
+    }
+  }, [route.params?.slide]);
 
   useEffect(() => {
     // Reset progress when slide changes to a non-auth slide
@@ -206,7 +217,7 @@ export const LandingScreen = () => {
       
       {!slide.isAuth ? (
         <LinearGradient
-          colors={slide.gradient}
+          colors={slide.gradient as [string, string, ...string[]]}
           start={slide.start}
           end={slide.end}
           style={StyleSheet.absoluteFill}
