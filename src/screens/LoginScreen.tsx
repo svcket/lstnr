@@ -105,7 +105,7 @@ export const LoginScreen = () => {
       >
         <View style={[
           styles.modalContent,
-          !isKeyboardVisible ? { paddingBottom: height * 0.45 } : {}
+          !isKeyboardVisible ? { paddingBottom: height * 0.25 } : {}
         ]}>
           <View style={styles.handleBar} />
 

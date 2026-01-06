@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import { enableScreens } from 'react-native-screens';
 
 // Disable native screens to fix the specific "boolean vs string" Fabric crash
+enableScreens(false);
 
 
 import React, { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 import * as Font from 'expo-font';
 import { Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
+import TestScreen from './src/screens/TestScreen';
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);

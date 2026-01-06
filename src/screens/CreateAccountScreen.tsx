@@ -50,13 +50,14 @@ export const CreateAccountScreen = () => {
     
     try {
       await createAccount(name, password);
-      await completeOnboarding();
+      // Navigate to Genre Selection instead of completing immediately
+      navigation.navigate('GenreSelection');
     } catch (e) {
       console.error(e);
       alert('Failed to create account');
-    } finally {
       setLoading(false);
-    }
+    } 
+    // Don't disable loading here if successful, scene transition handles it
   };
 
   const renderValidationItem = (isValid: boolean, label: string) => (
