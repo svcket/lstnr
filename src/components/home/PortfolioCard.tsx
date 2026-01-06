@@ -35,11 +35,9 @@ export const PortfolioCard = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    padding: 16,
-    marginBottom: 24, // Section spacing
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginBottom: 28, // Specific 28px formatting request
   },
   label: {
     fontFamily: FONT_FAMILY.body,

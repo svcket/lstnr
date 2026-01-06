@@ -40,6 +40,10 @@ describe('GenreSelectionScreen', () => {
     render(<GenreSelectionScreen />);
     const continueBtn = screen.getByText('Continue');
     
+    // Select a genre first to enable the button
+    const genre = screen.getByText('Afro beats');
+    fireEvent.press(genre);
+
     await act(async () => {
       fireEvent.press(continueBtn);
     });

@@ -15,7 +15,7 @@ import { HorizontalCard } from '../components/home/HorizontalCard';
 const PAGE_X = 16;
 const CARD_PAD = 16;
 const ROW_GAP = 12;
-const SECTION_GAP = 24; // Visual separation between sections
+const SECTION_GAP = 28; // Updated to 28px per request
 const STACK_GAP = 4; // Tight gap between text lines
 
 // --- MOCK DATA ---
