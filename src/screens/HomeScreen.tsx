@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Plus, ArrowDown, TrendingUp, Zap, ChevronRight, BookOpen, AlertCircle, Info } from 'lucide-react-native';
+import { Bell, ChevronRight, History } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { ICONS } from '../constants/assets';
 
 // Components
 import { PortfolioCard } from '../components/home/PortfolioCard';
@@ -15,7 +16,7 @@ import { HorizontalCard } from '../components/home/HorizontalCard';
 const PAGE_X = 16;
 const CARD_PAD = 16;
 const ROW_GAP = 12;
-const SECTION_GAP = 28; // Updated to 28px per request
+const SECTION_GAP = 16; // strict 16px spacing per Senior Dev requirement
 const STACK_GAP = 4; // Tight gap between text lines
 
 // --- MOCK DATA ---
@@ -45,11 +46,12 @@ const MOCK_ACTIVITY = [
   { id: 'a5', text: 'Claimed payout: Headies', time: '1w ago', amount: '$92' },
 ];
 
+// Learn items now use strict Asset keys
 const MOCK_LEARN = [
-  { id: 'l1', title: 'What is LSTNR?', subtitle: 'Artists, shares, and predictions.', icon: 'book' },
-  { id: 'l2', title: 'Owning artist shares', subtitle: 'What you hold, what moves price.', icon: 'info' },
-  { id: 'l3', title: 'Prediction markets', subtitle: 'Binary + multi-range, simplified.', icon: 'zap' },
-  { id: 'l4', title: 'Who decides outcomes?', subtitle: 'How markets resolve and settle.', icon: 'alert' },
+  { id: 'l1', title: 'What is LSTNR?', subtitle: 'Artists, shares, and predictions.', icon: ICONS.learnLstnr },
+  { id: 'l2', title: 'Owning artist shares', subtitle: 'What you hold, what moves price.', icon: ICONS.learnShares },
+  { id: 'l3', title: 'Prediction markets', subtitle: 'Binary + multi-range, simplified.', icon: ICONS.learnPredictions },
+  { id: 'l4', title: 'Who decides outcomes?', subtitle: 'How markets resolve and settle.', icon: ICONS.learnResolve },
 ];
 
 const MOCK_UPDATES = [
@@ -58,7 +60,25 @@ const MOCK_UPDATES = [
   { id: 'u3', text: 'Market settled: Headies Next Rated', time: '1d ago', type: 'settled' },
 ];
 
-// --- REUSABLE ROW COMPONENT ---
+// --- REUSABLE COMPONENTS ---
+
+// 1. Section Header (Title + Chevron)
+const SectionHeader = ({ title, onPress }: { title: string; onPress?: () => void }) => (
+  <TouchableOpacity 
+    style={styles.sectionHeader} 
+    onPress={onPress} 
+    activeOpacity={0.7}
+  >
+    <Text style={styles.sectionTitle}>{title}</Text>
+    <Image 
+      source={ICONS.chevronRight} 
+      style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }} 
+      resizeMode="contain"
+    />
+  </TouchableOpacity>
+);
+
+// 2. Generic Row Item
 interface RowItemProps {
   leftIcon: React.ReactNode;
   title: string;
@@ -82,18 +102,18 @@ const RowItem = ({
 }: RowItemProps) => (
   <View style={styles.rowWrapper}>
     <View style={styles.rowContent}>
-      {/* Left Cluster */}
+      {/* Left Cluster - Flex 1 to allow text truncation */}
       <View style={styles.rowLeft}>
         <View style={styles.iconContainer}>
           {leftIcon}
         </View>
         <View style={styles.textStack}>
-          <Text style={styles.rowTitle} numberOfLines={1}>{title}</Text>
-          <Text style={styles.rowSubtitle} numberOfLines={1}>{subtitle}</Text>
+          <Text style={styles.rowTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+          <Text style={styles.rowSubtitle} numberOfLines={1} ellipsizeMode="tail">{subtitle}</Text>
         </View>
       </View>
 
-      {/* Right Cluster */}
+      {/* Right Cluster - Flex undefined to hug content */}
       <View style={styles.rowRight}>
         {rightTop && <Text style={styles.rowValue}>{rightTop}</Text>}
         {rightBottom && (
@@ -105,6 +125,7 @@ const RowItem = ({
       </View>
     </View>
     
+    {/* Divider never renders for last item */}
     {hasDivider && <View style={styles.divider} />}
   </View>
 );
@@ -114,10 +135,10 @@ export const HomeScreen = () => {
   const navigation = useNavigation<any>(); 
   const [hasPositions, setHasPositions] = useState(true);
 
-  const renderQuickAction = (icon: React.ReactNode, label: string, onPress?: () => void) => (
+  const renderQuickAction = (iconSource: ImageSourcePropType, label: string, onPress?: () => void) => (
     <TouchableOpacity style={styles.quickAction} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.quickActionIcon}>
-        {icon}
+         <Image source={iconSource} style={styles.actionImage} resizeMode="contain" />
       </View>
       <Text style={styles.quickActionLabel}>{label}</Text>
     </TouchableOpacity>
@@ -157,10 +178,10 @@ export const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
-            {renderQuickAction(<Plus color="#000" size={20} strokeWidth={2.5} />, 'Add Cash')}
-            {renderQuickAction(<ArrowDown color="#000" size={20} strokeWidth={2.5} />, 'Withdraw')}
-            {renderQuickAction(<TrendingUp color="#000" size={20} strokeWidth={2.5} />, 'Buy Shares')}
-            {renderQuickAction(<Zap color="#000" size={20} strokeWidth={2.5} />, 'Predict')}
+            {renderQuickAction(ICONS.actionAdd, 'Add Cash')}
+            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw')}
+            {renderQuickAction(ICONS.actionBuy, 'Buy Shares')}
+            {renderQuickAction(ICONS.actionPredict, 'Predict')}
           </View>
 
           {!hasPositions ? (
@@ -180,7 +201,7 @@ export const HomeScreen = () => {
             <>
               {/* Your Shares */}
               <View style={styles.section}>
-                 <Text style={styles.sectionTitle}>Your shares</Text>
+                 <SectionHeader title="Your shares" />
                  <View style={styles.card}>
                     {MOCK_SHARES.map((share, index) => (
                       <RowItem 
@@ -199,11 +220,11 @@ export const HomeScreen = () => {
 
               {/* Your Predictions */}
               <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Your predictions</Text>
-                  <ScrollView // Keep standard ScrollView for horizontal
+                  <SectionHeader title="Your predictions" />
+                  <ScrollView 
                     horizontal 
                     showsHorizontalScrollIndicator={false} 
-                    contentContainerStyle={{ paddingHorizontal: PAGE_X }} // Align start/end
+                    contentContainerStyle={{ paddingHorizontal: PAGE_X }} 
                   >
                       {MOCK_PREDICTIONS.map(pred => (
                           <HorizontalCard 
@@ -218,12 +239,12 @@ export const HomeScreen = () => {
 
               {/* Recent Activity */}
               <View style={styles.section}>
-                 <Text style={styles.sectionTitle}>Recent activity</Text>
+                 <SectionHeader title="Recent activity" />
                  <View style={styles.card}>
                     {MOCK_ACTIVITY.map((item, index) => (
-                       <RowItem // Reusing generic row for simple layout
+                       <RowItem 
                           key={item.id}
-                          leftIcon={<View style={styles.dot} />} 
+                          leftIcon={<History color={COLORS.textSecondary} size={20} />} 
                           title={item.text}
                           subtitle={item.time}
                           rightTop={item.amount}
@@ -237,12 +258,12 @@ export const HomeScreen = () => {
 
           {/* Updates */}
           <View style={styles.section}>
-             <Text style={styles.sectionTitle}>Updates</Text>
+             <SectionHeader title="Updates" />
              <View style={styles.card}>
                  {MOCK_UPDATES.map((item, index) => (
                     <RowItem 
                       key={item.id}
-                      leftIcon={<View style={[styles.dot, { backgroundColor: COLORS.primary }]} />}
+                      leftIcon={<Bell color={COLORS.primary} size={20} fill={COLORS.primary} />}
                       title={item.text}
                       subtitle={item.time}
                       hasDivider={index < MOCK_UPDATES.length - 1}
@@ -253,16 +274,17 @@ export const HomeScreen = () => {
 
            {/* Learn */}
            <View style={styles.section}>
-             <Text style={styles.sectionTitle}>Learn</Text>
+             <SectionHeader title="Learn" />
              <View style={styles.card}>
                  {MOCK_LEARN.map((item, index) => (
                     <TouchableOpacity key={item.id}>
                         <RowItem 
                           leftIcon={
-                            item.icon === 'zap' ? <Zap color={COLORS.primary} size={16} /> :
-                            item.icon === 'alert' ? <AlertCircle color={COLORS.primary} size={16} /> :
-                            item.icon === 'info' ? <Info color={COLORS.primary} size={16} /> :
-                            <BookOpen color={COLORS.primary} size={16} />
+                            <Image 
+                              source={item.icon} 
+                              style={styles.learnIcon} 
+                              resizeMode="contain"
+                            />
                           }
                           title={item.title}
                           subtitle={item.subtitle}
@@ -281,6 +303,7 @@ export const HomeScreen = () => {
     </View>
   );
 };
+
 
 // --- PIXEL PERFECT STYLES ---
 const styles = StyleSheet.create({
@@ -349,6 +372,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  actionImage: {
+    width: 24,
+    height: 24,
+  },
   quickActionLabel: {
     fontFamily: FONT_FAMILY.body,
     fontSize: 12,
@@ -359,19 +386,24 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: SECTION_GAP,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: PAGE_X,
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontFamily: FONT_FAMILY.header,
     fontSize: 18,
     color: COLORS.text,
     lineHeight: 25,
-    marginBottom: 12,
-    paddingHorizontal: PAGE_X, // Align with Page
   },
   card: {
     backgroundColor: '#111111',
     borderRadius: 16,
-    marginHorizontal: PAGE_X, // Uses 16px page padding
-    padding: CARD_PAD, // 16px internal padding
+    marginHorizontal: PAGE_X, 
+    padding: CARD_PAD, 
     overflow: 'hidden',
   },
   
@@ -383,17 +415,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 48, // Standard touch target minimum
+    minHeight: 48, 
   },
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 16, // Prevent overlap
+    marginRight: 16, 
   },
   iconContainer: {
     width: 40, 
-    alignItems: 'center', // Center icon/avatar in this fixed width slot
+    alignItems: 'center', 
     justifyContent: 'center',
     marginRight: ROW_GAP,
   },
@@ -402,6 +434,11 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: '#333',
+  },
+  learnIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8, // Matching the tiles in screenshot
   },
   dot: {
     width: 6,
