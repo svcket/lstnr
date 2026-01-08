@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { COLORS, SPACING, FONT_FAMILY, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -84,7 +85,12 @@ export const OnboardingScreen = () => {
           onPress={handleNext}
           disabled={!userType}
         >
-          <Text style={styles.buttonText}>Continue</Text>
+          <LinearGradient
+            colors={userType ? COLORS.primaryGradient : ['#331010', '#331010']}
+            style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 28 }}
+          >
+            <Text style={styles.buttonText}>Continue</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

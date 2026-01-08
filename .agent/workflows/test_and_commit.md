@@ -10,7 +10,7 @@ This workflow runs linting, type checking, and tests, then commits changes if ev
 
 2. Run Tests
    // turbo
-   npm test
+   npm run test:ci
 
 3. Add all changes
    // turbo

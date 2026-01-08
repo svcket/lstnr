@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, ChevronRight, History } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+// import { Bell, ChevronRight, History } from 'lucide-react-native'; // Removed
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
@@ -16,8 +17,9 @@ import { HorizontalCard } from '../components/home/HorizontalCard';
 const PAGE_X = 16;
 const CARD_PAD = 16;
 const ROW_GAP = 12;
-const SECTION_GAP = 16; // strict 16px spacing per Senior Dev requirement
-const STACK_GAP = 4; // Tight gap between text lines
+const SECTION_GAP = 16; 
+const STACK_GAP = 4; 
+const SPACING_CONSTANTS = { s24: 12, s32: 24, s28: 28 };
 
 // --- MOCK DATA ---
 const MOCK_PORTFOLIO = {
@@ -121,7 +123,13 @@ const RowItem = ({
             {rightBottom}
           </Text>
         )}
-        {showChevron && <ChevronRight color={COLORS.textSecondary} size={16} />}
+        {showChevron && (
+          <Image 
+            source={ICONS.chevronRight} 
+            style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }} 
+            resizeMode="contain"
+          />
+        )}
       </View>
     </View>
     
@@ -135,12 +143,32 @@ export const HomeScreen = () => {
   const navigation = useNavigation<any>(); 
   const [hasPositions, setHasPositions] = useState(true);
 
-  const renderQuickAction = (iconSource: ImageSourcePropType, label: string, onPress?: () => void) => (
-    <TouchableOpacity style={styles.quickAction} onPress={onPress} activeOpacity={0.7}>
-      <View style={styles.quickActionIcon}>
-         <Image source={iconSource} style={styles.actionImage} resizeMode="contain" />
-      </View>
-      <Text style={styles.quickActionLabel}>{label}</Text>
+  const renderQuickAction = (
+    iconSource: ImageSourcePropType, 
+    label: string, 
+    bgColor: string, 
+    iconColor: string, 
+    hasBorder: boolean = false, 
+    onPress?: () => void
+  ) => (
+    <TouchableOpacity 
+      style={[
+        styles.quickAction, 
+        { 
+          backgroundColor: bgColor,
+          borderWidth: hasBorder ? 1 : 0,
+          borderColor: hasBorder ? '#1F1F1F' : 'transparent'
+        }
+      ]} 
+      onPress={onPress} 
+      activeOpacity={0.7}
+    >
+        <Image 
+          source={iconSource} 
+          style={[styles.actionImage, { tintColor: iconColor }]} 
+          resizeMode="contain" 
+        />
+        <Text style={[styles.quickActionLabel, { color: iconColor }]}>{label}</Text>
     </TouchableOpacity>
   );
 
@@ -153,13 +181,39 @@ export const HomeScreen = () => {
         <View style={styles.header}>
           <Text style={styles.greeting}>Good evening</Text>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell color={COLORS.text} size={24} strokeWidth={2} />
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => navigation.navigate('Updates')}
+            >
+              <View>
+                <Image 
+                  source={ICONS.notifications} 
+                  style={{ width: 40, height: 40, tintColor: COLORS.text }} 
+                  resizeMode="contain" 
+                />
+                {true && ( // Mocking unread state as true for now
+                  <View style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: COLORS.error, 
+                    borderWidth: 1,
+                    borderColor: '#000'
+                  }} />
+                )}
+              </View>
             </TouchableOpacity>
+
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-               <View style={styles.userAvatar}>
+               <LinearGradient 
+                 colors={COLORS.primaryGradient} 
+                 style={styles.userAvatar}
+               >
                  <Text style={styles.userAvatarText}>{user?.name?.[0] || 'U'}</Text>
-               </View>
+               </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -168,6 +222,9 @@ export const HomeScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* GAP A: Header -> Portfolio (24px) */}
+          <View style={{ height: SPACING_CONSTANTS.s24 }} />
+
           {/* Portfolio Hero */}
           <PortfolioCard 
              totalValue={hasPositions ? MOCK_PORTFOLIO.totalValue : '$0.00'}
@@ -176,13 +233,19 @@ export const HomeScreen = () => {
              isPositive={true}
           />
 
+          {/* GAP B: Portfolio -> Quick Actions (32px) */}
+          <View style={{ height: SPACING_CONSTANTS.s32 }} />
+
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
-            {renderQuickAction(ICONS.actionAdd, 'Add Cash')}
-            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw')}
-            {renderQuickAction(ICONS.actionBuy, 'Buy Shares')}
-            {renderQuickAction(ICONS.actionPredict, 'Predict')}
+            {renderQuickAction(ICONS.actionAdd, 'Add Cash', '#111111', '#FFFFFF', true)}
+            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw', '#111111', '#FFFFFF', true)}
+            {renderQuickAction(ICONS.actionBuy, 'Buy Shares', '#FFFFFF', '#000000', false)}
+            {renderQuickAction(ICONS.actionPredict, 'Predict', '#181818', '#FFFFFF', true)}
           </View>
+
+          {/* GAP C: Quick Actions -> Sections (28px) */}
+          <View style={{ height: SPACING_CONSTANTS.s28 }} />
 
           {!hasPositions ? (
             /* EMPTY STATE */
@@ -212,7 +275,7 @@ export const HomeScreen = () => {
                         rightTop={share.value}
                         rightBottom={share.change}
                         isPositive={share.isPositive}
-                        hasDivider={index < MOCK_SHARES.length - 1} // No divider for last item
+                        hasDivider={index < MOCK_SHARES.length - 1} 
                       />
                     ))}
                  </View>
@@ -240,37 +303,30 @@ export const HomeScreen = () => {
               {/* Recent Activity */}
               <View style={styles.section}>
                  <SectionHeader title="Recent activity" />
-                 <View style={styles.card}>
-                    {MOCK_ACTIVITY.map((item, index) => (
-                       <RowItem 
-                          key={item.id}
-                          leftIcon={<History color={COLORS.textSecondary} size={20} />} 
-                          title={item.text}
-                          subtitle={item.time}
-                          rightTop={item.amount}
-                          hasDivider={index < MOCK_ACTIVITY.length - 1}
-                       />
-                    ))}
-                 </View>
+                  <View style={styles.card}>
+                     {MOCK_ACTIVITY.map((item, index) => {
+                        const isMoneyOut = item.text.includes('Bought') || item.amount.includes('-');
+                        return (
+                           <RowItem 
+                              key={item.id}
+                              leftIcon={
+                                <Image 
+                                  source={isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
+                                  style={styles.feedIcon} 
+                                  resizeMode="contain" 
+                                />
+                              } 
+                              title={item.text}
+                              subtitle={item.time}
+                              rightTop={item.amount}
+                              hasDivider={index < MOCK_ACTIVITY.length - 1}
+                           />
+                        );
+                     })}
+                  </View>
               </View>
             </>
           )}
-
-          {/* Updates */}
-          <View style={styles.section}>
-             <SectionHeader title="Updates" />
-             <View style={styles.card}>
-                 {MOCK_UPDATES.map((item, index) => (
-                    <RowItem 
-                      key={item.id}
-                      leftIcon={<Bell color={COLORS.primary} size={20} fill={COLORS.primary} />}
-                      title={item.text}
-                      subtitle={item.time}
-                      hasDivider={index < MOCK_UPDATES.length - 1}
-                    />
-                 ))}
-             </View>
-          </View>
 
            {/* Learn */}
            <View style={styles.section}>
@@ -319,12 +375,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: PAGE_X,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 0,
   },
   greeting: {
     fontFamily: FONT_FAMILY.header,
     fontSize: 24,
     color: COLORS.text,
+    letterSpacing: 0,
   },
   headerRight: {
     flexDirection: 'row',
@@ -348,6 +406,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.header,
     color: '#FFF',
     fontSize: 14,
+    letterSpacing: 0,
   },
   scrollContent: {
     paddingBottom: 120, // BottomNav space
@@ -356,54 +415,56 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', // Distribute evenly
     paddingHorizontal: PAGE_X,
-    marginBottom: SECTION_GAP,
+    gap: 12, // Visual gap precaution
   },
   quickAction: {
+    flex: 1, 
+    aspectRatio: 1, 
+    borderRadius: 16,
+    // @ts-ignore
+    cornerCurve: 'continuous',
     alignItems: 'center',
-    gap: 8,
-  },
-  quickActionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
   },
   actionImage: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
+    marginTop: 4,
   },
   quickActionLabel: {
-    fontFamily: FONT_FAMILY.body,
-    fontSize: 12,
-    color: COLORS.text,
+    fontFamily: FONT_FAMILY.header, 
+    fontSize: 13,
+    textAlign: 'center',
+    letterSpacing: 0,
   },
   
   // Sections
   section: {
-    marginBottom: SECTION_GAP,
+    marginBottom: 32, // Section spacing
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: PAGE_X,
-    marginBottom: 12,
+    marginBottom: 16, // Header -> Content
   },
   sectionTitle: {
     fontFamily: FONT_FAMILY.header,
-    fontSize: 18,
+    fontSize: 22,
+    fontWeight: '600',
+    lineHeight: 30.8, // 140%
     color: COLORS.text,
-    lineHeight: 25,
+    letterSpacing: 0,
   },
   card: {
     backgroundColor: '#111111',
     borderRadius: 16,
     marginHorizontal: PAGE_X, 
-    padding: CARD_PAD, 
+    padding: 16, 
     overflow: 'hidden',
   },
   
@@ -438,13 +499,12 @@ const styles = StyleSheet.create({
   learnIcon: {
     width: 40,
     height: 40,
-    borderRadius: 8, // Matching the tiles in screenshot
+    borderRadius: 8, 
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.textSecondary,
+  // Feed Icons
+  feedIcon: {
+    width: 40,
+    height: 40,
   },
   textStack: {
     flex: 1,
@@ -454,11 +514,13 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.header,
     fontSize: 16,
     color: COLORS.text,
+    letterSpacing: 0,
   },
   rowSubtitle: {
     fontFamily: FONT_FAMILY.body,
     fontSize: 13,
     color: COLORS.textSecondary,
+    letterSpacing: 0,
   },
   
   // Right side
@@ -470,10 +532,12 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.header,
     fontSize: 16,
     color: COLORS.text,
+    letterSpacing: 0,
   },
   rowChange: {
     fontFamily: FONT_FAMILY.body,
     fontSize: 13,
+    letterSpacing: 0,
   },
   
   divider: {
@@ -498,6 +562,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0,
   },
   emptySubtitle: {
     fontFamily: FONT_FAMILY.body,
@@ -516,5 +581,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.header,
     color: '#000',
     fontSize: 16,
+    letterSpacing: 0,
   },
 });

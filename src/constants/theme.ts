@@ -1,5 +1,6 @@
 export const COLORS = {
-  primary: '#FF3636', // Requested Red
+  primary: '#F53636', // Red (Gradient End)
+  primaryGradient: ['#C99315', '#F53636'] as const, // Gold -> Red Gradient
   secondary: '#00FFFF', // Cyan
   background: '#000000', // Deep Black
   surface: '#181818', // Updated Surface

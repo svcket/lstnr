@@ -36,26 +36,25 @@ export const PortfolioCard = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 28, // Specific 28px formatting request
+    // paddingVertical removed to let parent spacers control rhythm
   },
   label: {
     fontFamily: FONT_FAMILY.body,
     fontSize: FONT_SIZE.s,
     color: COLORS.textSecondary,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   value: {
     fontFamily: FONT_FAMILY.header,
-    fontSize: 40, // Large hero size
+    fontSize: 40,
     color: COLORS.text,
     lineHeight: 48,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 6,
+    gap: 8,
   },
   change: {
     fontFamily: FONT_FAMILY.body,

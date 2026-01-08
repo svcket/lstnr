@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, FONT_FAMILY, SPACING } from '../../constants/theme';
+import { ICONS } from '../../constants/assets';
 import { Infinity } from 'lucide-react-native';
 
 interface HorizontalCardProps {
@@ -17,7 +18,15 @@ export const HorizontalCard = ({ title, subtitle, value, change, isPositive, typ
     <TouchableOpacity style={styles.card} activeOpacity={0.7}>
       <View style={styles.top}>
         <View style={styles.iconPlaceholder}>
-            {type === 'perp' && <Infinity size={16} color="#000" />}
+            {type === 'perp' ? (
+                <Infinity size={16} color="#FFF" />
+            ) : (
+                <Image 
+                    source={ICONS.actionPredict} 
+                    style={{ width: 16, height: 16, tintColor: '#FFFFFF' }} 
+                    resizeMode="contain"
+                />
+            )}
         </View>
       </View>
       
@@ -53,7 +62,7 @@ const styles = StyleSheet.create({
   card: {
     width: 140,
     height: 140,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#111111', // Updated to match Home Screen cards
     borderRadius: 16,
     padding: SPACING.m,
     marginRight: SPACING.m,
@@ -63,10 +72,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.s,
   },
   iconPlaceholder: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFF',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#181818',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -89,7 +98,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FONT_FAMILY.body,
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: '#9A9A9A', // Specific secondary color
   },
   bottomRow: {
     marginTop: 4,

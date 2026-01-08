@@ -7,6 +7,7 @@ import { View } from 'react-native';
 import { ExploreScreen } from '../screens/PlaceholderScreens';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { UpdatesScreen } from '../screens/UpdatesScreen';
 import { COLORS } from '../constants/theme';
 
 const Tab = createBottomTabNavigator();
@@ -32,6 +33,10 @@ export default function AppNavigator() {
       <Tab.Screen 
         name="Profile" 
         component={ProfileScreen} 
+      />
+      <Tab.Screen 
+        name="Updates" 
+        component={UpdatesScreen} 
       />
     </Tab.Navigator>
   );
