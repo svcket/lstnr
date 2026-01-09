@@ -35,9 +35,9 @@ const ONBOARDING_KEY = 'lstnr_onboarding_completed';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [splashLoading, setSplashLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [onboarded, setOnboarded] = useState(false);
+  const [splashLoading, setSplashLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [onboarded, setOnboarded] = useState<boolean>(false);
 
   // Flow State
   const [authIdentifier, setAuthIdentifier] = useState('');
@@ -47,6 +47,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     loadStorageData();
   }, []);
+
+  useEffect(() => {
+    if (typeof onboarded !== 'boolean') {
+       console.error('AuthContext: onboarded is not boolean!', typeof onboarded, onboarded);
+    }
+    if (typeof splashLoading !== 'boolean') {
+       console.error('AuthContext: splashLoading is not boolean!', typeof splashLoading, splashLoading);
+    }
+  }, [onboarded, splashLoading]);
 
   const loadStorageData = async () => {
     try {
@@ -58,13 +67,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // 2. Onboarding State
       const hasOnboarded = await SecureStore.getItemAsync(ONBOARDING_KEY);
-      // Ensure strict boolean parsing
-      setOnboarded(hasOnboarded === 'true');
+      // Strict boolean parsing: ONLY "true" string becomes true boolean
+      const isOnboardedBool = hasOnboarded === 'true';
+      setOnboarded(isOnboardedBool);
       
+      console.log('[AuthContext] Loaded storage:', { 
+        hasOnboardedRaw: hasOnboarded, 
+        isOnboardedBool 
+      });
+
     } catch (e) {
       console.error('Failed to load storage data', e);
     } finally {
       setTimeout(() => {
+        // Ensure strictly boolean
         setSplashLoading(false);
       }, 1000);
     }

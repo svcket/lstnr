@@ -34,9 +34,18 @@ export const FONT_SIZE = {
 };
 
 export const FONT_FAMILY = {
-  header: 'Oswald_700Bold',
-  body: 'Inter_400Regular',
-  bodyBold: 'Inter_700Bold',
+  // Raw Weights
+  regular: 'ClashDisplay-Regular',
+  medium: 'ClashDisplay-Medium',
+  bold: 'ClashDisplay-Bold',
+
+  // Semantics
+  body: 'ClashDisplay-Regular',   // Body + Microcopy
+  header: 'ClashDisplay-Medium',  // Section Headers
+  balance: 'ClashDisplay-Bold',   // Key numeric values
+  
+  // Legacy/Helpers
+  bodyBold: 'ClashDisplay-Bold', // Ensure this maps to Bold
 };
 
 export const BORDER_RADIUS = {

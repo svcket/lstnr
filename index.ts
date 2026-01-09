@@ -1,3 +1,8 @@
+import 'react-native-gesture-handler';
+import { enableScreens } from 'react-native-screens';
+// Disable native screens immediately to prevent Fabric crash with Freeze
+enableScreens(false);
+
 import { registerRootComponent } from 'expo';
 
 import App from './App';

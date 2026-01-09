@@ -25,6 +25,32 @@ export interface Artist {
   bio: string;
 }
 
+export interface ArtistMarket extends Artist {
+  ticker: string;
+  marketCap: number;
+  ath: number;
+  volume24h: number;
+  circulatingSupply: number;
+  mcs: number; // 0-100
+  momentum: 'high' | 'medium' | 'low';
+  priceHistory: { time: string; value: number }[];
+  links: { [key: string]: string };
+  creator: {
+    name: string;
+    avatar: string;
+    badges: string[];
+  };
+}
+
+export interface ActivityItem {
+  id: string;
+  type: 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW' | 'PREDICTION';
+  title: string;
+  timestamp: string;
+  amount: string;
+  iconType: 'in' | 'out' | 'predict' | 'trade';
+}
+
 export interface Market {
   id: string;
   question: string;
@@ -82,6 +108,54 @@ export const MOCK_ARTISTS: Artist[] = [
   },
 ];
 
+export const MOCK_ARTIST_DETAILS: Record<string, ArtistMarket> = {
+  'a1': {
+    ...MOCK_ARTISTS[0],
+    ticker: '$DUST',
+    marketCap: 10800,
+    ath: 15800,
+    volume24h: 369000,
+    circulatingSupply: 240000,
+    mcs: 82,
+    momentum: 'high',
+    priceHistory: Array.from({ length: 20 }, (_, i) => ({
+        time: new Date(Date.now() - i * 3600000).toISOString(),
+        value: 40 + Math.random() * 10
+    })).reverse(),
+    links: {
+        'Spotify': 'https://spotify.com',
+        'Apple Music': 'https://apple.com',
+        'Instagram': 'https://instagram.com',
+        'X': 'https://x.com'
+    },
+    creator: {
+        name: 'LSTNR DAO',
+        avatar: 'https://i.pravatar.cc/150?u=dao',
+        badges: ['Official', 'Verified']
+    }
+  },
+  'a2': {
+    ...MOCK_ARTISTS[1],
+    ticker: '$LUNA',
+    marketCap: 8900,
+    ath: 12000,
+    volume24h: 150000,
+    circulatingSupply: 180000,
+    mcs: 35, // Low MCS for testing warning
+    momentum: 'medium',
+    priceHistory: [],
+    links: {
+        'Spotify': 'https://spotify.com',
+        'Website': 'https://example.com'
+    },
+    creator: {
+        name: 'Indie Label',
+        avatar: 'https://i.pravatar.cc/150?u=label',
+        badges: ['Verified']
+    }
+  }
+};
+
 export const MOCK_MARKETS: Market[] = [
   {
     id: 'm1',
@@ -105,6 +179,14 @@ export const MOCK_MARKETS: Market[] = [
   },
 ];
 
+export const MOCK_ACTIVITY: ActivityItem[] = [
+  { id: '1', type: 'BUY', title: 'Bought $DUST', timestamp: '2m ago', amount: '50 Shares', iconType: 'trade' },
+  { id: '2', type: 'PREDICTION', title: 'Predicted Yes', timestamp: '1h ago', amount: '$500', iconType: 'predict' },
+  { id: '3', type: 'DEPOSIT', title: 'Deposited USDC', timestamp: '1d ago', amount: '+$1,000', iconType: 'in' },
+];
+
 export const getArtists = () => Promise.resolve(MOCK_ARTISTS);
 export const getMarkets = () => Promise.resolve(MOCK_MARKETS);
 export const getUser = () => Promise.resolve(MOCK_USER);
+export const getArtistDetail = (id: string) => Promise.resolve(MOCK_ARTIST_DETAILS[id] || MOCK_ARTIST_DETAILS['a1']);
+export const getActivity = () => Promise.resolve(MOCK_ACTIVITY);

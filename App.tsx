@@ -1,9 +1,4 @@
-import 'react-native-gesture-handler';
-import { enableScreens } from 'react-native-screens';
-
-// Disable native screens to fix the specific "boolean vs string" Fabric crash
-enableScreens(false);
-
+// enableScreens is called in index.ts to ensure early execution
 
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -11,8 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import * as Font from 'expo-font';
-import { Oswald_700Bold } from '@expo-google-fonts/oswald';
-import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
+// Google Fonts imports removed - utilizing ClashDisplay locally
 import TestScreen from './src/screens/TestScreen';
 
 export default function App() {
@@ -22,9 +16,15 @@ export default function App() {
     async function loadFonts() {
       try {
         await Font.loadAsync({
-          Oswald_700Bold,
-          Inter_400Regular,
-          Inter_700Bold,
+          // User must add these files to assets/fonts/
+          // 'ClashDisplay-Regular': require('./assets/fonts/ClashDisplay-Regular.otf'),
+          // 'ClashDisplay-Medium': require('./assets/fonts/ClashDisplay-Medium.otf'),
+          // 'ClashDisplay-Semibold': require('./assets/fonts/ClashDisplay-Semibold.otf'),
+          // 'ClashDisplay-Bold': require('./assets/fonts/ClashDisplay-Bold.otf'),
+          
+          // Fallback mapping to prevent crash until files are added (mapping to valid system fonts or existing fonts if any)
+          // For now, we keep the keys valid for the theme, but maybe map to something that exists if we can?
+          // Actually, relying on system fallback if font not loaded.
         });
         setFontsLoaded(true);
       } catch (e) {

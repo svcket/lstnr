@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { ArrowLeft } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
+import { HeaderBack } from '../components/common/HeaderBack';
 import { ICONS } from '../constants/assets';
 
 // Reuse RowItem logic if exported, or duplicate small component for isolation (cleaner here)
@@ -54,9 +54,7 @@ export const UpdatesScreen = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <ArrowLeft color={COLORS.text} size={24} />
-          </TouchableOpacity>
+          <HeaderBack />
           <Text style={styles.headerTitle}>Updates</Text>
           <View style={{ width: 24 }} /> 
         </View>

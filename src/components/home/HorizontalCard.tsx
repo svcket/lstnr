@@ -23,7 +23,7 @@ export const HorizontalCard = ({ title, subtitle, value, change, isPositive, typ
             ) : (
                 <Image 
                     source={ICONS.actionPredict} 
-                    style={{ width: 16, height: 16, tintColor: '#FFFFFF' }} 
+                    style={{ width: 24, height: 24, tintColor: '#FFFFFF' }} 
                     resizeMode="contain"
                 />
             )}
@@ -72,9 +72,9 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.s,
   },
   iconPlaceholder: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#181818',
     alignItems: 'center',
     justifyContent: 'center',

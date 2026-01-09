@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-// import { Bell, ChevronRight, History } from 'lucide-react-native'; // Removed
+import { Bell } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
@@ -30,9 +30,9 @@ const MOCK_PORTFOLIO = {
 };
 
 const MOCK_SHARES = [
-  { id: '1', artistName: 'Neon Dust', shares: '120 shares', value: '$1,840.00', change: '+6.3%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a1' },
-  { id: '2', artistName: 'Luna Tide', shares: '450 shares', value: '$4,250.50', change: '-2.1%', isPositive: false, avatar: 'https://i.pravatar.cc/150?u=a2' },
-  { id: '3', artistName: 'Steel Pulse', shares: '60 shares', value: '$840.00', change: '+1.2%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a3' },
+  { id: 'a1', artistName: 'Neon Dust', shares: '120 shares', value: '$1,840.00', change: '+6.3%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a1' },
+  { id: 'a2', artistName: 'Luna Tide', shares: '450 shares', value: '$4,250.50', change: '-2.1%', isPositive: false, avatar: 'https://i.pravatar.cc/150?u=a2' },
+  { id: 'a3', artistName: 'Steel Pulse', shares: '60 shares', value: '$840.00', change: '+1.2%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a3' },
 ];
 
 const MOCK_PREDICTIONS = [
@@ -74,11 +74,14 @@ const SectionHeader = ({ title, onPress }: { title: string; onPress?: () => void
     <Text style={styles.sectionTitle}>{title}</Text>
     <Image 
       source={ICONS.chevronRight} 
-      style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }} 
+      style={{ width: 16, height: 16, tintColor: COLORS.text }} 
       resizeMode="contain"
     />
   </TouchableOpacity>
 );
+
+// ... (omitted) ...
+
 
 // 2. Generic Row Item
 interface RowItemProps {
@@ -182,38 +185,22 @@ export const HomeScreen = () => {
           <Text style={styles.greeting}>Good evening</Text>
           <View style={styles.headerRight}>
             <TouchableOpacity 
-              style={styles.iconButton}
               onPress={() => navigation.navigate('Updates')}
+              activeOpacity={0.7}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
               <View>
-                <Image 
-                  source={ICONS.notifications} 
-                  style={{ width: 40, height: 40, tintColor: COLORS.text }} 
-                  resizeMode="contain" 
-                />
-                {true && ( // Mocking unread state as true for now
-                  <View style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: COLORS.error, 
-                    borderWidth: 1,
-                    borderColor: '#000'
-                  }} />
+                <Bell size={24} color={COLORS.text} />
+                {true && ( 
+                  <View style={styles.unreadDot} />
                 )}
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-               <LinearGradient 
-                 colors={COLORS.primaryGradient} 
-                 style={styles.userAvatar}
-               >
-                 <Text style={styles.userAvatarText}>{user?.name?.[0] || 'U'}</Text>
-               </LinearGradient>
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
+               <View style={[styles.headerIconContainer, styles.avatarContainer]}>
+                 <Text style={{ fontSize: 20 }}>👻</Text>
+               </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -240,7 +227,7 @@ export const HomeScreen = () => {
           <View style={styles.quickActionsContainer}>
             {renderQuickAction(ICONS.actionAdd, 'Add Cash', '#111111', '#FFFFFF', true)}
             {renderQuickAction(ICONS.actionWithdraw, 'Withdraw', '#111111', '#FFFFFF', true)}
-            {renderQuickAction(ICONS.actionBuy, 'Buy Shares', '#FFFFFF', '#000000', false)}
+            {renderQuickAction(ICONS.actionBuy, 'Shares', '#FFFFFF', '#000000', false)}
             {renderQuickAction(ICONS.actionPredict, 'Predict', '#181818', '#FFFFFF', true)}
           </View>
 
@@ -267,16 +254,21 @@ export const HomeScreen = () => {
                  <SectionHeader title="Your shares" />
                  <View style={styles.card}>
                     {MOCK_SHARES.map((share, index) => (
-                      <RowItem 
-                        key={share.id}
-                        leftIcon={<Image source={{ uri: share.avatar }} style={styles.artistAvatar} />}
-                        title={share.artistName}
-                        subtitle={share.shares}
-                        rightTop={share.value}
-                        rightBottom={share.change}
-                        isPositive={share.isPositive}
-                        hasDivider={index < MOCK_SHARES.length - 1} 
-                      />
+                      <TouchableOpacity 
+                        key={share.id} 
+                        activeOpacity={0.7}
+                        onPress={() => navigation.navigate('ArtistDetail', { artistId: share.id })}
+                      >
+                        <RowItem 
+                          leftIcon={<Image source={{ uri: share.avatar }} style={styles.artistAvatar} />}
+                          title={share.artistName}
+                          subtitle={share.shares}
+                          rightTop={share.value}
+                          rightBottom={share.change}
+                          isPositive={share.isPositive}
+                          hasDivider={index < MOCK_SHARES.length - 1} 
+                        />
+                      </TouchableOpacity>
                     ))}
                  </View>
               </View>
@@ -329,8 +321,12 @@ export const HomeScreen = () => {
           )}
 
            {/* Learn */}
+           {/* Learn */}
            <View style={styles.section}>
              <SectionHeader title="Learn" />
+             <Text style={styles.learnSubtitle}>
+               Understand how LSTNR works before you make your first move.
+             </Text>
              <View style={styles.card}>
                  {MOCK_LEARN.map((item, index) => (
                     <TouchableOpacity key={item.id}>
@@ -344,12 +340,17 @@ export const HomeScreen = () => {
                           }
                           title={item.title}
                           subtitle={item.subtitle}
-                          showChevron
+                          
                           hasDivider={index < MOCK_LEARN.length - 1}
                         />
                     </TouchableOpacity>
                  ))}
              </View>
+             
+             {/* Footer Disclaimer */}
+             <Text style={styles.footerText}>
+               LSTNR markets reflect community sentiment and publicly verifiable outcomes. Past performance does not guarantee future results.
+             </Text>
           </View>
 
         </ScrollView>
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   greeting: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.balance, // Bold
     fontSize: 24,
     color: COLORS.text,
     letterSpacing: 0,
@@ -387,26 +388,30 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 16, // Increased spacing as requested
   },
-  iconButton: {
-    padding: 4,
-  },
-  userAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#333',
+  headerIconContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#181818',
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#555',
+    borderColor: '#2A2A2A',
   },
-  userAvatarText: {
-    fontFamily: FONT_FAMILY.header,
-    color: '#FFF',
-    fontSize: 14,
-    letterSpacing: 0,
+  avatarContainer: {
+    backgroundColor: '#181818',
+    borderColor: '#333',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: -2,
+    right: 0,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.error, 
   },
   scrollContent: {
     paddingBottom: 120, // BottomNav space
@@ -435,7 +440,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   quickActionLabel: {
-    fontFamily: FONT_FAMILY.header, 
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit Bold
     fontSize: 13,
     textAlign: 'center',
     letterSpacing: 0,
@@ -448,14 +454,13 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 8,
     paddingHorizontal: PAGE_X,
     marginBottom: 16, // Header -> Content
   },
   sectionTitle: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.header, // Medium
     fontSize: 22,
-    fontWeight: '600',
     lineHeight: 30.8, // 140%
     color: COLORS.text,
     letterSpacing: 0,
@@ -511,8 +516,8 @@ const styles = StyleSheet.create({
     gap: STACK_GAP,
   },
   rowTitle: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
+    fontFamily: FONT_FAMILY.header, // Medium
+    fontSize: 15, // Reduced from 16px
     color: COLORS.text,
     letterSpacing: 0,
   },
@@ -529,13 +534,14 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   rowValue: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit Bold
     fontSize: 16,
     color: COLORS.text,
     letterSpacing: 0,
   },
   rowChange: {
-    fontFamily: FONT_FAMILY.body,
+    fontFamily: FONT_FAMILY.header, // Medium
     fontSize: 13,
     letterSpacing: 0,
   },
@@ -546,7 +552,7 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     width: '100%',
   },
-
+ 
   // Empty State
   emptyStateCard: {
     margin: PAGE_X,
@@ -557,7 +563,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.header, // Medium
     fontSize: 18,
     color: COLORS.text,
     marginBottom: 8,
@@ -578,9 +584,26 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   exploreButtonText: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.header, // Medium
     color: '#000',
     fontSize: 16,
     letterSpacing: 0,
+  },
+  learnSubtitle: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    color: COLORS.text,
+    paddingHorizontal: PAGE_X,
+    marginBottom: 16,
+    marginTop: -8, // Pull closer to header
+  },
+  footerText: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 12,
+    color: '#9A9A9A',
+    lineHeight: 18,
+    paddingHorizontal: PAGE_X,
+    marginTop: 16,
+    marginBottom: 40,
   },
 });

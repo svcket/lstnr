@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { HeaderBack } from '../components/common/HeaderBack';
 
 export const OtpScreen = () => {
   const navigation = useNavigation<any>();
@@ -71,9 +72,7 @@ export const OtpScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-           <Ionicons name="chevron-back" size={24} color="#FFF" />
-        </TouchableOpacity>
+        <HeaderBack />
         <Text style={styles.title}>Confirm your Email address</Text>
         <View style={{ width: 40 }} />
       </View>

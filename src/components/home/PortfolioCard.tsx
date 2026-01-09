@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   value: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit bold reinforcement
     fontSize: 40,
     color: COLORS.text,
     lineHeight: 48,
@@ -57,9 +58,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   change: {
-    fontFamily: FONT_FAMILY.body,
+    fontFamily: FONT_FAMILY.header, // Medium
     fontSize: FONT_SIZE.m,
-    fontWeight: '600',
   },
   period: {
     fontFamily: FONT_FAMILY.body,

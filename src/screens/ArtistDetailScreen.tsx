@@ -1,238 +1,560 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
-import { Artist } from '../services/mockApi';
-import { LineChart } from '../components/LineChart';
-import { ArrowLeft, Share2, MessageCircle } from 'lucide-react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COLORS, SPACING, FONT_FAMILY } from '../constants/theme';
+import { getArtistById, computeMCS, formatCompact, ArtistMarket } from '../mock/artistMarket';
+import { HeaderBack } from '../components/common/HeaderBack';
+import { Eye, Share, Copy, Info, Globe, Music, PlayCircle, Twitter, Instagram, MessageCircle, Disc } from 'lucide-react-native';
+import { LineChart } from '../components/LineChart'; 
+import { ArtistTabs, TabType } from '../components/artist/ArtistTabs';
+import { BuySellBar } from '../components/artist/BuySellBar';
+import { InfoModal } from '../components/common/InfoModal';
+import { TradeSheet } from '../components/artist/TradeSheet';
+import { ArtistComments } from '../components/artist/ArtistComments';
+
+const { width } = Dimensions.get('window');
+const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
 
 export const ArtistDetailScreen = ({ route, navigation }: any) => {
-  const { artist } = route.params as { artist: Artist };
-  const [chartData] = useState<number[]>([
-      artist.sharePrice * 0.8, 
-      artist.sharePrice * 0.85, 
-      artist.sharePrice * 0.82, 
-      artist.sharePrice * 0.9, 
-      artist.sharePrice * 0.95, 
-      artist.sharePrice * 0.92, 
-      artist.sharePrice
-  ]); // Mock history
+  const { artistId } = route.params || { artistId: 'a1' };
+  const insets = useSafeAreaInsets();
+  
+  const [artist, setArtist] = useState<ArtistMarket | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('Details');
+  const [activeTimeframe, setActiveTimeframe] = useState('15m');
+  const [tradeSheetMode, setTradeSheetMode] = useState<'BUY' | 'SELL' | null>(null);
+  const [mcs, setMcs] = useState(0);
+  const [infoModal, setInfoModal] = useState({ visible: false, title: '', description: '' });
 
-  const handleBuy = () => {
-    Alert.alert('Buy Shares', `Purchase shares of ${artist.name}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Confirm ($' + artist.sharePrice + ')', onPress: () => console.log('Bought') }
-    ]);
+  const openInfo = (title: string, description: string) => {
+    setInfoModal({ visible: true, title, description });
   };
 
-  const handleSell = () => {
-     Alert.alert('Sell Shares', `Sell your shares of ${artist.name}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Confirm', onPress: () => console.log('Sold') }
-    ]);
+  useEffect(() => {
+    getArtistById(artistId).then(data => {
+      setArtist(data);
+      setMcs(computeMCS(data));
+    });
+  }, [artistId]);
+
+  if (!artist) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
+
+  // Chart Data Logic
+  // @ts-ignore
+  const currentSeries = artist.priceHistory[activeTimeframe] || artist.priceHistory['15m'];
+  const chartValues = currentSeries.map((p: any) => p.value);
+  const minPrice = Math.min(...chartValues);
+  const maxPrice = Math.max(...chartValues);
+
+  const getSocialIcon = (label: string) => {
+    const size = 14;
+    const color = '#999';
+    const l = label.toLowerCase();
+    
+    if (l.includes('website')) return <Globe size={size} color={color} />;
+    if (l.includes('spotify')) return <Music size={size} color={color} />;
+    if (l.includes('apple')) return <Disc size={size} color={color} />;
+    if (l.includes('you')) return <PlayCircle size={size} color={color} />;
+    if (l.includes('x') || l.includes('twitter')) return <Twitter size={size} color={color} />;
+    if (l.includes('insta')) return <Instagram size={size} color={color} />;
+    if (l.includes('discord')) return <MessageCircle size={size} color={color} />;
+    
+    return <Globe size={size} color={color} />;
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
-          <ArrowLeft color={COLORS.text} size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Artist</Text>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Share2 color={COLORS.text} size={24} />
-        </TouchableOpacity>
+    <KeyboardAvoidingView 
+       style={{flex: 1, backgroundColor: COLORS.background}} 
+       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+       keyboardVerticalOffset={0}
+    >
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <View style={styles.headerLeft}>
+          <HeaderBack />
+          <Image source={{ uri: artist.avatar }} style={styles.avatar} />
+          <View>
+             <Text style={styles.headerName}>{artist.name}</Text>
+             <View style={styles.tickerRow}>
+                <Text style={styles.headerTicker}>{artist.ticker}</Text>
+                <Copy size={12} color="#666" style={{ marginLeft: 4 }} />
+             </View>
+          </View>
+        </View>
+        <View style={styles.headerRight}>
+          <Eye size={24} color="#FFF" />
+          <Share size={24} color="#FFF" />
+        </View>
       </View>
 
-      <ScrollView>
-        <View style={styles.profileHeader}>
-          <Image source={{ uri: artist.avatar }} style={styles.avatar} />
-          <Text style={styles.name}>{artist.name}</Text>
-          {artist.verified && <View style={styles.verifiedBadge}><Text style={styles.verifiedText}>VERIFIED</Text></View>}
+      <ScrollView 
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
+        stickyHeaderIndices={[2]}
+      >
+        {/* KPI Row */}
+        <View style={styles.kpiContainer}>
+           <View>
+              <View style={styles.kpiRow}>
+                 <Text style={styles.kpiValue}>{formatCompact(artist.marketCap)}</Text>
+                 <Text style={styles.kpiLabel}> MC</Text>
+              </View>
+              <Text style={styles.kpiChange}>+12.5% Today</Text>
+           </View>
+           <View style={{alignItems: 'flex-end'}}>
+              <View style={styles.kpiRow}>
+                 <Text style={styles.kpiValue}>{formatCompact(artist.ath)}</Text>
+                 <Text style={styles.kpiLabel}> ATH</Text>
+              </View>
+           </View>
         </View>
 
+        {/* Chart */}
         <View style={styles.chartContainer}>
-           <Text style={styles.currentPrice}>${artist.sharePrice.toFixed(2)}</Text>
-           <Text style={[styles.change, { color: artist.change >= 0 ? COLORS.success : COLORS.error }]}>
-             {artist.change >= 0 ? '+' : ''}{artist.change}% (24h)
-           </Text>
-           <LineChart data={chartData} color={artist.change >= 0 ? COLORS.success : COLORS.error} height={150} />
+           <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1 }}>
+                <LineChart 
+                  data={chartValues} 
+                  width={width - 48} // Reserve space for Y-axis
+                  height={180} 
+                  color={COLORS.success} 
+                />
+              </View>
+              {/* Right Y-Axis */}
+              <View style={styles.yAxis}>
+                 <Text style={styles.axisLabel}>${maxPrice.toFixed(2)}</Text>
+                 <Text style={styles.axisLabel}>${((maxPrice + minPrice)/2).toFixed(2)}</Text>
+                 <Text style={styles.axisLabel}>${minPrice.toFixed(2)}</Text>
+              </View>
+           </View>
+           
+           {/* Timeframe Selector */}
+           <View style={styles.timeframeRow}>
+              {TIMEFRAMES.map(tf => (
+                 <TouchableOpacity 
+                   key={tf} 
+                   style={[styles.tfPill, activeTimeframe === tf && styles.tfPillActive]}
+                   onPress={() => setActiveTimeframe(tf)}
+                 >
+                    <Text style={[styles.tfText, activeTimeframe === tf && styles.tfTextActive]}>{tf}</Text>
+                 </TouchableOpacity>
+              ))}
+           </View>
         </View>
 
-        <View style={styles.statsRow}>
-          <View style={styles.stat}>
-            <Text style={styles.statLabel}>Holders</Text>
-            <Text style={styles.statValue}>{artist.holders}</Text>
-          </View>
-          <View style={styles.stat}>
-             <Text style={styles.statLabel}>Market Cap</Text>
-             <Text style={styles.statValue}>$1.2M</Text>
-          </View>
-        </View>
+        {/* Tabs */}
+        <ArtistTabs activeTab={activeTab} onTabPress={setActiveTab} />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.bio}>{artist.bio}</Text>
-        </View>
+        {/* CONTENT */}
+        {activeTab === 'Comments' ? (
+            <View style={styles.tabContent}>
+                <ArtistComments />
+            </View>
+        ) : activeTab === 'Details' && (
+               <View style={styles.tabContent}>
+                 {/* Stats Grid */}
+                 <View style={styles.grid}>
+                    <StatCard label="Price" value={'$' + artist.price.toFixed(2)} />
+                    <StatCard label="Volume (24h)" value={formatCompact(artist.volume24h)} />
+                    <StatCard label="Market Cap" value={formatCompact(artist.marketCap)} />
+                    <StatCard label="Holders" value={artist.holders.toString()} />
+                 </View>
 
-         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Discussion</Text>
-          <TouchableOpacity style={styles.commentCta}>
-             <MessageCircle color={COLORS.textSecondary} size={20} />
-             <Text style={styles.commentText}>Join the conversation...</Text>
-          </TouchableOpacity>
-        </View>
+                 {/* Bio Card (Includes Metrics + Links) */}
+                 <Text style={styles.sectionHeader}>Artist Bio</Text>
+                 <View style={styles.bioCard}>
+                    <Text style={styles.bioText}>{artist.bio}</Text>
+                    <View style={styles.divider} />
+                    
+                    <BioMetric 
+                       label="Circulating Supply" 
+                       value={artist.circulatingSupply.toLocaleString()} 
+                       description="Represents the total number of shares currently held by investors. Higher supply typically means higher liquidity."
+                       onPressInfo={openInfo}
+                    />
+                    <BioMetric 
+                       label="Market Confidence Score" 
+                       value={`${mcs}% (${mcs > 70 ? 'High' : 'Mod'})`} 
+                       color={mcs > 70 ? COLORS.success : '#F5A623'}
+                       description="A composite score (0-100%) reflecting market sentiment. Calculated from volume trends, holder retention, and price stability."
+                       onPressInfo={openInfo}
+                    />
+                    <BioMetric 
+                       label="Momentum" 
+                       value="Bullish" 
+                       description="Indicates the current trend direction. Bullish means buying pressure is increasing, while Bearish suggests selling pressure."
+                       onPressInfo={openInfo}
+                    />
+
+                    {/* Social Links (Inside Bio Card now) */}
+                    {artist.links && Object.keys(artist.links).length > 0 && (
+                       <View style={styles.linksContainer}>
+                          <View style={styles.divider} />
+                          <View style={styles.socialsRow}>
+                             {Object.entries(artist.links).map(([label, url]) => (
+                               <TouchableOpacity key={label} style={styles.socialPill}>
+                                  {getSocialIcon(label)}
+                                  <Text style={styles.socialText}>{label}</Text>
+                               </TouchableOpacity>
+                             ))}
+                          </View>
+                       </View>
+                    )}
+                 </View>
+
+                 {/* Created By Section */}
+                 {artist.creator && (
+                    <View style={styles.creatorSection}>
+                       <Text style={styles.sectionHeader}>Created by</Text>
+                       <View style={styles.creatorCard}>
+                          <Image source={{ uri: artist.creator.avatar }} style={styles.creatorAvatar} />
+                          <View style={{ flex: 1, justifyContent: 'center' }}>
+                              <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                                 <Text style={styles.creatorName}>{artist.creator.name}</Text>
+                                 {/* Verified Badge Icon (Mock) */}
+                                 <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#F5A623', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ fontSize: 8, color: '#000', fontWeight: 'bold' }}>✓</Text>
+                                 </View>
+                              </View>
+                              
+                              <View style={styles.badgesRow}>
+                                 {artist.creator.ticker && (
+                                    <TouchableOpacity style={styles.badgePill}>
+                                       <View style={{width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFF', marginRight: 4}} />
+                                       <Text style={styles.badgeText}>{artist.creator.ticker}</Text>
+                                       <Copy size={10} color="#999" style={{marginLeft: 4}} />
+                                    </TouchableOpacity>
+                                 )}
+                                 {artist.creator.wallet && (
+                                    <View style={styles.badgePill}>
+                                       <Text style={styles.badgeText}>{artist.creator.wallet}</Text>
+                                    </View>
+                                 )}
+                              </View>
+                          </View>
+                          <TouchableOpacity style={styles.followBtn}>
+                            <Text style={styles.followText}>Follow</Text>
+                          </TouchableOpacity>
+                       </View>
+                    </View>
+                 )}
+               </View>
+            )}
       </ScrollView>
 
-      <View style={styles.actionFooter}>
-        <TouchableOpacity style={[styles.actionBtn, styles.sellBtn]} onPress={handleSell}>
-          <Text style={styles.sellText}>Sell</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, styles.buyBtn]} onPress={handleBuy}>
-          <Text style={styles.buyText}>Buy</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      {/* Buy/Sell Footer */}
+      <BuySellBar 
+         onBuy={() => setTradeSheetMode('BUY')}
+         onSell={() => setTradeSheetMode('SELL')}
+      />
+
+       <TradeSheet 
+         visible={!!tradeSheetMode} 
+         mode={tradeSheetMode || 'BUY'} 
+         artistName={artist.name}
+         ticker={artist.ticker}
+         sharePrice={artist.price}
+         mcs={mcs}
+         onClose={() => setTradeSheetMode(null)}
+         onConfirm={(val: any) => { console.log('Trade', val); setTradeSheetMode(null); }}
+       />
+       
+       <InfoModal 
+          visible={infoModal.visible}
+          title={infoModal.title}
+          description={infoModal.description}
+          onClose={() => setInfoModal(prev => ({ ...prev, visible: false }))}
+       />
+    </View>
+    </KeyboardAvoidingView>
   );
 };
+
+// Sub-components
+const StatCard = ({ label, value }: { label: string, value: string }) => (
+  <View style={styles.statCard}>
+     <Text style={styles.statValue}>{value}</Text>
+     <Text style={styles.statLabel}>{label}</Text>
+  </View>
+);
+
+const BioMetric = ({ label, value, color = '#FFF', description, onPressInfo }: any) => (
+  <View style={styles.bioRow}>
+    <TouchableOpacity 
+      activeOpacity={0.7}
+      style={{flexDirection: 'row', alignItems: 'center', gap: 6}}
+      onPress={() => onPressInfo && onPressInfo(label, description)}
+    >
+       <Text style={styles.bioLabel}>{label}</Text>
+       <Info size={14} color="#666" />
+    </TouchableOpacity>
+    <Text style={[styles.bioValue, { color }]}>{value}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#000',
   },
+  loading: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+  
+  // Header
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: SPACING.m,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  headerTitle: {
-    color: COLORS.text,
-    fontSize: FONT_SIZE.m,
-    fontWeight: 'bold',
-  },
-  iconBtn: {
-    padding: SPACING.s,
-  },
-  profileHeader: {
-    alignItems: 'center',
-    padding: SPACING.l,
+    gap: 12,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: BORDER_RADIUS.full,
-    marginBottom: SPACING.m,
-    borderWidth: 2,
-    borderColor: COLORS.surfaceLight,
+    width: 40, 
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#333',
   },
-  name: {
-    color: COLORS.text,
-    fontSize: FONT_SIZE.xl,
-    fontWeight: 'bold',
-    marginBottom: SPACING.s,
+  headerName: {
+    fontFamily: FONT_FAMILY.header, // Medium
+    fontSize: 16,
+    color: '#FFF',
   },
-  verifiedBadge: {
-    backgroundColor: COLORS.secondary,
-    paddingHorizontal: SPACING.s,
-    paddingVertical: 2,
-    borderRadius: BORDER_RADIUS.s,
+  tickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  verifiedText: {
-    color: COLORS.background,
-    fontSize: 10,
-    fontWeight: 'bold',
+  headerTicker: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    color: '#999',
   },
+  headerRight: {
+    flexDirection: 'row',
+    gap: 16, // +4px as requested (12 -> 16)
+  },
+
+  scrollContent: {
+  },
+
+  // KPI
+  kpiContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  kpiRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  kpiValue: {
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit Bold
+    fontSize: 18, // 18-20px
+    color: '#FFF',
+  },
+  kpiLabel: {
+    fontFamily: FONT_FAMILY.header, // Medium
+    fontSize: 14, // Smaller
+    color: '#9A9A9A',
+    marginLeft: 4,
+  },
+  kpiChange: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    color: COLORS.success,
+    marginTop: 4,
+  },
+
+  // Chart
   chartContainer: {
-    paddingVertical: SPACING.m,
+    marginBottom: 24,
+  },
+  yAxis: {
+    width: 48,
+    justifyContent: 'space-between',
+    paddingVertical: 10,
     alignItems: 'center',
   },
-  currentPrice: {
-    color: COLORS.text,
-    fontSize: 36,
-    fontWeight: '900',
+  axisLabel: {
+    color: '#666',
+    fontSize: 12, // Increased +2px (10->12)
+    fontFamily: FONT_FAMILY.body,
   },
-  change: {
-    fontSize: FONT_SIZE.m,
-    fontWeight: 'bold',
-    marginBottom: SPACING.m,
-  },
-  statsRow: {
+  timeframeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: SPACING.l,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: COLORS.surfaceLight,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    gap: 8,
   },
-  stat: {
-    alignItems: 'center',
-  },
-  statLabel: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZE.xs,
-    marginBottom: 4,
-  },
-  statValue: {
-    color: COLORS.text,
-    fontSize: FONT_SIZE.l,
-    fontWeight: 'bold',
-  },
-  section: {
-    padding: SPACING.l,
-  },
-  sectionTitle: {
-    color: COLORS.text,
-    fontSize: FONT_SIZE.l,
-    fontWeight: 'bold',
-    marginBottom: SPACING.m,
-  },
-  bio: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZE.m,
-    lineHeight: 24,
-  },
-  commentCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    padding: SPACING.m,
-    borderRadius: BORDER_RADIUS.m,
-    gap: SPACING.m,
-  },
-  commentText: {
-    color: COLORS.textSecondary,
-  },
-  actionFooter: {
-    flexDirection: 'row',
-    padding: SPACING.m,
-    gap: SPACING.m,
-    borderTopWidth: 1,
-    borderColor: COLORS.surface,
-    backgroundColor: COLORS.background,
-  },
-  actionBtn: {
+  tfPill: {
     flex: 1,
-    padding: SPACING.m,
-    borderRadius: BORDER_RADIUS.full,
+    paddingVertical: 8,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buyBtn: {
-    backgroundColor: COLORS.primary,
+  tfPillActive: {
+    backgroundColor: '#181818',
   },
-  sellBtn: {
-    backgroundColor: COLORS.surfaceLight,
+  tfText: {
+    color: '#666',
+    fontFamily: FONT_FAMILY.header, // Medium
+    fontSize: 14, // Increased +2px
   },
-  buyText: {
-    color: COLORS.background,
-    fontWeight: 'bold',
-    fontSize: FONT_SIZE.l,
+  tfTextActive: {
+    color: '#FFF',
   },
-  sellText: {
-    color: COLORS.text,
-    fontWeight: 'bold',
-    fontSize: FONT_SIZE.l,
+
+  // Tab Content
+  tabContent: {
+    paddingHorizontal: 16,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8, // Reduced to 8px as requested
+    marginBottom: 24,
+  },
+  statCard: {
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 16,
+    width: (width - 32 - 8) / 2, // Adjusted for 8px gap
+  },
+  statLabel: {
+    color: '#999',
+    fontSize: 12,
+    fontFamily: FONT_FAMILY.body,
+  },
+  statValue: {
+    color: '#FFF',
+    fontSize: 16, // 16px
+    fontFamily: FONT_FAMILY.balance, // Bold
+    marginBottom: 4,
+  },
+
+  // Bio
+  bioCard: {
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 32,
+  },
+  bioText: {
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.body,
+    color: '#CCC',
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1, 
+    backgroundColor: '#222', 
+    marginBottom: 16 
+  },
+  bioRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16, // Increased to 16px as requested
+  },
+  bioLabel: {
+    fontSize: 14, // Reverted to 14px as requested
+    fontFamily: FONT_FAMILY.header, // Medium/Regular
+    color: '#999',
+  },
+  bioValue: {
+    fontSize: 16, // 16px Bold
+    fontFamily: FONT_FAMILY.balance, // Bold
+  },
+  
+  // Links
+  linksContainer: {
+    marginTop: 8,
+  },
+  socialsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  socialPill: {
+    backgroundColor: '#181818',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6, 
+  },
+  socialText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.header, 
+  },
+
+  // Creator
+  creatorSection: {
+    marginBottom: 40,
+  },
+  sectionHeader: {
+    color: '#FFF', // Updated to White to match Home
+    fontSize: 22, // Updated to 22px
+    fontFamily: FONT_FAMILY.header,
+    marginBottom: 16, // More spacing
+  },
+  creatorCard: {
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  creatorAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#333',
+  },
+  creatorName: {
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontSize: 16,
+  },
+  badgesRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 6,
+  },
+  badgePill: {
+    backgroundColor: '#222',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#CCC',
+    fontSize: 12,
+    fontFamily: FONT_FAMILY.body,
+  },
+  followBtn: {
+    backgroundColor: '#FFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  followText: {
+    color: '#000',
+    fontFamily: FONT_FAMILY.balance, // Bold
+    fontSize: 14,
   },
 });

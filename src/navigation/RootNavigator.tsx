@@ -1,11 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
-import { enableScreens } from 'react-native-screens';
 import { useAuth } from '../context/AuthContext';
 
-// Disable native screens to fix Fabric prop mismatch crash
-enableScreens(false);
 import TestScreen from '../screens/TestScreen';
 import { LandingScreen } from '../screens/LandingScreen';
 import { SplashScreen } from '../screens/SplashScreen';
@@ -25,9 +22,13 @@ const Stack = createStackNavigator();
 export default function RootNavigator() {
   const { splashLoading, user, onboarded } = useAuth();
   
-  console.log("DEBUG: splashLoading:", splashLoading, typeof splashLoading);
-  console.log("DEBUG: onboarded:", onboarded, typeof onboarded);
-  console.log("DEBUG: user:", user, typeof user);
+  if (__DEV__) {
+    console.log('[RootNavigator] onboarded:', onboarded, '(', typeof onboarded, ')');
+    console.log('[RootNavigator] splashLoading:', splashLoading, '(', typeof splashLoading, ')');
+    
+    if (typeof onboarded !== 'boolean') console.error('CRITICAL: onboarded is NOT boolean (actual: ' + typeof onboarded + ')');
+    if (typeof splashLoading !== 'boolean') console.error('CRITICAL: splashLoading is NOT boolean (actual: ' + typeof splashLoading + ')');
+  }
   
   if (splashLoading) {
     return <SplashScreen />;
@@ -36,7 +37,7 @@ export default function RootNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName={user && onboarded ? 'MainTabs' : 'Landing'}
+        initialRouteName={user && Boolean(onboarded) ? 'MainTabs' : 'Landing'}
         detachInactiveScreens={false}
         screenOptions={{
            headerShown: false,

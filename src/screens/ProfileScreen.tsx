@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, ChevronRight, Bell, Shield, CircleHelp as HelpCircle, Wallet } from 'lucide-react-native'; // Fixed icon import logic if needed, Lucide usually has HelpCircle as HelpCircle or CircleHelp
+import { LogOut, ChevronRight, Bell, Shield, CircleHelp as HelpCircle, Wallet } from 'lucide-react-native'; 
+import { HeaderBack } from '../components/common/HeaderBack';
 
 export const ProfileScreen = () => {
     const { user, logout } = useAuth();
@@ -18,6 +19,9 @@ export const ProfileScreen = () => {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
+                <View style={{ position: 'absolute', left: 16, zIndex: 10, bottom: 12 }}>
+                   <HeaderBack />
+                </View>
                 <Text style={styles.title}>Profile</Text>
             </View>
 
@@ -69,12 +73,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    padding: SPACING.l,
+    paddingHorizontal: SPACING.l,
+    paddingVertical: SPACING.m,
     borderBottomWidth: 1,
     borderColor: COLORS.surface,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 60,
   },
   title: {
-      fontSize: 24,
+      fontSize: 20, // Slightly reduced to fit better centered? Or keep 24? 20 is more standard for center.
       fontWeight: 'bold',
       color: COLORS.text,
   },

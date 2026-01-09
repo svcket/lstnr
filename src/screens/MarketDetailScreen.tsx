@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { Market } from '../services/mockApi';
-import { ArrowLeft, Clock } from 'lucide-react-native';
+import { Clock } from 'lucide-react-native';
+import { HeaderBack } from '../components/common/HeaderBack';
 
 export const MarketDetailScreen = ({ route, navigation }: any) => {
   const { market } = route.params as { market: Market };
@@ -18,9 +19,7 @@ export const MarketDetailScreen = ({ route, navigation }: any) => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
        <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
-          <ArrowLeft color={COLORS.text} size={24} />
-        </TouchableOpacity>
+        <HeaderBack />
         <Text style={styles.headerTitle}>Market</Text>
         <TouchableOpacity style={styles.iconBtn} /> 
       </View>

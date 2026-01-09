@@ -7,6 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { FONT_FAMILY, SPACING, COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { HeaderBack } from '../components/common/HeaderBack';
 
 export const CreateAccountScreen = () => {
   const navigation = useNavigation<any>();
@@ -78,9 +79,7 @@ export const CreateAccountScreen = () => {
       <View style={styles.handleBar} />
       
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-           <Ionicons name="chevron-back" size={24} color="#FFF" />
-        </TouchableOpacity>
+        <HeaderBack />
         <Text style={styles.headerTitle}>Complete your account</Text>
         <View style={{ width: 40 }} />
       </View>

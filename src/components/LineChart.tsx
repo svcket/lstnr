@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Dimensions } from 'react-native';
-import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { COLORS } from '../constants/theme';
 
 interface LineChartProps {
@@ -32,23 +32,19 @@ export const LineChart = ({
   });
 
   const d = `M ${points.join(' L ')}`;
+  const fillD = `${d} L ${width},${height} L 0,${height} Z`;
 
   return (
     <View style={{ height, width }}>
       <Svg height={height} width={width}>
-        <Defs>
-          <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={color} stopOpacity="0.5" />
-            <Stop offset="1" stopColor={color} stopOpacity="0" />
-          </LinearGradient>
-        </Defs>
-        <Path
+      <Svg height={height} width={width}>
+        <Path // Stroke Path
           d={d}
           stroke={color}
           strokeWidth="3"
           fill="none"
         />
-        {/* Fill area below logic omitted for simplicity, just line for now */}
+      </Svg>
       </Svg>
     </View>
   );
