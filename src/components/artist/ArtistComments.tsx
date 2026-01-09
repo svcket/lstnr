@@ -218,8 +218,8 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 12 : 8,
   },
   inputWrapperFocused: {
-    backgroundColor: '#FFF',
     borderColor: '#FFF',
+    // Background remains default (transparent/dark)
   },
   input: {
     color: '#FFF',
@@ -228,7 +228,9 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   inputFocused: {
-    color: '#000',
+    // Text color remains white (inherited from input) or explicitly set if needed, but 'color: #000' was the issue.
+    // User wants text inside to be white.
+    color: '#FFF',
   },
   actionRow: {
     flexDirection: 'row',

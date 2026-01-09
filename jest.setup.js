@@ -18,7 +18,22 @@ jest.mock('lucide-react-native', () => ({
   EyeOff: 'EyeOff',
   Check: 'Check',
   ChevronDown: 'ChevronDown',
+  ChevronUp: 'ChevronUp',
   ChevronLeft: 'ChevronLeft',
+  ArrowLeft: 'ArrowLeft',
+  Share: 'Share',
+  Copy: 'Copy',
+  Info: 'Info',
+  Globe: 'Globe',
+  Music: 'Music',
+  PlayCircle: 'PlayCircle',
+  Twitter: 'Twitter',
+  Instagram: 'Instagram',
+  MessageCircle: 'MessageCircle',
+  Disc: 'Disc',
+  MoreVertical: 'MoreVertical',
+  Heart: 'Heart',
+  CornerDownRight: 'CornerDownRight',
 }), { virtual: true });
 
 // Mock Expo Vector Icons similarly (ionic, crypto-icons etc) if used

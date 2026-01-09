@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontFamily: FONT_FAMILY.header,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   buyText: {
