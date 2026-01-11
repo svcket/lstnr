@@ -43,6 +43,7 @@ export const FONT_FAMILY = {
   body: 'ClashDisplay-Regular',   // Body + Microcopy
   header: 'ClashDisplay-Medium',  // Section Headers
   balance: 'ClashDisplay-Bold',   // Key numeric values
+  mono: 'ClashDisplay-Medium',    // Tickers/Code (Alias to Medium for now)
   
   // Legacy/Helpers
   bodyBold: 'ClashDisplay-Bold', // Ensure this maps to Bold

@@ -28,12 +28,47 @@ export interface ArtistMarket {
   holderChange7d: number; // Percent
   circulatingSupply: number;
   
+  holdersList: Array<{
+    id: string;
+    name: string;
+    avatar?: string;
+    sharesOwned: number;
+    followersCount: number;
+    isFollowing: boolean;
+  }>;
+  
   bio: string;
   links?: Record<string, string>;
   
-  
   // MCS Factors
   volatilityIndex: number; // 0-1, high is bad
+
+  activityList: Array<{
+    id: string;
+    user: {
+      username: string;
+      avatarUrl: string;
+      shares: number;
+      followers: number;
+      isFollowing: boolean;
+      isSelf: boolean;
+    };
+    type: 'acquired' | 'released';
+    deltaShares: number;
+    symbol: string;
+    percent: number;
+    timestampLabel?: string;
+  }>;
+  
+  predictionsList: Array<{
+    id: string;
+    question: string;
+    yesPrice: number; // In cents (e.g. 58.5)
+    noPrice: number;
+    volume: number;
+    chance: number; // 0-100
+    resolvesAt: string;
+  }>;
   
   creator: Creator;
   
@@ -103,6 +138,115 @@ const generateSeries = (basePrice: number, points: number, volatility: number): 
   return data;
 };
 
+const generateHolders = (count: number, totalShares: number) => {
+  const holders = [];
+  const names = ['username123', 'walletxyz.eth', 'artfan007', 'vibehunter', 'nftcollector', 'melodywave', 'creatormind', 'tokenlady', 'cryptoking', 'musiclover'];
+  
+  // Distribute shares (Power law)
+  let remainingShares = totalShares;
+  
+  for (let i = 0; i < count; i++) {
+    const isTop = i < 10;
+    // Top holders have much more
+    const share = isTop 
+       ? Math.floor(remainingShares * (Math.random() * 0.1 + 0.05)) // 5-15%
+       : Math.floor(remainingShares * (Math.random() * 0.01)); // Small amts
+       
+    remainingShares -= share;
+    if (remainingShares <= 0) break;
+
+    holders.push({
+      id: `h_${i}`,
+      name: names[i % names.length] + (i > 9 ? `_${i}` : ''),
+      avatar: `https://i.pravatar.cc/150?u=h_${i}`,
+      sharesOwned: Math.max(1, share), // Ensure at least 1
+      followersCount: Math.floor(Math.random() * 500),
+      isFollowing: Math.random() > 0.8, // 20% chance following
+    });
+  }
+  
+  return holders.sort((a, b) => b.sharesOwned - a.sharesOwned);
+};
+
+const generateActivity = (count: number) => {
+  const items = [];
+  const names = ['username123', 'walletxyz.eth', 'artfan007', 'vibehunter', 'nftcollector', 'melodywave', 'creatormind', 'tokenlady', 'bluenoise.eth', 'soundscaper'];
+  
+  for (let i = 0; i < count; i++) {
+    const isAcquired = Math.random() > 0.4; // 60% acquired
+    const isSelf = i === 2; // Fixed self item
+    
+    items.push({
+      id: `act_${i}`,
+      user: {
+        username: names[i % names.length],
+        avatarUrl: `https://i.pravatar.cc/150?u=act_${i}`,
+        shares: Math.floor(Math.random() * 1000) + 50,
+        followers: Math.floor(Math.random() * 500),
+        isFollowing: Math.random() > 0.7,
+        isSelf: isSelf,
+      },
+      type: isAcquired ? 'acquired' : 'released',
+      deltaShares: 420, // Fixed as per mock image/request
+      symbol: 'BIGT', // Fixed as per mock image
+      percent: parseFloat((Math.random() * 3).toFixed(2)),
+      timestampLabel: `${i * 15 + 2}m ago`, // Mock time
+    } as const);
+  }
+  
+  return items;
+};
+
+const generatePredictions = () => {
+  return [
+    {
+      id: 'p1',
+      question: 'Would Tomi Obanure release an album in 2025?',
+      yesPrice: 5.8,
+      noPrice: 94.5,
+      volume: 369000,
+      chance: 90,
+      resolvesAt: '2025-12-31'
+    },
+    {
+      id: 'p2',
+      question: 'Would Tomi Obanure win the “Headies Next Rated Artist Award in 2026?”',
+      yesPrice: 32.4,
+      noPrice: 67.6,
+      volume: 125000,
+      chance: 27,
+      resolvesAt: '2026-09-01'
+    },
+    {
+      id: 'p3',
+      question: 'Will Tomi Obanure appear on COLORS Studios by 2026?',
+      yesPrice: 15.2,
+      noPrice: 84.8,
+      volume: 54000,
+      chance: 15,
+      resolvesAt: '2026-06-01'
+    },
+    {
+      id: 'p4',
+      question: 'Will Tomi Obanure appear on a project produced by Sarz in 2026?',
+      yesPrice: 78.5,
+      noPrice: 21.5,
+      volume: 890000,
+      chance: 78,
+      resolvesAt: '2026-12-31'
+    },
+    {
+      id: 'p5',
+      question: 'Will Tomi Obanure hit 1M monthly listeners on Spotify by Q3 2025?',
+      yesPrice: 45.0,
+      noPrice: 55.0,
+      volume: 42000,
+      chance: 45,
+      resolvesAt: '2025-09-30'
+    }
+  ];
+};
+
 export const MOCK_ARTIST: ArtistMarket = {
   id: 'a1',
   name: 'Neon Dust',
@@ -113,13 +257,17 @@ export const MOCK_ARTIST: ArtistMarket = {
   ath: 58.00,
   marketCap: 10850, // 10.8k
   volume24h: 369000,
-  avgVolume7d: 300000, // Healthy volume
+  avgVolume7d: 300000, 
   change24h: 12.5,
   holders: 1240,
   holderChange7d: 3.2,
   circulatingSupply: 240000,
-  volatilityIndex: 0.2, // Relatively stable
+  volatilityIndex: 0.2,
   
+  holdersList: generateHolders(50, 240000),
+  activityList: generateActivity(20),
+  predictionsList: generatePredictions(),
+
   bio: 'Electronic avant-garde collective redefining the sound of the void.',
   links: {
     'Spotify': 'https://spotify.com',
@@ -141,7 +289,7 @@ export const MOCK_ARTIST: ArtistMarket = {
   priceHistory: {
     '1m': generateSeries(45, 20, 0.2),
     '5m': generateSeries(44, 30, 0.5),
-    '15m': generateSeries(40, 40, 1.0), // More volatile
+    '15m': generateSeries(40, 40, 1.0),
     '30m': generateSeries(38, 50, 2.0),
     'All': generateSeries(10, 100, 5.0),
   }

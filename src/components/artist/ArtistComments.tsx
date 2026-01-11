@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Platform, Keyboard } from 'react-native';
-import { MoreVertical, Heart, MessageCircle, CornerDownRight, ChevronDown, ChevronUp } from 'lucide-react-native';
-import { COLORS, FONT_FAMILY, SPACING, BORDER_RADIUS } from '../../constants/theme';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Platform, Keyboard, LayoutAnimation, UIManager } from 'react-native';
+import { MoreVertical, Heart, CornerDownRight, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { COLORS, FONT_FAMILY } from '../../constants/theme';
 
-// 3) Data + state (local mock)
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+// 1) Updated Data Structure
 type Comment = {
   id: string;
   user: { name: string; avatar?: string };
-  createdAt: string; // “3mins”
-  symbol: string; // “$BIGT”
-  stance?: "yes" | "no";
+  createdAt: string; 
+  symbol?: string; // If present, used for display. If missing/flagged, non-holder.
+  isHolder: boolean; 
   text: string;
-  likes: string; // User requested "1.3k" string format in UI
-  repliesCount?: number;
+  likes: number; 
+  liked?: boolean;
+  replies?: Comment[];
 };
 
 const MOCK_COMMENTS: Comment[] = [
@@ -21,29 +26,62 @@ const MOCK_COMMENTS: Comment[] = [
     user: { name: 'Obongjayar', avatar: 'https://i.pravatar.cc/150?u=obong' },
     createdAt: '3mins',
     symbol: '$BIGT',
-    stance: 'yes',
+    isHolder: true,
     text: 'If you wanna waste time, you should just walk out the way you came',
-    likes: '1.3k',
-    repliesCount: 7,
+    likes: 1300,
+    liked: false,
+    replies: [
+        {
+            id: 'c1_r1',
+            user: { name: 'Sarah J', avatar: 'https://i.pravatar.cc/150?u=sarah' },
+            createdAt: '1min',
+            symbol: '$BIGT',
+            isHolder: true,
+            text: 'Exactly! 💯',
+            likes: 5,
+            replies: [
+                 {
+                    id: 'c1_r1_sr1',
+                    user: { name: 'Obongjayar', avatar: 'https://i.pravatar.cc/150?u=obong' },
+                    createdAt: 'Just now',
+                    isHolder: true,
+                    symbol: '$BIGT',
+                    text: 'Thanks for the support!',
+                    likes: 1,
+                    replies: []
+                 }
+            ]
+        },
+        {
+            id: 'c1_r2',
+            user: { name: 'Newbie', avatar: 'https://i.pravatar.cc/150?u=new' },
+            createdAt: '2mins',
+            isHolder: false, // Non-holder example
+            text: 'Is this a good entry point?',
+            likes: 0,
+            replies: []
+        }
+    ]
   },
   {
     id: 'c2',
-    user: { name: 'Obongjayar', avatar: 'https://i.pravatar.cc/150?u=obong2' },
-    createdAt: '3mins',
+    user: { name: 'CryptoKing', avatar: 'https://i.pravatar.cc/150?u=king' },
+    createdAt: '15mins',
     symbol: '$BIGT',
-    stance: 'no',
-    text: 'If you wanna waste time, you should just walk out the way you came',
-    likes: '1.3k',
-    repliesCount: 2,
+    isHolder: true,
+    text: 'Bullish divergence on the 15m chart. LFG! 🚀',
+    likes: 450,
+    liked: true,
+    replies: []
   },
   {
     id: 'c3',
-    user: { name: 'Obongjayar', avatar: 'https://i.pravatar.cc/150?u=obong3' },
-    createdAt: '3mins',
-    symbol: '$BIGT', // No stance
-    text: 'If you wanna waste time, you should just walk out the way you came',
-    likes: '1.3k',
-    repliesCount: 0,
+    user: { name: 'BearishBob', avatar: 'https://i.pravatar.cc/150?u=bob' },
+    createdAt: '1h',
+    isHolder: false,
+    text: 'Waiting for a dip...',
+    likes: 12,
+    replies: []
   }
 ];
 
@@ -60,12 +98,13 @@ export const ArtistComments = () => {
       user: { name: 'You', avatar: 'https://i.pravatar.cc/150?u=you' },
       createdAt: 'Just now',
       symbol: '$BIGT',
-      stance: 'yes', 
+      isHolder: true,
       text: inputText,
-      likes: '0',
-      repliesCount: 0,
+      likes: 0,
+      replies: [],
     };
     
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setComments([newComment, ...comments]);
     setInputText('');
     Keyboard.dismiss();
@@ -80,7 +119,7 @@ export const ArtistComments = () => {
 
   return (
     <View style={styles.container}>
-      {/* 2) Comment Composer */}
+      {/* Composer */}
       <View style={styles.composerContainer}>
          <View style={[styles.inputWrapper, isFocused && styles.inputWrapperFocused]}>
             <TextInput 
@@ -95,7 +134,6 @@ export const ArtistComments = () => {
             />
          </View>
          
-         {/* Action Row (Visible when focused or has text) */}
          {isFocused && (
            <View style={styles.actionRow}>
               <TouchableOpacity onPress={handleCancel}>
@@ -113,7 +151,7 @@ export const ArtistComments = () => {
          )}
       </View>
 
-      {/* 1) Comments List or Empty State */}
+      {/* Comments List */}
       {comments.length === 0 ? (
         <View style={styles.emptyContainer}>
            <View style={styles.mascotPlaceholder}>
@@ -124,7 +162,12 @@ export const ArtistComments = () => {
       ) : (
         <View style={styles.listContainer}>
            {comments.map((comment, index) => (
-             <CommentItem key={comment.id} comment={comment} isLast={index === comments.length - 1} />
+             <CommentItem 
+                key={comment.id} 
+                comment={comment} 
+                isLast={index === comments.length - 1} 
+                depth={0}
+             />
            ))}
         </View>
       )}
@@ -132,56 +175,111 @@ export const ArtistComments = () => {
   );
 };
 
-const CommentItem = ({ comment, isLast }: { comment: Comment; isLast: boolean }) => {
+const formatLikes = (count: number) => {
+    if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+    return count.toString();
+};
+
+const CommentItem = ({ comment, isLast, depth }: { comment: Comment; isLast: boolean; depth: number }) => {
   const [repliesExpanded, setRepliesExpanded] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
+  const [liked, setLiked] = useState(comment.liked || false);
+  const [likeCount, setLikeCount] = useState(comment.likes);
+  const [replyText, setReplyText] = useState('');
+
+  const toggleLike = () => {
+      setLiked(!liked);
+      setLikeCount(prev => liked ? prev - 1 : prev + 1);
+  };
+
+  const toggleReplyInput = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsReplying(!isReplying);
+  };
+
+  const toggleRepliesView = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setRepliesExpanded(!repliesExpanded);
+  };
+
+  const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
-    <View style={[styles.row, !isLast && styles.rowBorder]}>
-      {/* Left Avatar */}
-      <Image source={{ uri: comment.user.avatar }} style={styles.avatar} />
+    <View style={[
+        styles.row, 
+        !isLast && depth === 0 && styles.rowBorder,
+        { marginLeft: depth * 16 } // Indentation for nested replies
+    ]}>
+      {/* Avatar */}
+      <Image source={{ uri: comment.user.avatar }} style={[styles.avatar, { width: depth > 0 ? 24 : 32, height: depth > 0 ? 24 : 32 }]} />
       
-      {/* Body */}
       <View style={styles.body}>
-         {/* Header Row */}
+         {/* Header */}
          <View style={styles.headerRow}>
             <Text style={styles.username}>{comment.user.name}</Text>
             <Text style={styles.dot}>•</Text>
             <Text style={styles.timestamp}>{comment.createdAt}</Text>
          </View>
          
-         {/* Chip Row - Stance removed */}
-         <View style={styles.chipRow}>
-            <View style={styles.tokenChip}>
-               <Text style={styles.chipText}>{comment.symbol}</Text>
-            </View>
-            {/* Stance removed for now as per request */}
-         </View>
+         {/* Token Pill (Holders Only) */}
+         {comment.isHolder && comment.symbol && (
+             <View style={styles.chipRow}>
+                <View style={styles.tokenChip}>
+                   <Text style={styles.chipText}>{comment.symbol}</Text>
+                </View>
+             </View>
+         )}
          
-         {/* Comment Text */}
+         {/* Text */}
          <Text style={styles.commentText}>{comment.text}</Text>
          
-         {/* Actions Row - Upscaled */}
+         {/* Actions */}
          <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.actionBtn}>
-               <Heart size={16} color="#666" />
-               <Text style={styles.actionCount}>{comment.likes}</Text>
+            <TouchableOpacity style={styles.actionBtn} onPress={toggleLike}>
+               <Heart size={16} color={liked ? "#EF4444" : "#666"} fill={liked ? "#EF4444" : "transparent"} />
+               <Text style={[styles.actionCount, liked && { color: "#EF4444" }]}>{formatLikes(likeCount)}</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.actionBtn}>
+            <TouchableOpacity style={styles.actionBtn} onPress={toggleReplyInput}>
                <CornerDownRight size={16} color="#666" />
                <Text style={styles.actionLabel}>Reply</Text>
             </TouchableOpacity>
          </View>
 
-         {/* Replies Link */}
-         {comment.repliesCount && comment.repliesCount > 0 ? (
+         {/* Inline Reply Input */}
+         {isReplying && (
+             <View style={styles.inlineComposer}>
+                 <TextInput
+                    style={styles.replyInput}
+                    placeholder="Write a reply..."
+                    placeholderTextColor="#666"
+                    value={replyText}
+                    onChangeText={setReplyText}
+                    autoFocus
+                    multiline
+                 />
+                 <View style={styles.inlineActions}>
+                    <TouchableOpacity onPress={toggleReplyInput}>
+                        <Text style={styles.replyCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={[styles.replyPostBtn, !replyText.trim() && { opacity: 0.5, backgroundColor: '#333' }]}
+                        disabled={!replyText.trim()}
+                    >
+                        <Text style={[styles.replyPostText, !replyText.trim() && { color: '#666' }]}>Post</Text>
+                    </TouchableOpacity>
+                 </View>
+             </View>
+         )}
+
+         {/* View/Hide Replies Toggle */}
+         {hasReplies && (
             <TouchableOpacity 
-               style={styles.repliesRow} 
-               onPress={() => setRepliesExpanded(!repliesExpanded)}
+               style={styles.repliesToggle} 
+               onPress={toggleRepliesView}
             >
-               <View style={styles.repliesLine} />
                <Text style={styles.repliesText}>
-                  {repliesExpanded ? 'Hide' : 'View'} {comment.repliesCount} replies
+                  {repliesExpanded ? 'Hide' : 'View'} {comment.replies?.length} replies
                </Text>
                {repliesExpanded ? (
                  <ChevronUp size={14} color="#666" /> 
@@ -189,13 +287,29 @@ const CommentItem = ({ comment, isLast }: { comment: Comment; isLast: boolean })
                  <ChevronDown size={14} color="#666" />
                )}
             </TouchableOpacity>
-         ) : null}
+         )}
+
+         {/* Render Nested Replies */}
+         {repliesExpanded && hasReplies && (
+             <View style={styles.nestedContainer}>
+                 {comment.replies!.map((reply, idx) => (
+                     <CommentItem 
+                        key={reply.id} 
+                        comment={reply} 
+                        isLast={idx === comment.replies!.length - 1}
+                        depth={depth + 1}
+                     />
+                 ))}
+             </View>
+         )}
       </View>
       
-      {/* Right Menu */}
-      <TouchableOpacity style={styles.menuBtn}>
-         <MoreVertical size={16} color="#666" />
-      </TouchableOpacity>
+      {/* Menu - Only top level */}
+      {depth === 0 && (
+          <TouchableOpacity style={styles.menuBtn}>
+             <MoreVertical size={16} color="#666" />
+          </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -219,7 +333,6 @@ const styles = StyleSheet.create({
   },
   inputWrapperFocused: {
     borderColor: '#FFF',
-    // Background remains default (transparent/dark)
   },
   input: {
     color: '#FFF',
@@ -228,8 +341,6 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   inputFocused: {
-    // Text color remains white (inherited from input) or explicitly set if needed, but 'color: #000' was the issue.
-    // User wants text inside to be white.
     color: '#FFF',
   },
   actionRow: {
@@ -240,12 +351,12 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   cancelText: {
-    color: '#FFF', // White as requested
+    color: '#FFF', 
     fontFamily: FONT_FAMILY.header,
     fontSize: 14,
   },
   postButton: {
-    backgroundColor: '#FFF', // White active state
+    backgroundColor: '#FFF', 
     paddingVertical: 6,
     paddingHorizontal: 16,
     borderRadius: 16,
@@ -254,7 +365,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
   },
   postText: {
-    color: '#000', // Black text on white button
+    color: '#000', 
     fontFamily: FONT_FAMILY.header,
     fontSize: 14,
   },
@@ -279,9 +390,7 @@ const styles = StyleSheet.create({
   },
 
   // List
-  listContainer: {
-    
-  },
+  listContainer: {},
   row: {
     flexDirection: 'row',
     paddingBottom: 16,
@@ -327,8 +436,7 @@ const styles = StyleSheet.create({
   chipRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-    gap: 6,
+    marginBottom: 4,
   },
   tokenChip: {
     backgroundColor: '#181818',
@@ -358,6 +466,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 20,
+    marginBottom: 8, 
   },
   actionBtn: {
     flexDirection: 'row',
@@ -366,31 +475,71 @@ const styles = StyleSheet.create({
   },
   actionCount: {
     color: '#999',
-    fontSize: 14, // Increased from 12
+    fontSize: 14, 
     fontFamily: FONT_FAMILY.header,
   },
   actionLabel: {
     color: '#999',
-    fontSize: 14, // Increased from 12
+    fontSize: 14, 
     fontFamily: FONT_FAMILY.header,
   },
-  
+
   // Replies
-  repliesRow: {
+  repliesToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 8,
     gap: 8,
-  },
-  repliesLine: {
-    width: 20,
-    height: 1,
-    backgroundColor: '#333',
   },
   repliesText: {
     color: '#666',
     fontSize: 12,
     fontFamily: FONT_FAMILY.header,
+  },
+  nestedContainer: {
+      marginTop: 16,
+  },
+  
+  // Inline Composer
+  inlineComposer: {
+      marginTop: 8,
+      marginBottom: 16,
+  },
+  replyInput: {
+      minHeight: 48,
+      backgroundColor: '#111',
+      borderRadius: 12, // Cornered
+      padding: 16, // Uniform padding (Top/Left/Right/Bottom)
+      paddingTop: 16, // Explicit equality
+      color: '#FFF',
+      fontFamily: FONT_FAMILY.body,
+      fontSize: 14,
+      borderWidth: 1,
+      borderColor: '#333',
+      marginBottom: 8,
+      textAlignVertical: 'top', 
+  },
+  inlineActions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: 12,
+  },
+  replyCancelText: {
+      color: '#FFF',
+      fontFamily: FONT_FAMILY.header,
+      fontSize: 13,
+  },
+  replyPostBtn: {
+      backgroundColor: '#FFF',
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      borderRadius: 16,
+  },
+  replyPostText: {
+      color: '#000',
+      fontFamily: FONT_FAMILY.header,
+      fontSize: 13,
   },
   
   // Menu

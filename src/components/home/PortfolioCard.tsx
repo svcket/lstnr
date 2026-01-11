@@ -58,7 +58,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   change: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.balance, // Bold (Currency)
+    fontWeight: '700',
     fontSize: FONT_SIZE.m,
   },
   period: {

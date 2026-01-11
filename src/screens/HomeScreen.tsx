@@ -182,7 +182,7 @@ export const HomeScreen = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Good evening</Text>
+          <Text style={styles.greeting}>Wallet</Text>
           <View style={styles.headerRight}>
             <TouchableOpacity 
               onPress={() => navigation.navigate('Updates')}
@@ -251,7 +251,10 @@ export const HomeScreen = () => {
             <>
               {/* Your Shares */}
               <View style={styles.section}>
-                 <SectionHeader title="Your shares" />
+                 <SectionHeader 
+                   title="Your shares" 
+                   onPress={() => navigation.navigate('Shares')}
+                 />
                  <View style={styles.card}>
                     {MOCK_SHARES.map((share, index) => (
                       <TouchableOpacity 
@@ -275,7 +278,10 @@ export const HomeScreen = () => {
 
               {/* Your Predictions */}
               <View style={styles.section}>
-                  <SectionHeader title="Your predictions" />
+                  <SectionHeader 
+                    title="Your predictions" 
+                    onPress={() => navigation.navigate('Predictions')}
+                  />
                   <ScrollView 
                     horizontal 
                     showsHorizontalScrollIndicator={false} 
@@ -294,7 +300,10 @@ export const HomeScreen = () => {
 
               {/* Recent Activity */}
               <View style={styles.section}>
-                 <SectionHeader title="Recent activity" />
+                 <SectionHeader 
+                    title="Recent activity" 
+                    onPress={() => navigation.navigate('Activity')}
+                 />
                   <View style={styles.card}>
                      {MOCK_ACTIVITY.map((item, index) => {
                         const isMoneyOut = item.text.includes('Bought') || item.amount.includes('-');
@@ -355,7 +364,7 @@ export const HomeScreen = () => {
 
         </ScrollView>
 
-        <BottomNav />
+        <BottomNav activeTab="Wallet" />
       </SafeAreaView>
     </View>
   );

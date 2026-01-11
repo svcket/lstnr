@@ -29,6 +29,9 @@ export const ICONS = {
   navInboxActive: require('../assets/icons/nav-inbox-active.png'),
   navInboxInactive: require('../assets/icons/nav-inbox-inactive.png'),
 
+  navWalletActive: require('../assets/icons/nav-wallet-active.png'),
+  navWalletInactive: require('../assets/icons/nav-wallet-inactive.png'),
+
   // Feed Icons
   notifications: require('../assets/icons/icon-notifications.png'),
   updates: require('../assets/icons/icon-updates.png'),

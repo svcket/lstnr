@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
     borderColor: '#FF3B30', // Soft Red
   },
   btnText: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.balance,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   buyText: {
     color: '#00FF94',

@@ -11,6 +11,10 @@ import { BuySellBar } from '../components/artist/BuySellBar';
 import { InfoModal } from '../components/common/InfoModal';
 import { TradeSheet } from '../components/artist/TradeSheet';
 import { ArtistComments } from '../components/artist/ArtistComments';
+import { ArtistHolders } from '../components/artist/ArtistHolders';
+import { ArtistActivity } from '../components/artist/ArtistActivity';
+import { ArtistPredictions } from '../components/artist/ArtistPredictions';
+import { ShareSheet } from '../components/artist/ShareSheet';
 
 const { width } = Dimensions.get('window');
 const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
@@ -25,9 +29,17 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
   const [tradeSheetMode, setTradeSheetMode] = useState<'BUY' | 'SELL' | null>(null);
   const [mcs, setMcs] = useState(0);
   const [infoModal, setInfoModal] = useState({ visible: false, title: '', description: '' });
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
+  const [isWatchlisted, setIsWatchlisted] = useState(false);
+  const [scrubbedPrice, setScrubbedPrice] = useState<number | null>(null);
 
   const openInfo = (title: string, description: string) => {
     setInfoModal({ visible: true, title, description });
+  };
+  
+  const toggleWatchlist = () => {
+      setIsWatchlisted(!isWatchlisted);
+      // In real app, this would call an API
   };
 
   useEffect(() => {
@@ -83,8 +95,12 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <Eye size={24} color="#FFF" />
-          <Share size={24} color="#FFF" />
+          <TouchableOpacity onPress={toggleWatchlist}>
+             <Eye size={24} color={isWatchlisted ? COLORS.primary : "#FFF"} fill={isWatchlisted ? COLORS.primary : "transparent"} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShareSheetVisible(true)}>
+             <Share size={24} color="#FFF" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -118,11 +134,14 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
                   width={width - 48} // Reserve space for Y-axis
                   height={180} 
                   color={COLORS.success} 
+                  onScrub={(value) => setScrubbedPrice(value)}
                 />
               </View>
               {/* Right Y-Axis */}
               <View style={styles.yAxis}>
-                 <Text style={styles.axisLabel}>${maxPrice.toFixed(2)}</Text>
+                 <Text style={[styles.axisLabel, scrubbedPrice !== null ? { color: COLORS.white, fontWeight: '700' } : undefined]}>
+                    ${(scrubbedPrice !== null ? scrubbedPrice : currentSeries[currentSeries.length-1].value).toFixed(2)}
+                 </Text>
                  <Text style={styles.axisLabel}>${((maxPrice + minPrice)/2).toFixed(2)}</Text>
                  <Text style={styles.axisLabel}>${minPrice.toFixed(2)}</Text>
               </View>
@@ -150,6 +169,18 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
             <View style={styles.tabContent}>
                 <ArtistComments />
             </View>
+        ) : activeTab === 'Holders' ? (
+             <View style={styles.tabContent}>
+                <ArtistHolders artist={artist} />
+             </View>
+        ) : activeTab === 'Activity' ? (
+              <View style={styles.tabContent}>
+                <ArtistActivity artist={artist} />
+              </View>
+        ) : activeTab === 'Predictions' ? (
+              <View style={styles.tabContent}>
+                <ArtistPredictions artist={artist} />
+              </View>
         ) : activeTab === 'Details' && (
                <View style={styles.tabContent}>
                  {/* Stats Grid */}
@@ -264,6 +295,12 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
           title={infoModal.title}
           description={infoModal.description}
           onClose={() => setInfoModal(prev => ({ ...prev, visible: false }))}
+       />
+       
+       <ShareSheet 
+          visible={shareSheetVisible}
+          onClose={() => setShareSheetVisible(false)}
+          artistName={artist.name}
        />
     </View>
     </KeyboardAvoidingView>
@@ -433,8 +470,9 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: '#FFF',
-    fontSize: 16, // 16px
+    fontSize: 14, // Reduced to 14px as requested
     fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit Bold
     marginBottom: 4,
   },
 
@@ -469,8 +507,9 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   bioValue: {
-    fontSize: 16, // 16px Bold
+    fontSize: 14, // Reduced to 14px as requested
     fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '700', // Explicit Bold
   },
   
   // Links
