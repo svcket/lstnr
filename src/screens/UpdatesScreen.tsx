@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: FONT_FAMILY.header,
+    fontWeight: '600',
     fontSize: 18,
     color: COLORS.text,
     letterSpacing: 1,

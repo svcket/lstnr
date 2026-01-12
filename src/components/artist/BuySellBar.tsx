@@ -7,19 +7,28 @@ import { COLORS, FONT_FAMILY } from '../../constants/theme';
 interface BuySellBarProps {
   onBuy: () => void;
   onSell: () => void;
+  price?: string;
 }
 
-export const BuySellBar = ({ onBuy, onSell }: BuySellBarProps) => {
+export const BuySellBar = ({ onBuy, onSell, price }: BuySellBarProps) => {
   // Using a View fallback if BlurView has issues, but trying Blur for premium feel.
   // Actually, safe bet is solid black with top border as per constraints "slight blur or solid #000000".
   
   return (
     <View style={styles.container}>
+      {/* Price Display (Optional) */}
+      {price && (
+        <View style={styles.priceContainer}>
+            <Text style={styles.priceLabel}>Current Price</Text>
+            <Text style={styles.priceValue}>{price}</Text>
+        </View>
+      )}
+
       {/* Buy Button: Black fill, Neon Green Outline, Green Text */}
       <TouchableOpacity style={[styles.btn, styles.buyBtn]} onPress={onBuy} activeOpacity={0.8}>
         <Text style={[styles.btnText, styles.buyText]}>Buy</Text>
       </TouchableOpacity>
-
+      
       {/* Sell Button: Black fill, Red Outline, Red Text */}
       <TouchableOpacity style={[styles.btn, styles.sellBtn]} onPress={onSell} activeOpacity={0.8}>
         <Text style={[styles.btnText, styles.sellText]}>Sell</Text>
@@ -68,6 +77,20 @@ const styles = StyleSheet.create({
   },
   sellText: {
     color: '#FF3B30',
-  }
-
+  },
+  priceContainer: {
+      justifyContent: 'center',
+      paddingRight: 16,
+  },
+  priceLabel: {
+      fontFamily: FONT_FAMILY.body,
+      fontSize: 10,
+      color: '#666',
+  },
+  priceValue: {
+      fontFamily: FONT_FAMILY.balance,
+      fontSize: 16,
+      fontWeight: '700',
+      color: '#FFF',
+  },
 });

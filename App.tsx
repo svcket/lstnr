@@ -9,6 +9,8 @@ import * as Font from 'expo-font';
 // Google Fonts imports removed - utilizing ClashDisplay locally
 import TestScreen from './src/screens/TestScreen';
 
+import { runDataIntegrityChecks } from './src/utils/devAssertions';
+
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
@@ -21,10 +23,6 @@ export default function App() {
           // 'ClashDisplay-Medium': require('./assets/fonts/ClashDisplay-Medium.otf'),
           // 'ClashDisplay-Semibold': require('./assets/fonts/ClashDisplay-Semibold.otf'),
           // 'ClashDisplay-Bold': require('./assets/fonts/ClashDisplay-Bold.otf'),
-          
-          // Fallback mapping to prevent crash until files are added (mapping to valid system fonts or existing fonts if any)
-          // For now, we keep the keys valid for the theme, but maybe map to something that exists if we can?
-          // Actually, relying on system fallback if font not loaded.
         });
         setFontsLoaded(true);
       } catch (e) {
@@ -32,6 +30,9 @@ export default function App() {
       }
     }
     loadFonts();
+    
+    // Run Data Checks
+    runDataIntegrityChecks();
   }, []);
 
   if (!fontsLoaded) {

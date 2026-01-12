@@ -4,23 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
 import { ICONS } from '../constants/assets';
-
-// Mock Data for Full Activity
-const ACTIVITY_DATA = Array.from({ length: 20 }).map((_, i) => {
-   const isMoneyOut = Math.random() > 0.5;
-   return {
-     id: `act_${i}`,
-     text: isMoneyOut ? `Bought ${Math.floor(Math.random()*50)} Shares` : `Sold ${Math.floor(Math.random()*50)} Shares`,
-     time: `${i + 1}d ago`,
-     amount: isMoneyOut ? `-$${Math.floor(Math.random()*200)}` : `+$${Math.floor(Math.random()*200)}`,
-     isMoneyOut
-   };
-});
+// Dynamic Data
+import { getRecentActivity } from '../data/catalog';
 
 export const ActivityScreen = () => {
-    
+  const activityData = getRecentActivity();
+
   // Using FlatList for infinite scrolling potential
-  const renderItem = ({ item, index }: { item: typeof ACTIVITY_DATA[0], index: number }) => (
+  const renderItem = ({ item, index }: { item: any, index: number }) => (
     <View style={styles.itemContainer}>
        <View style={styles.left}>
          <Image 
@@ -36,7 +27,7 @@ export const ActivityScreen = () => {
        <Text style={styles.amount}>{item.amount}</Text>
        
        {/* Divider (except last) */}
-       {index < ACTIVITY_DATA.length - 1 && <View style={styles.separator} />}
+       {index < activityData.length - 1 && <View style={styles.separator} />}
     </View>
   );
 
@@ -53,7 +44,7 @@ export const ActivityScreen = () => {
           {/* FIXED CARD CONTAINER */}
            <View style={styles.cardContainer}>
               <FlatList 
-                data={ACTIVITY_DATA}
+                data={activityData}
                 keyExtractor={item => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContent}
@@ -81,7 +72,8 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerTitle: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
+    fontWeight: '600', // Semibold
     fontSize: 18,
     color: '#FFF',
   },
@@ -118,7 +110,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   title: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 15,
     color: '#FFF',
     marginBottom: 4,

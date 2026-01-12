@@ -11,10 +11,14 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import { UpdatesScreen } from '../screens/UpdatesScreen';
 import { ArtistDetailScreen } from '../screens/ArtistDetailScreen';
 import { LabelDetailScreen } from '../screens/LabelDetailScreen';
+import { TrendingArtistsScreen } from '../screens/TrendingArtistsScreen';
+import { PopularLabelsScreen } from '../screens/PopularLabelsScreen';
+import { TopPredictionsScreen } from '../screens/TopPredictionsScreen';
 import { SharesScreen } from '../screens/SharesScreen';
 import { PredictionsScreen } from '../screens/PredictionsScreen';
 import { ActivityScreen } from '../screens/ActivityScreen';
 import { LearnScreen } from '../screens/LearnScreen';
+import { PredictionDetailScreen } from '../screens/PredictionDetailScreen';
 
 // ... imports
 
@@ -56,11 +60,15 @@ export default function AppNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }} detachInactiveScreens={false}>
       <Stack.Screen name="Tabs" component={TabNavigator} />
       <Stack.Screen name="ArtistDetail" component={ArtistDetailScreen} />
+      <Stack.Screen name="TrendingArtists" component={TrendingArtistsScreen} />
+      <Stack.Screen name="PopularLabels" component={PopularLabelsScreen} />
+      <Stack.Screen name="TopPredictions" component={TopPredictionsScreen} />
       <Stack.Screen name="LabelDetail" component={LabelDetailScreen} />
       <Stack.Screen name="Shares" component={SharesScreen} />
       <Stack.Screen name="Predictions" component={PredictionsScreen} />
       <Stack.Screen name="Activity" component={ActivityScreen} />
       <Stack.Screen name="Learn" component={LearnScreen} />
+      <Stack.Screen name="PredictionDetail" component={PredictionDetailScreen} />
     </Stack.Navigator>
   );
 }

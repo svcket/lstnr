@@ -17,7 +17,7 @@ export const PortfolioCard = ({
 }: PortfolioCardProps) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Portfolio</Text>
+      <Text style={styles.label}>Balance</Text>
       <Text style={styles.value}>{totalValue}</Text>
       
       <View style={styles.row}>

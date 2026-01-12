@@ -33,11 +33,7 @@ export const LearnScreen = () => {
          </View>
        </View>
        
-       <Image 
-          source={ICONS.chevronRight} 
-          style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }} 
-          resizeMode="contain"
-       />
+
        
        {/* Divider (except last) */}
        {index < LEARN_DATA.length - 1 && <View style={styles.separator} />}
@@ -85,7 +81,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerTitle: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 18,
     color: '#FFF',
   },
@@ -125,7 +121,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   title: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 15,
     color: '#FFF',
     marginBottom: 2,

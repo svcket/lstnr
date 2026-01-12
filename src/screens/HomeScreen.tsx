@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Bell } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { ICONS } from '../constants/assets';
+// Dynamic Data
+import { getPortfolio, getArtistById, getAllPredictions, getRecentActivity } from '../data/catalog';
+import { getEntityMetrics } from '../lib/mockMetrics';
+import { EntityRow } from '../components/common/EntityRow';
 
 // Components
 import { PortfolioCard } from '../components/home/PortfolioCard';
@@ -15,10 +18,6 @@ import { HorizontalCard } from '../components/home/HorizontalCard';
 
 // --- SPACING CONSTANTS (STRICT) ---
 const PAGE_X = 16;
-const CARD_PAD = 16;
-const ROW_GAP = 12;
-const SECTION_GAP = 16; 
-const STACK_GAP = 4; 
 const SPACING_CONSTANTS = { s24: 12, s32: 24, s28: 28 };
 
 // --- MOCK DATA ---
@@ -29,16 +28,8 @@ const MOCK_PORTFOLIO = {
   isPositive: true,
 };
 
-const MOCK_SHARES = [
-  { id: 'a1', artistName: 'Neon Dust', shares: '120 shares', value: '$1,840.00', change: '+6.3%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a1' },
-  { id: 'a2', artistName: 'Luna Tide', shares: '450 shares', value: '$4,250.50', change: '-2.1%', isPositive: false, avatar: 'https://i.pravatar.cc/150?u=a2' },
-  { id: 'a3', artistName: 'Steel Pulse', shares: '60 shares', value: '$840.00', change: '+1.2%', isPositive: true, avatar: 'https://i.pravatar.cc/150?u=a3' },
-];
-
-const MOCK_PREDICTIONS = [
-  { id: 'p1', title: 'Will "Neon Dust" hit Top 10?', subtitle: 'Stake: $120 • YES', type: 'prediction' as const, isPositive: true },
-  { id: 'p2', title: 'Album Release: Dec 2025', subtitle: 'Stake: $350 • YES', type: 'prediction' as const, isPositive: true },
-];
+// Predictions for now are from catalog (mock mapped)
+const PREDICTIONS_DATA = getAllPredictions();
 
 const MOCK_ACTIVITY = [
   { id: 'a1', text: 'Bought 40 Neon Dust shares', time: '2h ago', amount: '$180' },
@@ -54,12 +45,6 @@ const MOCK_LEARN = [
   { id: 'l2', title: 'Owning artist shares', subtitle: 'What you hold, what moves price.', icon: ICONS.learnShares },
   { id: 'l3', title: 'Prediction markets', subtitle: 'Binary + multi-range, simplified.', icon: ICONS.learnPredictions },
   { id: 'l4', title: 'Who decides outcomes?', subtitle: 'How markets resolve and settle.', icon: ICONS.learnResolve },
-];
-
-const MOCK_UPDATES = [
-  { id: 'u1', text: 'Neon Dust +3.1% today', time: '1h ago', type: 'gain' },
-  { id: 'u2', text: 'Your prediction "Album Release" moved to 68%', time: '4h ago', type: 'neutral' },
-  { id: 'u3', text: 'Market settled: Headies Next Rated', time: '1d ago', type: 'settled' },
 ];
 
 // --- REUSABLE COMPONENTS ---
@@ -80,10 +65,7 @@ const SectionHeader = ({ title, onPress }: { title: string; onPress?: () => void
   </TouchableOpacity>
 );
 
-// ... (omitted) ...
-
-
-// 2. Generic Row Item
+// 2. Generic Row Item (Still used for Activity/Learn)
 interface RowItemProps {
   leftIcon: React.ReactNode;
   title: string;
@@ -146,6 +128,9 @@ export const HomeScreen = () => {
   const navigation = useNavigation<any>(); 
   const [hasPositions, setHasPositions] = useState(true);
 
+  // Dynamic Portfolio
+  const portfolio = getPortfolio(); 
+
   const renderQuickAction = (
     iconSource: ImageSourcePropType, 
     label: string, 
@@ -174,6 +159,10 @@ export const HomeScreen = () => {
         <Text style={[styles.quickActionLabel, { color: iconColor }]}>{label}</Text>
     </TouchableOpacity>
   );
+  
+  const formatCurrency = (val: number) => {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+  };
 
   return (
     <View style={styles.container}>
@@ -182,7 +171,7 @@ export const HomeScreen = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Wallet</Text>
+          <Text style={styles.greeting}>Portfolio</Text>
           <View style={styles.headerRight}>
             <TouchableOpacity 
               onPress={() => navigation.navigate('Updates')}
@@ -255,24 +244,26 @@ export const HomeScreen = () => {
                    title="Your shares" 
                    onPress={() => navigation.navigate('Shares')}
                  />
-                 <View style={styles.card}>
-                    {MOCK_SHARES.map((share, index) => (
-                      <TouchableOpacity 
-                        key={share.id} 
-                        activeOpacity={0.7}
-                        onPress={() => navigation.navigate('ArtistDetail', { artistId: share.id })}
-                      >
-                        <RowItem 
-                          leftIcon={<Image source={{ uri: share.avatar }} style={styles.artistAvatar} />}
-                          title={share.artistName}
-                          subtitle={share.shares}
-                          rightTop={share.value}
-                          rightBottom={share.change}
-                          isPositive={share.isPositive}
-                          hasDivider={index < MOCK_SHARES.length - 1} 
-                        />
-                      </TouchableOpacity>
-                    ))}
+                 <View style={[styles.card, { paddingVertical: 0 }]}>
+                    {portfolio.map((item, index) => {
+                         const artist = getArtistById(item.artistId);
+                         if (!artist) return null;
+                         const metrics = getEntityMetrics(artist.id);
+                         
+                         return (
+                             <EntityRow 
+                                 key={artist.id}
+                                 name={artist.name}
+                                 avatarUrl={artist.avatarUrl}
+                                 symbol={artist.symbol}
+                                 subtitle={`${item.shares} shares`}
+                                 price={formatCurrency(metrics.price)}
+                                 changePct={metrics.changeTodayPct}
+                                 isLast={index === portfolio.length - 1}
+                                 onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
+                             />
+                         );
+                    })}
                  </View>
               </View>
 
@@ -287,11 +278,11 @@ export const HomeScreen = () => {
                     showsHorizontalScrollIndicator={false} 
                     contentContainerStyle={{ paddingHorizontal: PAGE_X }} 
                   >
-                      {MOCK_PREDICTIONS.map(pred => (
+                      {PREDICTIONS_DATA.slice(0, 2).map(pred => (
                           <HorizontalCard 
                             key={pred.id}
-                            title={pred.title}
-                            subtitle={pred.subtitle}
+                            title={pred.question}
+                            subtitle={`Ends ${new Date(pred.deadline).toLocaleDateString()}`}
                             type="prediction"
                           />
                       ))}
@@ -305,14 +296,13 @@ export const HomeScreen = () => {
                     onPress={() => navigation.navigate('Activity')}
                  />
                   <View style={styles.card}>
-                     {MOCK_ACTIVITY.map((item, index) => {
-                        const isMoneyOut = item.text.includes('Bought') || item.amount.includes('-');
+                     {getRecentActivity().map((item, index) => {
                         return (
                            <RowItem 
                               key={item.id}
                               leftIcon={
                                 <Image 
-                                  source={isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
+                                  source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
                                   style={styles.feedIcon} 
                                   resizeMode="contain" 
                                 />
@@ -320,7 +310,7 @@ export const HomeScreen = () => {
                               title={item.text}
                               subtitle={item.time}
                               rightTop={item.amount}
-                              hasDivider={index < MOCK_ACTIVITY.length - 1}
+                              hasDivider={index < getRecentActivity().length - 1}
                            />
                         );
                      })}
@@ -329,7 +319,6 @@ export const HomeScreen = () => {
             </>
           )}
 
-           {/* Learn */}
            {/* Learn */}
            <View style={styles.section}>
              <SectionHeader title="Learn" />
@@ -390,6 +379,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontFamily: FONT_FAMILY.balance, // Bold
+    fontWeight: '600', // Matches Explore greeting weight
     fontSize: 24,
     color: COLORS.text,
     letterSpacing: 0,
@@ -468,9 +458,9 @@ const styles = StyleSheet.create({
     marginBottom: 16, // Header -> Content
   },
   sectionTitle: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 22,
-    lineHeight: 30.8, // 140%
+    lineHeight: 30.8,
     color: COLORS.text,
     letterSpacing: 0,
   },
@@ -502,7 +492,7 @@ const styles = StyleSheet.create({
     width: 40, 
     alignItems: 'center', 
     justifyContent: 'center',
-    marginRight: ROW_GAP,
+    marginRight: 12,
   },
   artistAvatar: {
     width: 40,
@@ -522,10 +512,10 @@ const styles = StyleSheet.create({
   },
   textStack: {
     flex: 1,
-    gap: STACK_GAP,
+    gap: 4,
   },
   rowTitle: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 15, // Reduced from 16px
     color: COLORS.text,
     letterSpacing: 0,

@@ -55,7 +55,7 @@ export const BottomNav = ({ activeTab = 'Home' }: { activeTab?: string }) => {
              style={[styles.icon, { tintColor: getColor(activeTab === 'Wallet') }]} 
              resizeMode="contain" 
            />
-          <Text style={[styles.label, { color: getColor(activeTab === 'Wallet') }]}>Wallet</Text>
+          <Text style={[styles.label, { color: getColor(activeTab === 'Wallet') }]}>Portfolio</Text>
         </TouchableOpacity>
       </View>
       <SafeAreaView edges={['bottom']} style={{ backgroundColor: COLORS.black }} />

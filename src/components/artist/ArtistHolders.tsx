@@ -1,34 +1,37 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
-import { ArtistMarket } from '../../mock/artistMarket';
 import { MetricGrid } from './MetricGrid';
 import { HolderRow } from './HolderRow';
+import { Holder } from '../../lib/mockMetrics';
 
 interface ArtistHoldersProps {
-  artist: ArtistMarket;
+  holdersList: Holder[];
+  totalShares: number;
+  sharePrice: number;
+  marketCap: number;
+  holdersCount: number;
 }
 
 type FilterType = 'All' | 'Following' | 'Myself';
 const FILTERS: FilterType[] = ['All', 'Following', 'Myself'];
 
-export const ArtistHolders = ({ artist }: ArtistHoldersProps) => {
+export const ArtistHolders = ({ holdersList, totalShares, sharePrice, marketCap, holdersCount }: ArtistHoldersProps) => {
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
 
   const filteredHolders = useMemo(() => {
     switch (activeFilter) {
       case 'Following':
-        return artist.holdersList.filter(h => h.isFollowing);
+        return holdersList.filter(h => h.isFollowing);
       case 'Myself':
         return []; // Mock: I don't hold any yet
       default:
-        return artist.holdersList;
+        return holdersList;
     }
-  }, [activeFilter, artist.holdersList]);
+  }, [activeFilter, holdersList]);
 
   // Derived Metrics
-  const totalShares = artist.circulatingSupply;
-  const top10Shares = artist.holdersList
+  const top10Shares = holdersList
     .slice(0, 10)
     .reduce((sum, h) => sum + h.sharesOwned, 0);
   const top10Pct = (top10Shares / totalShares) * 100;
@@ -40,8 +43,8 @@ export const ArtistHolders = ({ artist }: ArtistHoldersProps) => {
     <View style={styles.headerContainer}>
       {/* Metric Grid */}
       <MetricGrid 
-        marketCap={artist.marketCap}
-        holders={artist.holders}
+        marketCap={marketCap}
+        holders={holdersCount}
         artistStake={artistStakePct}
         top10Stake={top10Pct}
       />
@@ -65,8 +68,6 @@ export const ArtistHolders = ({ artist }: ArtistHoldersProps) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-        {/* Placeholder Mascot - Using generic Image for now if no local asset */}
-        {/* <Image source={require('../../../assets/mascot_empty.png')} ... /> */}
         <Text style={styles.emptyEmoji}>🤔</Text>
         <Text style={styles.emptyText}>No holders available</Text>
     </View>
@@ -81,14 +82,14 @@ export const ArtistHolders = ({ artist }: ArtistHoldersProps) => {
           <HolderRow 
              holder={item} 
              totalShares={totalShares} 
-             sharePrice={artist.price}
+             sharePrice={sharePrice}
              isLast={index === filteredHolders.length - 1}
           />
         )}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.listContent}
-        scrollEnabled={false} // Since custom scroll handling in DetailScreen tabs
+        scrollEnabled={false} 
       />
     </View>
   );

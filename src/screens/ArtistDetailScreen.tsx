@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_FAMILY } from '../constants/theme';
-import { getArtistById, computeMCS, formatCompact, ArtistMarket } from '../mock/artistMarket';
+import { getArtistById, Artist } from '../data/catalog';
+import { getEntityMetrics, mockSeries, getHoldersList } from '../lib/mockMetrics';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { CreatorCard } from '../components/common/CreatorCard';
 import { Eye, Share, Copy, Info, Globe, Music, PlayCircle, Twitter, Instagram, MessageCircle, Disc } from 'lucide-react-native';
 import { LineChart } from '../components/LineChart'; 
 import { ArtistTabs, TabType } from '../components/artist/ArtistTabs';
@@ -23,11 +25,13 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
   const { artistId } = route.params || { artistId: 'a1' };
   const insets = useSafeAreaInsets();
   
-  const [artist, setArtist] = useState<ArtistMarket | null>(null);
+  const [artist, setArtist] = useState<Artist | null>(null);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [chartSeries, setChartSeries] = useState<number[]>([]);
+  
   const [activeTab, setActiveTab] = useState<TabType>('Details');
   const [activeTimeframe, setActiveTimeframe] = useState('15m');
   const [tradeSheetMode, setTradeSheetMode] = useState<'BUY' | 'SELL' | null>(null);
-  const [mcs, setMcs] = useState(0);
   const [infoModal, setInfoModal] = useState({ visible: false, title: '', description: '' });
   const [shareSheetVisible, setShareSheetVisible] = useState(false);
   const [isWatchlisted, setIsWatchlisted] = useState(false);
@@ -39,24 +43,30 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
   
   const toggleWatchlist = () => {
       setIsWatchlisted(!isWatchlisted);
-      // In real app, this would call an API
   };
 
   useEffect(() => {
-    getArtistById(artistId).then(data => {
-      setArtist(data);
-      setMcs(computeMCS(data));
-    });
-  }, [artistId]);
+    const data = getArtistById(artistId);
+    if (data) {
+        setArtist(data);
+        const m = getEntityMetrics(artistId);
+        setMetrics(m);
+        // Generate chart based on ID + timeframe (mock)
+        const series = mockSeries(123 + TIMEFRAMES.indexOf(activeTimeframe), 40); 
+        setChartSeries(series);
+    }
+  }, [artistId, activeTimeframe]);
 
-  if (!artist) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
+  if (!artist || !metrics) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
 
   // Chart Data Logic
-  // @ts-ignore
-  const currentSeries = artist.priceHistory[activeTimeframe] || artist.priceHistory['15m'];
-  const chartValues = currentSeries.map((p: any) => p.value);
-  const minPrice = Math.min(...chartValues);
-  const maxPrice = Math.max(...chartValues);
+  const minPrice = Math.min(...chartSeries);
+  const maxPrice = Math.max(...chartSeries);
+  const currentPrice = chartSeries[chartSeries.length - 1];
+
+  const formatCompact = (num: number) => {
+      return new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num);
+  };
 
   const getSocialIcon = (label: string) => {
     const size = 14;
@@ -85,11 +95,11 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerLeft}>
           <HeaderBack />
-          <Image source={{ uri: artist.avatar }} style={styles.avatar} />
+          <Image source={{ uri: artist.avatarUrl }} style={styles.avatar} />
           <View>
              <Text style={styles.headerName}>{artist.name}</Text>
              <View style={styles.tickerRow}>
-                <Text style={styles.headerTicker}>{artist.ticker}</Text>
+                <Text style={styles.headerTicker}>{artist.symbol}</Text>
                 <Copy size={12} color="#666" style={{ marginLeft: 4 }} />
              </View>
           </View>
@@ -106,20 +116,20 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
 
       <ScrollView 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
-        stickyHeaderIndices={[2]}
+        stickyHeaderIndices={[2]} // Pin the tabs
       >
         {/* KPI Row */}
         <View style={styles.kpiContainer}>
            <View>
               <View style={styles.kpiRow}>
-                 <Text style={styles.kpiValue}>{formatCompact(artist.marketCap)}</Text>
+                 <Text style={styles.kpiValue}>{formatCompact(metrics.marketCap)}</Text>
                  <Text style={styles.kpiLabel}> MC</Text>
               </View>
-              <Text style={styles.kpiChange}>+12.5% Today</Text>
+              <Text style={styles.kpiChange}>+{metrics.changeTodayPct.toFixed(2)}% Today</Text>
            </View>
            <View style={{alignItems: 'flex-end'}}>
               <View style={styles.kpiRow}>
-                 <Text style={styles.kpiValue}>{formatCompact(artist.ath)}</Text>
+                 <Text style={styles.kpiValue}>{formatCompact(metrics.ath)}</Text>
                  <Text style={styles.kpiLabel}> ATH</Text>
               </View>
            </View>
@@ -130,7 +140,7 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
            <View style={{ flexDirection: 'row' }}>
               <View style={{ flex: 1 }}>
                 <LineChart 
-                  data={chartValues} 
+                  data={chartSeries} 
                   width={width - 48} // Reserve space for Y-axis
                   height={180} 
                   color={COLORS.success} 
@@ -140,7 +150,7 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
               {/* Right Y-Axis */}
               <View style={styles.yAxis}>
                  <Text style={[styles.axisLabel, scrubbedPrice !== null ? { color: COLORS.white, fontWeight: '700' } : undefined]}>
-                    ${(scrubbedPrice !== null ? scrubbedPrice : currentSeries[currentSeries.length-1].value).toFixed(2)}
+                    ${(scrubbedPrice !== null ? scrubbedPrice : currentPrice).toFixed(2)}
                  </Text>
                  <Text style={styles.axisLabel}>${((maxPrice + minPrice)/2).toFixed(2)}</Text>
                  <Text style={styles.axisLabel}>${minPrice.toFixed(2)}</Text>
@@ -171,24 +181,30 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
             </View>
         ) : activeTab === 'Holders' ? (
              <View style={styles.tabContent}>
-                <ArtistHolders artist={artist} />
+                <ArtistHolders 
+                   holdersList={getHoldersList(artist.id, metrics.circulatingSupply)}
+                   totalShares={metrics.circulatingSupply}
+                   sharePrice={metrics.price}
+                   marketCap={metrics.marketCap}
+                   holdersCount={metrics.holders}
+                /> 
              </View>
         ) : activeTab === 'Activity' ? (
               <View style={styles.tabContent}>
-                <ArtistActivity artist={artist} />
+                <ArtistActivity artist={artist as any} />
               </View>
         ) : activeTab === 'Predictions' ? (
               <View style={styles.tabContent}>
-                <ArtistPredictions artist={artist} />
+                <ArtistPredictions artist={artist as any} />
               </View>
         ) : activeTab === 'Details' && (
                <View style={styles.tabContent}>
                  {/* Stats Grid */}
                  <View style={styles.grid}>
-                    <StatCard label="Price" value={'$' + artist.price.toFixed(2)} />
-                    <StatCard label="Volume (24h)" value={formatCompact(artist.volume24h)} />
-                    <StatCard label="Market Cap" value={formatCompact(artist.marketCap)} />
-                    <StatCard label="Holders" value={artist.holders.toString()} />
+                    <StatCard label="Price" value={'$' + metrics.price.toFixed(2)} />
+                    <StatCard label="Volume (24h)" value={formatCompact(metrics.volume24h)} />
+                    <StatCard label="Market Cap" value={formatCompact(metrics.marketCap)} />
+                    <StatCard label="Holders" value={metrics.holders.toLocaleString()} />
                  </View>
 
                  {/* Bio Card (Includes Metrics + Links) */}
@@ -199,20 +215,20 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
                     
                     <BioMetric 
                        label="Circulating Supply" 
-                       value={artist.circulatingSupply.toLocaleString()} 
+                       value={metrics.circulatingSupply.toLocaleString()} 
                        description="Represents the total number of shares currently held by investors. Higher supply typically means higher liquidity."
                        onPressInfo={openInfo}
                     />
                     <BioMetric 
                        label="Market Confidence Score" 
-                       value={`${mcs}% (${mcs > 70 ? 'High' : 'Mod'})`} 
-                       color={mcs > 70 ? COLORS.success : '#F5A623'}
+                       value={`${metrics.marketConfidenceScore.value}% (${metrics.marketConfidenceScore.level})`} 
+                       color={metrics.marketConfidenceScore.value > 70 ? COLORS.success : '#F5A623'}
                        description="A composite score (0-100%) reflecting market sentiment. Calculated from volume trends, holder retention, and price stability."
                        onPressInfo={openInfo}
                     />
                     <BioMetric 
                        label="Momentum" 
-                       value="Bullish" 
+                       value={metrics.momentum} 
                        description="Indicates the current trend direction. Bullish means buying pressure is increasing, while Bearish suggests selling pressure."
                        onPressInfo={openInfo}
                     />
@@ -234,40 +250,8 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
                  </View>
 
                  {/* Created By Section */}
-                 {artist.creator && (
-                    <View style={styles.creatorSection}>
-                       <Text style={styles.sectionHeader}>Created by</Text>
-                       <View style={styles.creatorCard}>
-                          <Image source={{ uri: artist.creator.avatar }} style={styles.creatorAvatar} />
-                          <View style={{ flex: 1, justifyContent: 'center' }}>
-                              <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
-                                 <Text style={styles.creatorName}>{artist.creator.name}</Text>
-                                 {/* Verified Badge Icon (Mock) */}
-                                 <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#F5A623', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ fontSize: 8, color: '#000', fontWeight: 'bold' }}>✓</Text>
-                                 </View>
-                              </View>
-                              
-                              <View style={styles.badgesRow}>
-                                 {artist.creator.ticker && (
-                                    <TouchableOpacity style={styles.badgePill}>
-                                       <View style={{width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFF', marginRight: 4}} />
-                                       <Text style={styles.badgeText}>{artist.creator.ticker}</Text>
-                                       <Copy size={10} color="#999" style={{marginLeft: 4}} />
-                                    </TouchableOpacity>
-                                 )}
-                                 {artist.creator.wallet && (
-                                    <View style={styles.badgePill}>
-                                       <Text style={styles.badgeText}>{artist.creator.wallet}</Text>
-                                    </View>
-                                 )}
-                              </View>
-                          </View>
-                          <TouchableOpacity style={styles.followBtn}>
-                            <Text style={styles.followText}>Follow</Text>
-                          </TouchableOpacity>
-                       </View>
-                    </View>
+                 {artist.createdBy && (
+                    <CreatorCard creator={artist.createdBy} />
                  )}
                </View>
             )}
@@ -283,9 +267,9 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
          visible={!!tradeSheetMode} 
          mode={tradeSheetMode || 'BUY'} 
          artistName={artist.name}
-         ticker={artist.ticker}
-         sharePrice={artist.price}
-         mcs={mcs}
+         ticker={artist.symbol}
+         sharePrice={metrics.price}
+         mcs={metrics.marketConfidenceScore.value}
          onClose={() => setTradeSheetMode(null)}
          onConfirm={(val: any) => { console.log('Trade', val); setTradeSheetMode(null); }}
        />
@@ -356,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
   },
   headerName: {
-    fontFamily: FONT_FAMILY.header, // Medium
+    fontFamily: FONT_FAMILY.medium, // Explicit Medium
     fontSize: 16,
     color: '#FFF',
   },
@@ -371,7 +355,7 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     flexDirection: 'row',
-    gap: 16, // +4px as requested (12 -> 16)
+    gap: 20, // +4px as requested (16 -> 20)
   },
 
   scrollContent: {
@@ -543,57 +527,9 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sectionHeader: {
-    color: '#FFF', // Updated to White to match Home
-    fontSize: 22, // Updated to 22px
-    fontFamily: FONT_FAMILY.header,
-    marginBottom: 16, // More spacing
-  },
-  creatorCard: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  creatorAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#333',
-  },
-  creatorName: {
     color: '#FFF',
-    fontFamily: FONT_FAMILY.balance, // Bold
-    fontSize: 16,
-  },
-  badgesRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 6,
-  },
-  badgePill: {
-    backgroundColor: '#222',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badgeText: {
-    color: '#CCC',
-    fontSize: 12,
-    fontFamily: FONT_FAMILY.body,
-  },
-  followBtn: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  followText: {
-    color: '#000',
-    fontFamily: FONT_FAMILY.balance, // Bold
-    fontSize: 14,
+    fontSize: 18, // UPDATED: Standardized to 18px
+    fontFamily: FONT_FAMILY.header,
+    marginBottom: 16,
   },
 });

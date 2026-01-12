@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY, SPACING } from '../../constants/theme';
 import { formatCompact } from '../../mock/artistMarket';
 
@@ -39,14 +40,23 @@ export const HolderRow = ({ holder, totalShares, sharePrice, isLast }: HolderRow
         </View>
       </View>
 
-      {/* Right: Value + % */}
+      {/* Right: Value + % + Arrow */}
       <View style={styles.right}>
-        <Text style={styles.value}>{formatCompact(value)}</Text>
-        <Text style={styles.percentage}>{percentage.toFixed(2)}%</Text>
+        <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+            <Text style={styles.value}>{formatCompact(value)}</Text>
+            <Text style={styles.percentage}>{percentage.toFixed(2)}%</Text>
+        </View>
+        <Image 
+            source={require('../../assets/icons/chevron-right.png')} // Fallback or strict icon ref
+            style={{ width: 16, height: 16, tintColor: '#666' }}
+            resizeMode="contain"
+        />
       </View>
     </View>
   );
 };
+// Note: using explicit image or lucide? Prompt said "Arrow icon". 
+// I will use Lucide ChevronRight for consistency if not strictly assets. Actually I'll use Lucide.
 
 const styles = StyleSheet.create({
   container: {
@@ -84,13 +94,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   right: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   value: {
     color: '#FFF',
     fontFamily: FONT_FAMILY.balance, // Bold
     fontWeight: '700', // Explicit Bold
-    fontSize: 14,
+    fontSize: 15, // +1px as requested
     marginBottom: 2,
   },
   percentage: {

@@ -1,3 +1,5 @@
+import { Prediction } from '../data/catalog';
+
 export interface ChartPoint {
   date: string;
   value: number;
@@ -59,16 +61,8 @@ export interface ArtistMarket {
     percent: number;
     timestampLabel?: string;
   }>;
-  
-  predictionsList: Array<{
-    id: string;
-    question: string;
-    yesPrice: number; // In cents (e.g. 58.5)
-    noPrice: number;
-    volume: number;
-    chance: number; // 0-100
-    resolvesAt: string;
-  }>;
+
+  predictionsList: Prediction[];
   
   creator: Creator;
   
@@ -81,50 +75,13 @@ export interface ArtistMarket {
   };
 }
 
-// Helpers
-export const formatMoney = (val: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(val);
-};
-
-export const formatCompact = (val: number) => {
-  if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'm';
-  if (val >= 1000) return '$' + (val / 1000).toFixed(1) + 'k';
-  return '$' + val.toFixed(0);
-};
-
-// MCS Logic
-// MCS = clamp(round(volumeScore + momentumScore + holderScore + volatilityScore), 0, 100)
-export const computeMCS = (artist: ArtistMarket): number => {
-  let score = 0;
-  
-  // 1. Volume Score (0-25)
-  if (artist.volume24h >= artist.avgVolume7d) score += 22;
-  else if (artist.volume24h >= artist.avgVolume7d * 0.5) score += 15;
-  else score += 5;
-  
-  // 2. Momentum Score (0-25)
-  if (artist.change24h > 10) score += 25;
-  else if (artist.change24h > 0) score += 18;
-  else if (artist.change24h > -5) score += 10;
-  else score += 2;
-  
-  // 3. Holder Score (0-25)
-  if (artist.holderChange7d > 5) score += 25;
-  else if (artist.holderChange7d > 0) score += 15;
-  else score += 5;
-  
-  // 4. Volatility Penalty (0-25... essentially inverted volatility)
-  // Low vol = high score
-  const stability = 1 - artist.volatilityIndex; // 0.8 means stable
-  score += Math.round(stability * 25);
-  
-  return Math.min(100, Math.max(0, score));
-};
+// Helper: Format number to compact (e.g. 1.2k, 1M)
+export const formatCompact = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 1
+    }).format(num);
+}
 
 // Mock Data Generator
 const generateSeries = (basePrice: number, points: number, volatility: number): ChartPoint[] => {
@@ -197,52 +154,51 @@ const generateActivity = (count: number) => {
   return items;
 };
 
-const generatePredictions = () => {
+const generatePredictions = (): Prediction[] => {
   return [
     {
       id: 'p1',
+      marketType: 'binary',
       question: 'Would Tomi Obanure release an album in 2025?',
-      yesPrice: 5.8,
-      noPrice: 94.5,
-      volume: 369000,
       chance: 90,
-      resolvesAt: '2025-12-31'
+      volume: 369000,
+      deadline: '2025-12-31T00:00:00Z',
+      created: '2025-01-01T00:00:00Z',
+      relatedEntityId: 'a1'
     },
     {
       id: 'p2',
+      marketType: 'binary',
       question: 'Would Tomi Obanure win the “Headies Next Rated Artist Award in 2026?”',
-      yesPrice: 32.4,
-      noPrice: 67.6,
-      volume: 125000,
       chance: 27,
-      resolvesAt: '2026-09-01'
+      volume: 125000,
+      deadline: '2026-09-01T00:00:00Z',
+      created: '2025-06-01T00:00:00Z',
+      relatedEntityId: 'a1'
     },
     {
       id: 'p3',
-      question: 'Will Tomi Obanure appear on COLORS Studios by 2026?',
-      yesPrice: 15.2,
-      noPrice: 84.8,
-      volume: 54000,
-      chance: 15,
-      resolvesAt: '2026-06-01'
-    },
-    {
-      id: 'p4',
-      question: 'Will Tomi Obanure appear on a project produced by Sarz in 2026?',
-      yesPrice: 78.5,
-      noPrice: 21.5,
+      marketType: 'multi-range',
+      question: 'Which collaboration will drop first in 2026?',
       volume: 890000,
-      chance: 78,
-      resolvesAt: '2026-12-31'
+      category: 'Music',
+      deadline: '2026-06-01T00:00:00Z',
+      created: '2025-11-20T00:00:00Z',
+      outcomes: [
+          { id: 'o1', name: 'Wizkid', chance: 45, price: 0.45 },
+          { id: 'o2', name: 'Burna Boy', chance: 30, price: 0.30 },
+          { id: 'o3', name: 'Davido', chance: 25, price: 0.25 },
+      ]
     },
     {
       id: 'p5',
-      question: 'Will Tomi Obanure hit 1M monthly listeners on Spotify by Q3 2025?',
-      yesPrice: 45.0,
-      noPrice: 55.0,
-      volume: 42000,
+      marketType: 'binary',
+      question: 'Will Tomi Obanure hit 1M monthly listeners by Q3 2025?',
       chance: 45,
-      resolvesAt: '2025-09-30'
+      volume: 42000,
+      deadline: '2025-09-30T00:00:00Z',
+      created: '2025-02-01T00:00:00Z',
+      relatedEntityId: 'a1'
     }
   ];
 };
