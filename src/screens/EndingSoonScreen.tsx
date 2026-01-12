@@ -11,21 +11,19 @@ import { FilterPill } from '../components/common/FilterPill';
 import { FilterSheet } from '../components/common/FilterSheet';
 import { 
     PRED_OUTCOMES, 
-    TIME_FRAMES, 
-    PRED_END_DATES, 
     REGIONS, 
+    EVENT_CATEGORIES,
     filterPredictions 
 } from '../utils/filters';
 
-export const PredictionsScreen = () => {
+export const EndingSoonScreen = () => {
     const navigation = useNavigation<any>();
     const [search, setSearch] = useState('');
     
     // Filters
     const [outcome, setOutcome] = useState('All');
-    const [timeFrame, setTimeFrame] = useState('24h'); // For volume display? Or just sorting
-    const [endDate, setEndDate] = useState('Anytime');
     const [region, setRegion] = useState('Global');
+    const [category, setCategory] = useState('All');
 
     const [activeSheet, setActiveSheet] = useState<string | null>(null);
 
@@ -33,14 +31,20 @@ export const PredictionsScreen = () => {
     const basePreds = getAllPredictions();
     const predictions = [...basePreds, ...basePreds].map((p, i) => ({ ...p, id: `${p.id}_${i}` }));
 
-    const filteredPredictions = useMemo(() => {
-        return filterPredictions(predictions, {
+    const sortedPredictions = useMemo(() => {
+        // 1. Filter
+        let results = filterPredictions(predictions, {
             search,
             outcome,
-            date: endDate,
-            region
+            region,
+            category
         });
-    }, [predictions, search, outcome, endDate, region]);
+
+        // 2. Sort by Ending Soon (deadline ascending)
+        results = results.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+
+        return results;
+    }, [predictions, search, outcome, region, category]);
 
     const renderItem = ({ item }: { item: typeof predictions[0] }) => (
         <PredictionCard prediction={item as any} />
@@ -56,22 +60,6 @@ export const PredictionsScreen = () => {
                     onSelect: setOutcome,
                     onReset: () => setOutcome('All')
                 };
-            case '24 h':
-                return {
-                    title: 'Timeframe',
-                    options: TIME_FRAMES,
-                    selected: timeFrame,
-                    onSelect: setTimeFrame,
-                    onReset: () => setTimeFrame('24h')
-                };
-            case 'End date':
-                return {
-                    title: 'Ends In',
-                    options: PRED_END_DATES,
-                    selected: endDate,
-                    onSelect: setEndDate,
-                    onReset: () => setEndDate('Anytime')
-                };
             case 'Region':
                 return {
                     title: 'Region',
@@ -79,6 +67,14 @@ export const PredictionsScreen = () => {
                     selected: region,
                     onSelect: setRegion,
                     onReset: () => setRegion('Global')
+                };
+            case 'Category':
+                return {
+                    title: 'Category',
+                    options: EVENT_CATEGORIES,
+                    selected: category,
+                    onSelect: setCategory,
+                    onReset: () => setCategory('All')
                 };
             default: return null;
         }
@@ -91,7 +87,7 @@ export const PredictionsScreen = () => {
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.header}>
                     <HeaderBack />
-                    <Text style={styles.headerTitle}>Predictions</Text>
+                    <Text style={styles.headerTitle}>Ending Soon</Text>
                     <View style={{ width: 40 }} /> 
                 </View>
 
@@ -101,7 +97,7 @@ export const PredictionsScreen = () => {
                         <Search size={20} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
                         <TextInput 
                           style={styles.searchInput}
-                          placeholder="Artists, labels, predictions, URL"
+                          placeholder="Search predictions..."
                           placeholderTextColor={COLORS.textSecondary}
                           value={search}
                           onChangeText={setSearch}
@@ -112,15 +108,14 @@ export const PredictionsScreen = () => {
                 {/* Filters */}
                 <View style={{ marginBottom: 16 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
-                        <FilterPill label="Outcome" value={outcome} isActive={outcome !== 'All'} onPress={() => setActiveSheet('Outcome')} />
-                        <FilterPill label={timeFrame === '24h' ? '24 h' : timeFrame === '7d' ? '7 d' : '30 d'} isActive={timeFrame !== '24h'} onPress={() => setActiveSheet('24 h')} />
-                        <FilterPill label="End date" value={endDate} isActive={endDate !== 'Anytime'} onPress={() => setActiveSheet('End date')} />
-                        <FilterPill label="Region" value={region} isActive={region !== 'Global'} onPress={() => setActiveSheet('Region')} />
+                         <FilterPill label="Outcome" value={outcome} isActive={outcome !== 'All'} onPress={() => setActiveSheet('Outcome')} />
+                         <FilterPill label="Region" value={region} isActive={region !== 'Global'} onPress={() => setActiveSheet('Region')} />
+                         <FilterPill label="Category" value={category} isActive={category !== 'All'} onPress={() => setActiveSheet('Category')} />
                     </ScrollView>
                 </View>
 
                 <FlatList
-                    data={filteredPredictions}
+                    data={sortedPredictions}
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     contentContainerStyle={styles.listContent}

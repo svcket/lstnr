@@ -19,6 +19,8 @@ import { PredictionsScreen } from '../screens/PredictionsScreen';
 import { ActivityScreen } from '../screens/ActivityScreen';
 import { LearnScreen } from '../screens/LearnScreen';
 import { PredictionDetailScreen } from '../screens/PredictionDetailScreen';
+import { EndingSoonScreen } from '../screens/EndingSoonScreen';
+import { HoldersChatScreen } from '../screens/HoldersChatScreen';
 
 // ... imports
 
@@ -69,6 +71,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Activity" component={ActivityScreen} />
       <Stack.Screen name="Learn" component={LearnScreen} />
       <Stack.Screen name="PredictionDetail" component={PredictionDetailScreen} />
+      <Stack.Screen name="EndingSoon" component={EndingSoonScreen} />
+      <Stack.Screen name="HoldersChat" component={HoldersChatScreen} />
     </Stack.Navigator>
   );
 }

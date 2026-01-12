@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { FONT_FAMILY } from '../../constants/theme';
-import { ArtistMarket } from '../../mock/artistMarket';
 import { PredictionCard } from './PredictionCard';
+import { getEntityPredictions, EntityPrediction } from '../../data/social';
 
 interface ArtistPredictionsProps {
-  artist: ArtistMarket;
+  entityId: string;
+  name: string; // For generating titles if needed
 }
 
-export const ArtistPredictions = ({ artist }: ArtistPredictionsProps) => {
-  const predictions = artist.predictionsList || [];
+export const ArtistPredictions = ({ entityId, name }: ArtistPredictionsProps) => {
+  const [predictions, setPredictions] = useState<EntityPrediction[]>([]);
+
+  useEffect(() => {
+      setPredictions(getEntityPredictions(entityId, name));
+  }, [entityId, name]);
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
@@ -24,11 +29,11 @@ export const ArtistPredictions = ({ artist }: ArtistPredictionsProps) => {
         data={predictions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <PredictionCard prediction={item} />
+          <PredictionCard prediction={item as any} /> 
         )}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.listContent}
-        scrollEnabled={false} // Nested inside parent ScrollView
+        scrollEnabled={false}
       />
     </View>
   );

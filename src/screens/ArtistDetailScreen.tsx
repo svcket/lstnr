@@ -22,7 +22,7 @@ const { width } = Dimensions.get('window');
 const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
 
 export const ArtistDetailScreen = ({ route, navigation }: any) => {
-  const { artistId } = route.params || { artistId: 'a1' };
+  const { artistId, initialTab, openChat } = route.params || { artistId: 'a1' };
   const insets = useSafeAreaInsets();
   
   const [artist, setArtist] = useState<Artist | null>(null);
@@ -30,6 +30,12 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
   const [chartSeries, setChartSeries] = useState<number[]>([]);
   
   const [activeTab, setActiveTab] = useState<TabType>('Details');
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   const [activeTimeframe, setActiveTimeframe] = useState('15m');
   const [tradeSheetMode, setTradeSheetMode] = useState<'BUY' | 'SELL' | null>(null);
   const [infoModal, setInfoModal] = useState({ visible: false, title: '', description: '' });
@@ -177,16 +183,13 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
         {/* CONTENT */}
         {activeTab === 'Comments' ? (
             <View style={styles.tabContent}>
-                <ArtistComments />
+                <ArtistComments entityId={artist.id} />
             </View>
         ) : activeTab === 'Holders' ? (
              <View style={styles.tabContent}>
                 <ArtistHolders 
-                   holdersList={getHoldersList(artist.id, metrics.circulatingSupply)}
-                   totalShares={metrics.circulatingSupply}
-                   sharePrice={metrics.price}
-                   marketCap={metrics.marketCap}
-                   holdersCount={metrics.holders}
+                   entityId={artist.id}
+                   initialViewMode={openChat ? 'Chat' : 'Holders'}
                 /> 
              </View>
         ) : activeTab === 'Activity' ? (
@@ -195,7 +198,7 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
               </View>
         ) : activeTab === 'Predictions' ? (
               <View style={styles.tabContent}>
-                <ArtistPredictions artist={artist as any} />
+                <ArtistPredictions entityId={artist.id} name={artist.name} />
               </View>
         ) : activeTab === 'Details' && (
                <View style={styles.tabContent}>

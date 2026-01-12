@@ -1,59 +1,49 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { FONT_FAMILY } from '../../constants/theme';
-
-interface ActivityItem {
-  id: string;
-  user: {
-    username: string;
-    avatarUrl: string;
-    shares: number;
-    followers: number;
-    isFollowing: boolean;
-    isSelf: boolean;
-  };
-  type: 'acquired' | 'released';
-  deltaShares: number;
-  symbol: string;
-  percent: number;
-  timestampLabel?: string;
-}
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { FONT_FAMILY, COLORS } from '../../constants/theme';
+import { ActivityItem } from '../../data/social';
 
 interface ActivityRowProps {
   item: ActivityItem;
-  isLast?: boolean;
+  isLast: boolean;
 }
 
 export const ActivityRow = ({ item, isLast }: ActivityRowProps) => {
-  const isAcquired = item.type === 'acquired';
-  const actionColor = isAcquired ? '#4ADE80' : '#F87171'; // Green : Red
+  const isAcquired = item.action === 'acquired';
+  const actionColor = isAcquired ? COLORS.success : COLORS.error;
   const sign = isAcquired ? '+' : '-';
 
   return (
-    <View style={[styles.container, isLast && styles.lastItem]}>
-      {/* Left: Avatar + Main Info */}
+    <View style={[styles.container, !isLast && styles.borderBottom]}>
+      {/* Left: Avatar + User Info */}
       <View style={styles.left}>
-        <Image 
-          source={{ uri: item.user.avatarUrl }} 
-          style={styles.avatar} 
-        />
-        <View>
-          <Text style={styles.line1}>
-            <Text style={styles.username}>{item.user.username}</Text>
-            <Text style={{ color: actionColor }}> {item.type}</Text>
-          </Text>
-          <Text style={styles.meta}>
-            {item.user.shares} shares • {item.user.followers} followers
-          </Text>
+        <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
+        <View style={styles.userInfo}>
+             <Text style={styles.username}>{item.user.name}</Text>
+             <Text style={styles.action}>
+                 <Text style={{color: actionColor}}>{item.action}</Text>
+                 <Text style={{color: '#9A9A9A'}}> • {item.timestamp}</Text>
+             </Text>
         </View>
       </View>
 
-      {/* Right: Value Delta */}
+      {/* Right: Stacked Value Info */}
       <View style={styles.right}>
-        <Text style={[styles.value, { color: actionColor }]}>
-          {sign}{item.deltaShares} {item.symbol}
-        </Text>
-        <Text style={styles.percent}>{item.percent}%</Text>
+          {/* Top: USD Value */}
+          <Text style={styles.value}>${item.value.toLocaleString()}</Text>
+          
+          {/* Middle: Token Amount */}
+          <Text style={[styles.amount, { color: actionColor }]}>
+              {sign}{item.amount.toLocaleString()} 
+          </Text>
+          <Text style={styles.symbol}>{item.symbol}</Text>
+
+          {/* Bottom: Impact/Stat */}
+          {item.impact !== undefined && (
+             <Text style={styles.impact}>
+                 {item.impact.toFixed(2)}%
+             </Text>
+          )}
       </View>
     </View>
   );
@@ -62,55 +52,64 @@ export const ActivityRow = ({ item, isLast }: ActivityRowProps) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222', // Match HolderRow separator or subtle divider
-    // User requested "If Holders uses no dividers, use none here", but mock Holders *did* use subtle separators.
-    // Sticking to subtle divider from Holders logic.
+    paddingHorizontal: 0, // Parent handles padding
   },
-  lastItem: {
-    borderBottomWidth: 0,
+  borderBottom: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
     flex: 1,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#333',
+    marginRight: 12,
   },
-  line1: {
-    fontFamily: FONT_FAMILY.header, // Medium
-    fontSize: 14,
-    marginBottom: 2,
-    color: '#FFF',
+  userInfo: {
+      justifyContent: 'center',
   },
   username: {
     color: '#FFF',
-  },
-  meta: {
-    color: '#9A9A9A', // Muted gray
-    fontFamily: FONT_FAMILY.body, // Regular
-    fontSize: 12,
-  },
-  right: {
-    alignItems: 'flex-end',
-  },
-  value: {
-    fontFamily: FONT_FAMILY.balance, // Bold
-    fontWeight: '700', // Explicit Bold
-    fontSize: 14,
+    fontFamily: FONT_FAMILY.header,
+    fontSize: 14, // Standard body size
+    fontWeight: '600',
     marginBottom: 2,
   },
-  percent: {
-    color: '#9A9A9A',
-    fontFamily: FONT_FAMILY.body,
-    fontSize: 12,
+  action: {
+      fontSize: 13,
+      color: '#999',
+  },
+  right: {
+      alignItems: 'flex-end',
+      minWidth: 80,
+  },
+  value: {
+      color: '#FFF',
+      fontFamily: FONT_FAMILY.header,
+      fontWeight: '700',
+      fontSize: 14,
+      marginBottom: 2,
+  },
+  amount: {
+      fontSize: 12,
+      fontWeight: '500',
+      marginBottom: 0,
+  },
+  symbol: {
+      fontSize: 10,
+      color: '#666',
+      marginBottom: 2,
+  },
+  impact: {
+      color: '#666',
+      fontSize: 11,
   },
 });

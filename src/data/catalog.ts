@@ -13,6 +13,8 @@ export interface Artist {
     symbol: string;
     avatarUrl: string;
     bio: string;
+    region: 'Global' | 'Africa' | 'North America' | 'Europe' | 'Asia' | 'South America';
+    genres: string[];
     links: {
         spotify?: string;
         appleMusic?: string;
@@ -41,38 +43,6 @@ export interface Label {
     createdBy?: Creator;
 }
 
-export type Prediction = 
-  | {
-      id: string;
-      marketType: "binary";
-      question: string;
-      chance: number;
-      volume: number;
-      deadline: string;
-      isLive?: boolean;
-      created: string; // Add created date for sorting/context
-      relatedEntityId?: string;
-    }
-  | {
-      id: string;
-      marketType: "multi-range";
-      question: string;
-      outcomes: {
-        id: string;
-        name: string;
-        chance: number;
-        price: number;
-      }[];
-      volume: number;
-      category: "Music";
-      deadline: string;
-      isLive?: boolean;
-      created: string;
-      relatedEntityId?: string;
-    };
-
-// --- SEED DATA ---
-
 // --- SEED DATA ---
 
 export const ARTISTS: Artist[] = [
@@ -83,6 +53,8 @@ export const ARTISTS: Artist[] = [
         symbol: '$YE',
         avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kanye_West_at_the_2009_Tribeca_Film_Festival_%28cropped%29.jpg/440px-Kanye_West_at_the_2009_Tribeca_Film_Festival_%28cropped%29.jpg',
         bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop and popular culture. From "The College Dropout" to "Donda", Ye\'s discography is a testament to his evolving creative genius. He continues to push boundaries in music, fashion, and design.',
+        region: 'North America',
+        genres: ['Hip-Hop', 'Pop'],
         links: { 
             spotify: 'https://spotify.com',
             appleMusic: 'https://apple.com',
@@ -104,6 +76,8 @@ export const ARTISTS: Artist[] = [
         symbol: '$TEMS',
         avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Tems_Wait_For_U_video_shoot_%28cropped%29.jpg/440px-Tems_Wait_For_U_video_shoot_%28cropped%29.jpg',
         bio: 'Nigerian singer, songwriter, and record producer who has taken the global stage by storm. Known for her unique vocal style and deep, soulful melodies, Tems has collaborated with giants like Drake, Wizkid, and Beyoncé. A leading voice in the modern Afrobeats movement.',
+        region: 'Africa',
+        genres: ['Afrobeats', 'R&B'],
         links: { 
             instagram: 'https://instagram.com/temsbaby',
             x: 'https://x.com/temsbaby',
@@ -124,6 +98,8 @@ export const ARTISTS: Artist[] = [
         symbol: '$ODG',
         avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Burna_Boy_at_The_O2_Arena.jpg/440px-Burna_Boy_at_The_O2_Arena.jpg',
         bio: 'Grammy-winning Nigerian singer and songwriter, often called the "African Giant". Burna Boy mixes dancehall, reggae, afrobeat, and pop to create a sound that is strictly his own. He is a driving force in bringing African music to the mainstream global audience.',
+        region: 'Africa',
+        genres: ['Afrobeats', 'Dancehall', 'Pop'],
         links: { 
             website: 'https://onspaceship.com',
             instagram: 'https://instagram.com/burnaboygram',
@@ -144,7 +120,10 @@ export const ARTISTS: Artist[] = [
         name: 'Frank Ocean',
         symbol: '$BLND',
         avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Frank_Ocean_2014_Coachella_1.jpg/440px-Frank_Ocean_2014_Coachella_1.jpg',
+
         bio: 'One of the most praised and enigmatic songwriters of his generation. Frank Ocean\'s introspective storytelling and avant-garde R&B style have earned him a cult following. Known for his masterpieces "Channel Orange" and "Blonde".',
+        region: 'North America',
+        genres: ['R&B', 'Pop'],
         links: { 
             website: 'https://blonded.co',
             instagram: 'https://instagram.com/blonded',
@@ -163,6 +142,8 @@ export const ARTISTS: Artist[] = [
         symbol: '$SZA',
         avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/SZA_Ctrl_Tour_Toronto_2017.jpg/440px-SZA_Ctrl_Tour_Toronto_2017.jpg',
         bio: 'Top Dawg Entertainment\'s first lady, SZA writes honest, deeply personal songs about insecurity, relationships, and self-discovery. Her albums "Ctrl" and "SOS" are critical darlings that have cemented her place as an R&B superstar.',
+        region: 'North America',
+        genres: ['R&B', 'Pop'],
         links: { 
             x: 'https://x.com/sza',
             instagram: 'https://instagram.com/sza',
@@ -276,6 +257,38 @@ export const LABELS: Label[] = [
     }
 ];
 
+export type Prediction = 
+  | {
+      id: string;
+      marketType: "binary";
+      question: string;
+      chance: number;
+      volume: number;
+      deadline: string;
+      isLive?: boolean;
+      created: string; 
+      relatedEntityId?: string;
+      region?: string;
+    }
+  | {
+      id: string;
+      marketType: "multi-range";
+      question: string;
+      outcomes: {
+        id: string;
+        name: string;
+        chance: number;
+        price: number;
+      }[];
+      volume: number;
+      category: "Music";
+      deadline: string;
+      isLive?: boolean;
+      created: string;
+      relatedEntityId?: string;
+      region?: string;
+    };
+
 export const PREDICTIONS: Prediction[] = [
     {
         id: 'p1',
@@ -285,7 +298,8 @@ export const PREDICTIONS: Prediction[] = [
         volume: 1250000,
         deadline: '2026-10-01T00:00:00Z',
         created: '2025-01-01T00:00:00Z',
-        relatedEntityId: 'a1'
+        relatedEntityId: 'a1',
+        region: 'North America'
     },
     {
         id: 'p2',
@@ -295,7 +309,8 @@ export const PREDICTIONS: Prediction[] = [
         volume: 450000,
         deadline: '2026-02-04T00:00:00Z',
         created: '2025-02-01T00:00:00Z',
-        relatedEntityId: 'a2'
+        relatedEntityId: 'a2',
+        region: 'Africa'
     },
     {
         id: 'p3',
@@ -306,6 +321,7 @@ export const PREDICTIONS: Prediction[] = [
         deadline: '2026-01-15T00:00:00Z',
         created: '2025-11-20T00:00:00Z',
         isLive: true,
+        region: 'North America',
         outcomes: [
             { id: 'o1', name: 'Kendrick Lamar', chance: 35, price: 0.35 },
             { id: 'o2', name: 'Rihanna', chance: 20, price: 0.20 },
@@ -321,6 +337,7 @@ export const PREDICTIONS: Prediction[] = [
         category: 'Music',
         deadline: '2026-12-31T00:00:00Z',
         created: '2026-01-01T00:00:00Z',
+        region: 'North America',
         outcomes: [
             { id: 'o1', name: 'Sabrina Carpenter', chance: 20, price: 0.20 },
             { id: 'o2', name: 'Chappell Roan', chance: 18, price: 0.18 },
@@ -334,7 +351,8 @@ export const PREDICTIONS: Prediction[] = [
         chance: 8,
         volume: 5500000,
         deadline: '2026-12-31T00:00:00Z',
-        created: '2025-05-15T00:00:00Z'
+        created: '2025-05-15T00:00:00Z',
+        region: 'North America'
     },
     {
         id: 'p6',
@@ -343,7 +361,8 @@ export const PREDICTIONS: Prediction[] = [
         chance: 85,
         volume: 920000,
         deadline: '2026-03-31T00:00:00Z',
-        created: '2025-12-10T00:00:00Z'
+        created: '2025-12-10T00:00:00Z',
+        region: 'Global'
     }
 ];
 
@@ -390,3 +409,49 @@ export const getRecentActivity = (): ActivityItem[] => {
     ];
 };
 export const formatCompact = (num: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+
+// --- DETAIL TYPES ---
+
+export type PredictionDetail = Prediction & {
+    description: string;
+    outcomes: {
+        id: string;
+        name: string;
+        probability: number; // 0-100 or 0-1
+        volume: number;
+        color: string; // Hex for graph/pill
+    }[];
+    chartData: { t: number; yesProb: number }[]; // Mock time series
+    marketOpenAt: string;
+    marketCloseRule: string;
+    payoutNote: string;
+    status: 'OPEN' | 'LIVE' | 'RESOLVED';
+};
+
+// --- MOCK DETAILS ---
+
+export const getPredictionDetail = (id: string): PredictionDetail | null => {
+    const base = PREDICTIONS.find(p => p.id === id);
+    if (!base) return null;
+
+    // Deterministic mock chart data based on ID
+    const baseProb = 'chance' in base ? base.chance : 50;
+    const chartData = Array.from({ length: 24 }).map((_, i) => ({
+        t: i,
+        yesProb: Math.min(99, Math.max(1, baseProb + Math.sin(i) * 10 + (Math.random() * 5 - 2.5)))
+    }));
+
+    return {
+        ...base,
+        description: `This market resolves to "Yes" if ${base.question} happens by the deadline. The resolution source will be official announcements and reputable news outlets.`,
+        outcomes: [
+            { id: 'yes', name: 'Yes', probability: baseProb, volume: base.volume * 0.6, color: '#22c55e' }, // Green-ish
+            { id: 'no', name: 'No', probability: 100 - baseProb, volume: base.volume * 0.4, color: '#ef4444' } // Red-ish
+        ],
+        chartData,
+        marketOpenAt: base.created,
+        marketCloseRule: 'After outcome occurs or at deadline.',
+        payoutNote: 'Usually within two hours of closing.',
+        status: base.isLive ? 'LIVE' : 'OPEN'
+    } as PredictionDetail;
+};

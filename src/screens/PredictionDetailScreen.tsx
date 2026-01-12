@@ -1,378 +1,529 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, Platform, KeyboardAvoidingView } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
-import { getPredictionById, Prediction, getArtistById } from '../data/catalog';
-import { LineChart } from '../components/LineChart';
-import { BuySellBar } from '../components/artist/BuySellBar';
-import { Info, Share, Copy, Clock, Users, ArrowUpRight, MessageCircle } from 'lucide-react-native';
-import { formatCompact } from '../data/catalog';
-import { mockSeries } from '../lib/mockMetrics';
+import { Share, MessageCircle, Lock, Monitor, ShieldCheck, Info } from 'lucide-react-native';
+import { ArtistTabs, TabType } from '../components/artist/ArtistTabs';
 import { ArtistComments } from '../components/artist/ArtistComments';
+import { ArtistHolders } from '../components/artist/ArtistHolders';
+import { ArtistActivity } from '../components/artist/ArtistActivity';
+import { getPredictionDetail, PredictionDetail } from '../data/catalog';
+import { FilterSheet } from '../components/common/FilterSheet';
+import { LineChart } from '../components/LineChart';
+import { getUserSharesInfo, MIN_SHARES_FOR_CHAT } from '../data/social';
 
 const { width } = Dimensions.get('window');
+const TIMEFRAMES = ['1M', '5M', '10M', '1H', '1D', 'ALL'];
 
-// Mock chart data generator adapted for probability (0-100)
-const getProbSeries = (seed: number) => {
-    // Generate a series that stays between 0-100
-    const points = [];
-    let val = 50;
-    for (let i = 0; i < 40; i++) {
-        const change = (Math.random() - 0.5) * 10;
-        val = Math.max(1, Math.min(99, val + change));
-        points.push(val);
-    }
-    return points;
-};
-
-export const PredictionDetailScreen = () => {
-    const route = useRoute<any>();
+export const PredictionDetailScreen = ({ route }: any) => {
+    const { predictionId } = route.params || { predictionId: 'p1' };
     const navigation = useNavigation<any>();
-    const { predictionId } = route.params || {};
-    const [prediction, setPrediction] = useState<Prediction | null>(null);
-    const [chartSeries, setChartSeries] = useState<number[]>([]);
-    const [scrubbedVal, setScrubbedVal] = useState<number | null>(null);
     const insets = useSafeAreaInsets();
-    const [activeTab, setActiveTab] = useState<'Comments' | 'Activity'>('Comments');
+
+    const [detail, setDetail] = useState<PredictionDetail | null>(null);
+    const [activeTab, setActiveTab] = useState<TabType>('Details');
+    const [tradeSheetOpen, setTradeSheetOpen] = useState(false);
+    
+    // Chart State
+    const [chartSeries, setChartSeries] = useState<number[]>([]);
+    const [activeTimeframe, setActiveTimeframe] = useState('1D');
+    const [scrubbedProb, setScrubbedProb] = useState<number | null>(null);
+
+    // Chat Access
+    const [hasAccess, setHasAccess] = useState(false);
 
     useEffect(() => {
-        if (predictionId) {
-            const p = getPredictionById(predictionId);
-            if (p) {
-                setPrediction(p);
-                setChartSeries(getProbSeries(predictionId.length));
-            }
+        const data = getPredictionDetail(predictionId);
+        setDetail(data);
+        if (data) {
+            setChartSeries(data.chartData.map(d => d.yesProb));
         }
-    }, [predictionId]);
 
-    if (!prediction) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
+        const info = getUserSharesInfo(predictionId); 
+        setHasAccess(info.hasAccess);
+    }, [predictionId, activeTimeframe]);
 
-    const currentValue = scrubbedVal ?? (chartSeries[chartSeries.length - 1] || 50);
-    const isMulti = prediction.marketType === 'multi-range';
+    if (!detail) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
 
+    const currentProb = detail.outcomes[0].probability;
+    const displayProb = scrubbedProb !== null ? scrubbedProb : currentProb;
+
+    // Data for Axis
+    const minVal = chartSeries.length > 0 ? Math.min(...chartSeries) : 0;
+    const maxVal = chartSeries.length > 0 ? Math.max(...chartSeries) : 100;
+    
     return (
-        <KeyboardAvoidingView 
-           style={{flex: 1, backgroundColor: COLORS.background}} 
-           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-           keyboardVerticalOffset={0}
-        >
         <View style={styles.container}>
             {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top }]}>
-                <HeaderBack />
-                <View style={styles.headerActions}>
-                    <TouchableOpacity><Share size={24} color="#FFF" /></TouchableOpacity>
-                </View>
+                 <HeaderBack />
+                 <Text style={styles.headerTitle}>Predictions</Text>
+                 <TouchableOpacity>
+                     <Share size={24} color={COLORS.white} />
+                 </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {/* Title Section */}
-                <View style={styles.titleSection}>
-                    {prediction.relatedEntityId && (
-                        <EntityBadge entityId={prediction.relatedEntityId} navigation={navigation} />
-                    )}
-                    <Text style={styles.question}>{prediction.question}</Text>
-                    
-                    <View style={styles.metaRow}>
-                        <Clock size={14} color="#666" />
-                        <Text style={styles.metaText}>Resolves {new Date(prediction.deadline).toLocaleDateString()}</Text>
-                        <View style={styles.metaDivider} />
-                        <Users size={14} color="#666" />
-                        <Text style={styles.metaText}>$ {formatCompact(prediction.volume)} Vol.</Text>
+            <ScrollView stickyHeaderIndices={[1]} showsVerticalScrollIndicator={false}>
+                {/* 1. Hero Chart Section */}
+                <View style={styles.heroSection}>
+                    <View style={styles.heroHeader}>
+                         <View style={styles.titleRow}>
+                            <Text style={styles.question}>{detail.question}</Text>
+                         </View>
+                         
+                         <View style={styles.probContainer}>
+                             <Text style={styles.probValue}>{Math.round(displayProb)}%</Text>
+                             <Text style={styles.probLabel}>Chance of Yes</Text>
+                         </View>
+                    </View>
+
+                    {/* Chart with Y-Axis */}
+                    <View style={styles.chartContainer}>
+                        <View style={{ flexDirection: 'row' }}>
+                             <View style={{ flex: 1 }}>
+                                 <LineChart 
+                                     data={chartSeries} 
+                                     height={220} 
+                                     width={width - 48} 
+                                     color={detail.outcomes[0].color}
+                                     onScrub={setScrubbedProb}
+                                 />
+                             </View>
+                             
+                             {/* Right Y-Axis */}
+                             <View style={styles.yAxis}>
+                                <Text style={[styles.axisLabel, scrubbedProb !== null ? { color: COLORS.white, fontWeight: '700' } : undefined]}>
+                                   {Math.round(scrubbedProb !== null ? scrubbedProb : currentProb)}%
+                                </Text>
+                                <Text style={styles.axisLabel}>{Math.round((maxVal + minVal) / 2)}%</Text>
+                                <Text style={styles.axisLabel}>{Math.round(minVal)}%</Text>
+                             </View>
+                        </View>
+                    </View>
+
+                    {/* Timeframe Pills */}
+                    <View style={styles.timeframeRow}>
+                       {TIMEFRAMES.map(tf => (
+                          <TouchableOpacity 
+                            key={tf} 
+                            style={[styles.tfPill, activeTimeframe === tf && styles.tfPillActive]}
+                            onPress={() => setActiveTimeframe(tf)}
+                          >
+                             <Text style={[styles.tfText, activeTimeframe === tf && styles.tfTextActive]}>{tf}</Text>
+                          </TouchableOpacity>
+                       ))}
+                    </View>
+
+                    {/* Make Prediction (Moved Above Tabs) */}
+                    <View style={styles.predictionSection}>
+                        <Text style={styles.sectionTitle}>Make your prediction</Text>
+                        <View style={styles.outcomesList}>
+                            {detail.outcomes.map((outcome, idx) => (
+                                <OutcomeRow 
+                                    key={outcome.id}
+                                    outcome={outcome}
+                                    volume={Math.floor(detail.volume * (outcome.probability / 100))}
+                                    onPress={() => setTradeSheetOpen(true)}
+                                    isFirst={idx === 0}
+                                />
+                            ))}
+                        </View>
                     </View>
                 </View>
 
-                {/* Main Outcome Display / Chart Header */}
-                <View style={styles.chartHeader}>
-                   <View>
-                       <Text style={styles.probValue}>{currentValue.toFixed(1)}%</Text>
-                       <Text style={styles.probLabel}>Probability</Text>
-                   </View>
-                </View>
+                {/* 2. Tabs (Sticky) */}
+                <ArtistTabs 
+                    activeTab={activeTab} 
+                    onTabPress={setActiveTab} 
+                    tabs={['Details', 'Comments', 'Holders', 'Activity']}
+                    mode="fixed" 
+                    style={{ marginBottom: 16 }}
+                />
 
-                {/* Chart */}
-                <View style={styles.chartContainer}>
-                    <LineChart 
-                        data={chartSeries}
-                        width={width}
-                        height={160}
-                        color={currentValue > 50 ? COLORS.success : '#F5A623'}
-                        onScrub={setScrubbedVal}
-                    />
-                </View>
-
-                {/* Outcomes List (Multi) or Yes/No Stats (Binary) */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Outcomes</Text>
-                    <View style={styles.outcomesCard}>
-                        {prediction.marketType === 'multi-range' ? (
-                            prediction.outcomes.map((outcome, idx) => (
-                                <View key={outcome.id}>
-                                    <View style={styles.outcomeRow}>
-                                        <Text style={styles.outcomeName}>{outcome.name}</Text>
-                                        <View style={{alignItems: 'flex-end'}}>
-                                            <Text style={styles.outcomePercent}>{outcome.chance}%</Text>
-                                            <Text style={styles.outcomePrice}>{outcome.price}¢</Text>
-                                        </View>
+                {/* 3. Tab Content */}
+                <View style={styles.tabContent}>
+                    {activeTab === 'Details' && (
+                        <View>
+                            {/* Group Chat Promo Card */}
+                            <View style={styles.promoCard}>
+                                <View style={styles.promoHeader}>
+                                    <View style={styles.iconCircle}>
+                                        <MessageCircle size={20} color={COLORS.primary} />
                                     </View>
-                                    {idx < prediction.outcomes.length - 1 && <View style={styles.divider} />}
-                                </View>
-                            ))
-                        ) : (
-                            // Binary View
-                            <View>
-                                <View style={styles.outcomeRow}>
-                                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-                                        <View style={[styles.dot, {backgroundColor: COLORS.success}]} />
-                                        <Text style={styles.outcomeName}>Yes</Text>
-                                    </View>
-                                    <View style={{alignItems: 'flex-end'}}>
-                                        <Text style={[styles.outcomePercent, {color: COLORS.success}]}>{prediction.chance}%</Text>
-                                        {/* Mock price from probability */}
-                                        <Text style={styles.outcomePrice}>{(prediction.chance / 100).toFixed(2)}¢</Text>
+                                    <View style={{flex: 1}}>
+                                        <Text style={styles.promoTitle}>Holders Chat</Text>
+                                        <Text style={styles.promoSubtitle}>
+                                            A private group for holders.
+                                        </Text>
                                     </View>
                                 </View>
-                                <View style={styles.divider} />
-                                <View style={styles.outcomeRow}>
-                                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-                                        <View style={[styles.dot, {backgroundColor: COLORS.error}]} />
-                                        <Text style={styles.outcomeName}>No</Text>
-                                    </View>
-                                    <View style={{alignItems: 'flex-end'}}>
-                                        <Text style={[styles.outcomePercent, {color: COLORS.error}]}>{100 - prediction.chance}%</Text>
-                                        <Text style={styles.outcomePrice}>{((100 - prediction.chance) / 100).toFixed(2)}¢</Text>
-                                    </View>
+                                
+                                <View style={styles.promoFooter}>
+                                     <Text style={styles.promoHelper}>
+                                         {hasAccess 
+                                           ? 'You have access to this group.' 
+                                           : `Hold at least ${MIN_SHARES_FOR_CHAT} shares to join.`}
+                                     </Text>
+                                     <TouchableOpacity 
+                                        style={[styles.promoBtn, !hasAccess && styles.promoBtnLocked]}
+                                        onPress={() => {
+                                            if (hasAccess) {
+                                                navigation.navigate('HoldersChat', { entityId: predictionId });
+                                            } else {
+                                                setTradeSheetOpen(true);
+                                            }
+                                        }}
+                                     >
+                                         <Text style={[styles.promoBtnText, !hasAccess && styles.promoBtnTextLocked]}>
+                                             {hasAccess ? 'Join Chat' : 'Buy to Join'}
+                                         </Text>
+                                         {!hasAccess && <Lock size={14} color="#000" style={{marginLeft: 6}} />}
+                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        )}
-                    </View>
-                </View>
 
-                {/* Tabs for content */}
-                <View style={styles.tabsRow}>
-                    <TouchableOpacity 
-                        style={[styles.tab, activeTab === 'Comments' && styles.activeTab]}
-                        onPress={() => setActiveTab('Comments')}
-                    >
-                        <Text style={[styles.tabText, activeTab === 'Comments' && styles.activeTabText]}>Comments</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={[styles.tab, activeTab === 'Activity' && styles.activeTab]}
-                        onPress={() => setActiveTab('Activity')}
-                    >
-                        <Text style={[styles.tabText, activeTab === 'Activity' && styles.activeTabText]}>Activity</Text>
-                    </TouchableOpacity>
-                </View>
+                            {/* About */}
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>About</Text>
+                                <Text style={styles.bodyText}>{detail.description}</Text>
+                            </View>
 
-                {/* Tab Content */}
-                <View style={styles.tabContent}>
-                    {activeTab === 'Comments' ? (
-                        <ArtistComments />
-                    ) : (
-                        <View style={{padding: 32, alignItems: 'center'}}>
-                            <Text style={{color: '#666', fontFamily: FONT_FAMILY.body}}>Recent trading activity...</Text>
+                             {/* Timeline */}
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Timeline and payout</Text>
+                                <TimelineItem label="Market Open" value={new Date(detail.marketOpenAt).toLocaleDateString()} isFirst />
+                                <TimelineItem label="Market Closes" value={detail.marketCloseRule} />
+                                <TimelineItem label="Payout Available" value={detail.payoutNote} isLast />
+                            </View>
+                            
+                            <View style={{ height: 40 }} />
                         </View>
                     )}
-                </View>
 
+                    {activeTab === 'Comments' && <ArtistComments entityId={predictionId} />}
+                    
+                    {activeTab === 'Holders' && <ArtistHolders entityId={predictionId} />}
+                    
+                    {activeTab === 'Activity' && <ArtistActivity artist={{ id: predictionId } as any} />}
+                </View>
             </ScrollView>
 
-            {/* Sticky Buy/Sell Action */}
-            <BuySellBar 
-                onBuy={() => console.log('Buy')}
-                onSell={() => console.log('Sell')}
-                price={prediction.marketType === 'binary' ? `$${(prediction.chance / 100).toFixed(2)}` : undefined}
-            />
+            <FilterSheet 
+                 visible={tradeSheetOpen} 
+                 onClose={() => setTradeSheetOpen(false)} 
+                 title="Trade Position" 
+                 options={[{label: 'Buy Yes', value: 'yes'}, {label: 'Buy No', value: 'no'}]} 
+                 selectedValues={[]} 
+                 onSelect={() => setTradeSheetOpen(false)} 
+             />
         </View>
-        </KeyboardAvoidingView>
     );
 };
 
-const EntityBadge = ({ entityId, navigation }: { entityId: string, navigation: any }) => {
-    // Try finding in Artists first, then Labels (simplified mock lookup)
-    const artist = getArtistById(entityId); 
-    // const label = getLabelById(entityId); // If needed
-
-    if (!artist) return null;
-
+const OutcomeRow = ({ outcome, volume, onPress, isFirst }: any) => {
     return (
-        <TouchableOpacity 
-            style={styles.entityBadge}
-            onPress={() => navigation.push('ArtistDetail', { artistId: artist.id })}
-        >
-            <Image source={{ uri: artist.avatarUrl }} style={styles.badgeAvatar} />
-            <Text style={styles.badgeName}>{artist.name}</Text>
-            <ArrowUpRight size={12} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.outcomeRow}>
+             {/* Icon/Logo */}
+             <View style={[styles.outcomeIcon, { backgroundColor: outcome.color }]}>
+                 {/* Placeholder Icon */}
+                 {isFirst ? <ShieldCheck size={20} color="#FFF" /> : <Monitor size={20} color="#FFF" />}
+             </View>
+
+             <View style={styles.outcomeInfo}>
+                 <Text style={styles.outcomeName}>{outcome.name}</Text>
+                 <Text style={styles.outcomeVol}>${volume.toLocaleString()} Vol</Text>
+             </View>
+
+             <TouchableOpacity style={styles.outcomeBtn} onPress={onPress}>
+                 <Text style={styles.outcomeBtnText}>{outcome.probability}%</Text>
+             </TouchableOpacity>
+        </View>
     );
 };
 
+const TimelineItem = ({ label, value, isFirst, isLast }: any) => (
+    <View style={styles.timelineItem}>
+        <View style={styles.timelineLeft}>
+            <View style={[styles.timelineDot, isFirst && { backgroundColor: COLORS.primary }]} />
+            {!isLast && <View style={[styles.timelineLine, isFirst && { backgroundColor: COLORS.primary }]} />}
+        </View>
+        <View style={styles.timelineContent}>
+            <Text style={styles.timelineLabel}>{label}</Text>
+            <Text style={styles.timelineValue}>{value}</Text>
+        </View>
+    </View>
+);
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: COLORS.black,
     },
-    loading: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+    loading: {
+        flex: 1,
+        backgroundColor: COLORS.black,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingBottom: 8,
     },
-    headerActions: {
-        flexDirection: 'row',
-        gap: 16,
+    headerTitle: {
+        color: COLORS.white,
+        fontFamily: FONT_FAMILY.header,
+        fontWeight: '600', 
+        fontSize: 16,
     },
-    scrollContent: {
-        paddingBottom: 120,
+    heroSection: {
+        paddingBottom: 0,
     },
-    titleSection: {
+    heroHeader: {
         paddingHorizontal: 16,
-        marginBottom: 24,
+        marginBottom: 8,
+    },
+    titleRow: {
+        marginBottom: 16,
     },
     question: {
-        fontFamily: FONT_FAMILY.medium,
         fontSize: 22,
-        color: '#FFF',
-        marginBottom: 12,
-        lineHeight: 30,
+        fontFamily: FONT_FAMILY.header,
+        color: COLORS.white,
+        lineHeight: 28,
+        fontWeight: '600',
     },
-    entityBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-        backgroundColor: '#181818',
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 20,
-        marginBottom: 12,
-        gap: 6,
+    probContainer: {
     },
-    badgeAvatar: {
-        width: 16,
-        height: 16,
-        borderRadius: 8,
+    probValue: {
+        fontSize: 18,
+        fontFamily: FONT_FAMILY.balance,
+        color: COLORS.white,
+        fontWeight: '700',
     },
-    badgeName: {
-        fontFamily: FONT_FAMILY.medium,
+    probLabel: {
         fontSize: 13,
-        color: '#FFF',
+        color: COLORS.textSecondary,
+        fontWeight: '500', 
     },
-    metaRow: {
-        flexDirection: 'row',
+    chartContainer: {
+        height: 220,
+        marginVertical: 16,
+    },
+    yAxis: {
+        width: 48,
+        justifyContent: 'space-between',
+        paddingVertical: 10,
         alignItems: 'center',
+    },
+    axisLabel: {
+        color: '#666',
+        fontSize: 12,
+        fontFamily: FONT_FAMILY.body,
+    },
+    timeframeRow: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        marginTop: 16,
         gap: 8,
     },
-    metaText: {
-        fontFamily: FONT_FAMILY.body,
-        fontSize: 13,
-        color: '#999',
+    tfPill: {
+        flex: 1,
+        paddingVertical: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent', // Default transparent
     },
-    metaDivider: {
-        width: 1,
-        height: 12,
-        backgroundColor: '#333',
+    tfPillActive: {
+        backgroundColor: '#181818',
+    },
+    tfText: {
+        fontFamily: FONT_FAMILY.header,
+        fontSize: 14,
+        color: '#666',
+    },
+    tfTextActive: {
+        color: '#FFF',
     },
     
-    // Chart
-    chartHeader: {
+    // Prediction Section (Hero)
+    predictionSection: {
+        marginTop: 24,
         paddingHorizontal: 16,
         marginBottom: 16,
     },
-    probValue: {
-        fontFamily: FONT_FAMILY.balance,
-        fontSize: 32,
-        fontWeight: '700',
-        color: '#FFF',
-    },
-    probLabel: {
-        fontFamily: FONT_FAMILY.body,
-        fontSize: 13,
-        color: '#666',
-    },
-    chartContainer: {
-        marginBottom: 32,
-    },
 
-    // Outcomes
+    // TAB CONTENT
+    tabContent: {
+        minHeight: 800, 
+        paddingHorizontal: 16, 
+        paddingTop: 0,
+    },
     section: {
-        paddingHorizontal: 16,
         marginBottom: 32,
     },
     sectionTitle: {
-        fontFamily: FONT_FAMILY.medium,
         fontSize: 18,
+        fontFamily: FONT_FAMILY.header,
         color: '#FFF',
         marginBottom: 16,
     },
-    outcomesCard: {
-        backgroundColor: '#111',
-        borderRadius: 16,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#222',
+    bodyText: {
+        fontSize: 15,
+        color: '#CCC',
+        lineHeight: 22,
+    },
+    
+    // Outcome Rows
+    outcomesList: {
+        gap: 12,
     },
     outcomeRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
+        marginBottom: 4,
+    },
+    outcomeIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+    },
+    outcomeInfo: {
+        flex: 1,
     },
     outcomeName: {
-        fontFamily: FONT_FAMILY.medium,
-        fontSize: 16,
         color: '#FFF',
-    },
-    outcomePercent: {
-        fontFamily: FONT_FAMILY.balance,
         fontSize: 16,
-        fontWeight: '700',
-        color: '#FFF',
+        fontWeight: '600',
+        marginBottom: 2,
     },
-    outcomePrice: {
-        fontFamily: FONT_FAMILY.body,
-        fontSize: 12,
+    outcomeVol: {
         color: '#666',
+        fontSize: 12,
     },
-    divider: {
-        height: 1,
-        backgroundColor: '#222',
+    outcomeBtn: {
+        backgroundColor: '#FFF',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        minWidth: 60,
+        alignItems: 'center',
     },
-    dot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
+    outcomeBtnText: {
+        color: '#000',
+        fontWeight: '700',
+        fontSize: 14,
     },
 
-    // Tabs
-    tabsRow: {
+    // PROMO CARD
+    promoCard: {
+      backgroundColor: '#111',
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 32,
+      borderWidth: 1,
+      borderColor: '#222',
+    },
+    promoHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    iconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.08)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    promoTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#FFF',
+      fontFamily: FONT_FAMILY.header,
+      marginBottom: 2,
+    },
+    promoSubtitle: {
+      fontSize: 13,
+      color: '#999',
+    },
+    promoFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    promoHelper: {
+      fontSize: 12,
+      color: '#666',
+      flex: 1,
+      marginRight: 12,
+    },
+    promoBtn: {
+      backgroundColor: '#FFF',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    promoBtnLocked: {
+      backgroundColor: COLORS.primary, // or brand color
+    },
+    promoBtnText: {
+      color: '#000',
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    promoBtnTextLocked: {
+      color: '#000',
+    },
+
+    // TIMELINE
+    timelineItem: {
         flexDirection: 'row',
-        paddingHorizontal: 16,
-        marginBottom: 16,
-        gap: 24,
-        borderBottomWidth: 1,
-        borderBottomColor: '#222',
+        minHeight: 60,
     },
-    tab: {
-        paddingBottom: 16,
+    timelineLeft: {
+        width: 24,
+        alignItems: 'center',
+        marginRight: 16,
     },
-    activeTab: {
-        borderBottomWidth: 2,
-        borderBottomColor: '#FFF',
+    timelineDot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: '#333',
+        borderWidth: 2,
+        borderColor: '#000',
     },
-    tabText: {
-        fontFamily: FONT_FAMILY.medium,
-        fontSize: 16,
-        color: '#666',
+    timelineLine: {
+        width: 2,
+        flex: 1,
+        backgroundColor: '#333',
+        marginVertical: 4,
     },
-    activeTabText: {
-        color: '#FFF',
+    timelineContent: {
+        flex: 1,
+        paddingBottom: 24,
     },
-    tabContent: {
-        minHeight: 300,
+    timelineLabel: {
+        fontSize: 15,
+        color: COLORS.white,
+        marginBottom: 4,
+        fontWeight: '600',
+    },
+    timelineValue: {
+        fontSize: 14,
+        color: COLORS.textSecondary,
     },
 });

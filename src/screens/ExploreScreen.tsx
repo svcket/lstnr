@@ -202,7 +202,22 @@ export const ExploreScreen = () => {
                     <View style={{ marginBottom: 24 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: PX_16, gap: PX_8 }}>
                             {(['All', 'Artists', 'Predictions', 'Ending soon'] as FilterType[]).map(f => (
-                                <FilterChip key={f} label={f} isActive={filter === f} onPress={() => setFilter(f)} />
+                                <FilterChip 
+                                    key={f} 
+                                    label={f} 
+                                    isActive={filter === f} 
+                                    onPress={() => {
+                                        if (f === 'Artists') {
+                                            navigation.navigate('TrendingArtists');
+                                        } else if (f === 'Predictions') {
+                                            navigation.navigate('Predictions');
+                                        } else if (f === 'Ending soon') {
+                                            navigation.navigate('EndingSoon');
+                                        } else {
+                                            setFilter(f);
+                                        }
+                                    }} 
+                                />
                             ))}
                         </ScrollView>
                     </View>

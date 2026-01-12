@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
-import { ChevronLeft } from 'lucide-react-native';
+import { HeaderBack } from '../components/common/HeaderBack';
 import { getAllPredictions } from '../data/catalog';
 import { PredictionCard } from '../components/artist/PredictionCard';
 
@@ -24,11 +24,9 @@ export const TopPredictionsScreen = () => {
             <StatusBar barStyle="light-content" />
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-                        <ChevronLeft size={24} color="#FFF" />
-                    </TouchableOpacity>
+                    <HeaderBack />
                     <Text style={styles.headerTitle}>Top Predictions</Text>
-                    <View style={styles.backBtn} /> 
+                    <View style={{ width: 40 }} /> 
                 </View>
 
                 <FlatList

@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { FONT_FAMILY } from '../../constants/theme';
-import { ArtistMarket } from '../../mock/artistMarket';
 import { ActivityRow } from './ActivityRow';
+import { getActivity, ActivityItem } from '../../data/social';
 
 interface ArtistActivityProps {
-  artist: ArtistMarket;
+  artist: { id: string }; // Minimal requirement
 }
 
 type FilterType = 'All' | 'Following' | 'Myself';
@@ -13,17 +13,22 @@ const FILTERS: FilterType[] = ['All', 'Following', 'Myself'];
 
 export const ArtistActivity = ({ artist }: ArtistActivityProps) => {
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
+  const [activityList, setActivityList] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+      setActivityList(getActivity(artist.id));
+  }, [artist.id]);
 
   const filteredActivity = useMemo(() => {
     switch (activeFilter) {
       case 'Following':
-        return artist.activityList.filter(item => item.user.isFollowing);
+        return activityList.filter(item => item.user.isVerified); // Mock proxy for following
       case 'Myself':
-        return artist.activityList.filter(item => item.user.isSelf);
+        return []; // Mock empty for now
       default:
-        return artist.activityList;
+        return activityList;
     }
-  }, [activeFilter, artist.activityList]);
+  }, [activeFilter, activityList]);
 
   const renderHeader = () => (
     <View style={styles.filterRow}>
@@ -43,9 +48,8 @@ export const ArtistActivity = ({ artist }: ArtistActivityProps) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-        {/* Reuse simple text/emoji or mascot if available */}
         <Text style={styles.emptyEmoji}>🤔</Text>
-        <Text style={styles.emptyText}>No activity available</Text>
+        <Text style={styles.emptyText}>No activity found</Text>
     </View>
   );
 
@@ -63,7 +67,7 @@ export const ArtistActivity = ({ artist }: ArtistActivityProps) => {
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.listContent}
-        scrollEnabled={false} // Nested inside parent ScrollView
+        scrollEnabled={false} 
       />
     </View>
   );
@@ -96,10 +100,10 @@ const styles = StyleSheet.create({
   filterText: {
     fontFamily: FONT_FAMILY.header, // Medium
     fontSize: 14,
-    color: '#FFF', // Unselected text is White
+    color: '#999', 
   },
   activeText: {
-    color: '#000', // Selected text is Black
+    color: '#000', 
   },
   emptyContainer: {
     alignItems: 'center',

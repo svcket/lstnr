@@ -8,7 +8,7 @@ import { getAllLabels } from '../data/catalog';
 import { getEntityMetrics } from '../lib/mockMetrics';
 
 export const PopularLabelsScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     
     // Populate list
     const baseLabels = getAllLabels();
@@ -35,7 +35,7 @@ export const PopularLabelsScreen = () => {
             <TouchableOpacity 
                 style={styles.row} 
                 activeOpacity={0.7}
-                onPress={() => navigation.navigate('LabelDetail', { labelId: item.id.split('_')[0] } as never)}
+                onPress={() => navigation.navigate('LabelDetail', { labelId: item.id.split('_')[0] })}
             >
                 {/* Rank */}
                 <View style={styles.rankCol}>
