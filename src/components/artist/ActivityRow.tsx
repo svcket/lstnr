@@ -34,9 +34,8 @@ export const ActivityRow = ({ item, isLast }: ActivityRowProps) => {
           
           {/* Middle: Token Amount */}
           <Text style={[styles.amount, { color: actionColor }]}>
-              {sign}{item.amount.toLocaleString()} 
+              {sign}{item.amount.toLocaleString()} <Text style={styles.symbol}>{item.symbol}</Text>
           </Text>
-          <Text style={styles.symbol}>{item.symbol}</Text>
 
           {/* Bottom: Impact/Stat */}
           {item.impact !== undefined && (
