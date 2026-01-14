@@ -166,6 +166,56 @@ export const PredictionDetailScreen = ({ route }: any) => {
                              onTimeframeChange={setActiveTimeframe}
                         />
 
+                        {/* Make Prediction - Button Bar */}
+                        <View style={styles.predictionSection}>
+                            <Text style={styles.sectionTitle}>Make your prediction</Text>
+                            
+                            {detail.marketType === 'multi-range' ? (
+                                <View style={styles.outcomesList}>
+                                    {detail.outcomes.slice(0, showAllOutcomes ? undefined : 3).map((outcome, idx) => (
+                                        <OutcomeRow 
+                                            key={outcome.id}
+                                            outcome={outcome as any}
+                                            volume={Math.floor(detail.volume * ((outcome as any).probability / 100))}
+                                            onPress={() => setTradeSheetOpen(true)}
+                                            isFirst={idx === 0} 
+                                            marketType={detail.marketType}
+                                        />
+                                    ))}
+                                    {detail.outcomes.length > 3 && (
+                                        <TouchableOpacity 
+                                            style={styles.showMoreBtn}
+                                            onPress={() => {
+                                                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                                                setShowAllOutcomes(!showAllOutcomes);
+                                            }}
+                                        >
+                                            <Text style={styles.showMoreText}>
+                                                {showAllOutcomes ? 'Show Less' : `Show ${detail.outcomes.length - 3} More Outcomes`}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            ) : (
+                                <View style={styles.binaryBar}>
+                                     <TouchableOpacity 
+                                        style={[styles.actionBtn, styles.btnYes]} 
+                                        onPress={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
+                                        activeOpacity={0.8}
+                                     >
+                                         <Text style={[styles.actionText, styles.textYes]}>YES {Math.round(detail.outcomes.find(o => o.id === 'yes')?.probability || 0)}%</Text>
+                                     </TouchableOpacity>
+
+                                     <TouchableOpacity 
+                                        style={[styles.actionBtn, styles.btnNo]} 
+                                        onPress={() => { setViewSide('no'); setTradeSheetOpen(true); }}
+                                        activeOpacity={0.8}
+                                     >
+                                         <Text style={[styles.actionText, styles.textNo]}>NO {Math.round(detail.outcomes.find(o => o.id === 'no')?.probability || 0)}%</Text>
+                                     </TouchableOpacity>
+                                </View>
+                            )}
+                        </View>
                     </ScreenContainer>
                 </View>
 
@@ -179,43 +229,11 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 />
 
                 {/* 3. Tab Content */}
-                <View style={[styles.tabContent, { minHeight: 800, paddingBottom: detail.marketType !== 'multi-range' ? 100 : 0 }]}>
+                <View style={[styles.tabContent, { minHeight: 800 }]}>
                     <ScreenContainer px={16}>
                         {activeTab === 'Details' && (
                             /* Stack Container with Gap */
                             <View style={styles.detailsStack}>
-                                {/* Multi-Range Outcome List (Only for Multi) */}
-                                {detail.marketType === 'multi-range' && (
-                                    <View style={styles.predictionSection}>
-                                        <Text style={styles.sectionTitle}>Make your prediction</Text>
-                                        <View style={styles.outcomesList}>
-                                            {detail.outcomes.slice(0, showAllOutcomes ? undefined : 3).map((outcome, idx) => (
-                                                <OutcomeRow 
-                                                    key={outcome.id}
-                                                    outcome={outcome as any}
-                                                    volume={Math.floor(detail.volume * ((outcome as any).probability / 100))}
-                                                    onPress={() => setTradeSheetOpen(true)}
-                                                    isFirst={idx === 0} 
-                                                    marketType={detail.marketType}
-                                                />
-                                            ))}
-                                            {detail.outcomes.length > 3 && (
-                                                <TouchableOpacity 
-                                                    style={styles.showMoreBtn}
-                                                    onPress={() => {
-                                                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                                                        setShowAllOutcomes(!showAllOutcomes);
-                                                    }}
-                                                >
-                                                    <Text style={styles.showMoreText}>
-                                                        {showAllOutcomes ? 'Show Less' : `Show ${detail.outcomes.length - 3} More Outcomes`}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            )}
-                                        </View>
-                                    </View>
-                                )}
-
                                 {/* 1. Chat Promo Card */}
                                 <View style={styles.promoCard}>
                                     <View style={{flexDirection: 'column', gap: 4, flex: 1}}>
@@ -297,26 +315,8 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 </View>
             </ScrollView>
 
-             {/* Fixed Bottom Bar (Binary Only) */}
-             {detail.marketType !== 'multi-range' && (
-                 <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 24) }]}>
-                     <TouchableOpacity 
-                        style={[styles.actionBtn, styles.btnYes]} 
-                        onPress={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
-                        activeOpacity={0.8}
-                     >
-                         <Text style={[styles.actionText, styles.textYes]}>Yes</Text>
-                     </TouchableOpacity>
 
-                     <TouchableOpacity 
-                        style={[styles.actionBtn, styles.btnNo]} 
-                        onPress={() => { setViewSide('no'); setTradeSheetOpen(true); }}
-                        activeOpacity={0.8}
-                     >
-                         <Text style={[styles.actionText, styles.textNo]}>No</Text>
-                     </TouchableOpacity>
-                 </View>
-             )}
+
 
             <FilterSheet
                  visible={tradeSheetOpen}
@@ -336,33 +336,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
     );
 };
 
-const BinaryChoiceButtons = ({ yesPercent, noPercent, yesLabel = 'YES', noLabel = 'NO', onPickYes, onPickNo }: any) => {
-    return (
-        <View style={styles.binaryChoiceContainer}>
-            <TouchableOpacity 
-                style={[styles.binaryChoiceBtn, styles.btnYes]} 
-                onPress={onPickYes}
-                activeOpacity={0.8}
-            >
-                <View style={styles.binaryBtnContent}>
-                    <Text style={styles.binaryLabel}>{yesLabel}</Text>
-                    <Text style={styles.binaryPercent}>{yesPercent}%</Text>
-                </View>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-                style={[styles.binaryChoiceBtn, styles.btnNo]} 
-                onPress={onPickNo}
-                activeOpacity={0.8}
-            >
-                <View style={styles.binaryBtnContent}>
-                    <Text style={styles.binaryLabel}>{noLabel}</Text>
-                    <Text style={styles.binaryPercent}>{noPercent}%</Text>
-                </View>
-            </TouchableOpacity>
-        </View>
-    );
-};
+
 
 const OutcomeRow = ({ outcome, volume, onPress, isFirst, marketType }: any) => {
     return (
