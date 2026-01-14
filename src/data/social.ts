@@ -17,6 +17,15 @@ export interface Comment {
     likes: number;
     liked?: boolean;
     isHolder?: boolean;
+    repliesCount?: number;
+    replies?: Comment[];
+    contextType: 'ARTIST' | 'LABEL' | 'PREDICTION';
+    symbol: string;
+    predictionMeta?: {
+        marketType: 'binary' | 'multi-range';
+        pickedOutcomeLabel?: string;
+        pickedSide?: 'YES' | 'NO' | null;
+    };
 }
 
 export interface ChatMessage {
@@ -87,7 +96,31 @@ export const getComments = (entityId: string): Comment[] => {
                 : `Does anyone know when the next album drops?`,
             createdAt: `${i + 1}h ago`,
             likes: Math.floor(Math.random() * 50),
-            isHolder: Math.random() > 0.5
+            isHolder: Math.random() > 0.5,
+            repliesCount: i % 3 === 0 ? 3 : 0,
+            replies: i % 3 === 0 ? Array.from({ length: 3 }).map((_, r) => ({
+                 id: `r_${entityId}_${i}_${r}`,
+                 user: MOCK_USERS[(i + r + 1) % MOCK_USERS.length],
+                 text: `This is a nested reply #${r+1}`,
+                 createdAt: `${r * 10 + 5}m ago`,
+                 likes: Math.floor(Math.random() * 10),
+                 liked: false,
+                 // Nested inherits context
+                 contextType: entityId.startsWith('p') ? 'PREDICTION' : 'ARTIST',
+                 symbol: '$BIGT',
+                 predictionMeta: entityId.startsWith('p') ? {
+                     marketType: entityId.includes('multi') ? 'multi-range' : 'binary',
+                     pickedOutcomeLabel: entityId.includes('multi') ? 'Kendrick Lamar' : (Math.random() > 0.5 ? 'Yes' : 'No'),
+                     pickedSide: entityId.includes('multi') ? null : (Math.random() > 0.5 ? 'YES' : 'NO')
+                 } : undefined
+            })) : [],
+            contextType: entityId.startsWith('p') ? 'PREDICTION' : 'ARTIST',
+            symbol: '$BIGT',
+            predictionMeta: entityId.startsWith('p') ? {
+                 marketType: entityId.includes('multi') ? 'multi-range' : 'binary',
+                 pickedOutcomeLabel: entityId.includes('multi') ? 'Kendrick Lamar' : (Math.random() > 0.5 ? 'Yes' : 'No'),
+                 pickedSide: entityId.includes('multi') ? null : (Math.random() > 0.5 ? 'YES' : 'NO')
+            } : undefined
         }));
     }
     return commentsStore[entityId];
@@ -102,7 +135,9 @@ export const addComment = (entityId: string, text: string) => {
         createdAt: 'Just now',
         likes: 0,
         liked: false,
-        isHolder: true // Assuming user is holder for demo
+        isHolder: true,
+        contextType: entityId.startsWith('p') ? 'PREDICTION' : 'ARTIST',
+        symbol: '$BIGT'
     };
     commentsStore[entityId] = [newComment, ...list];
     return newComment;
@@ -136,7 +171,7 @@ export const addChatMessage = (entityId: string, text: string) => {
 
 export const getHolders = (entityId: string): Holder[] => {
     if (!holdersStore[entityId]) {
-        holdersStore[entityId] = Array.from({ length: 12 }).map((_, i) => ({
+        holdersStore[entityId] = Array.from({ length: 30 }).map((_, i) => ({
             id: `h_${entityId}_${i}`,
             name: MOCK_USERS[i % MOCK_USERS.length].name,
             avatar: MOCK_USERS[i % MOCK_USERS.length].avatar,

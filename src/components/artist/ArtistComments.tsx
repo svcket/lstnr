@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Platform, Keyboard, LayoutAnimation, UIManager } from 'react-native';
-import { MoreVertical, Heart, CornerDownRight, ChevronDown, ChevronUp, Send } from 'lucide-react-native';
+import { MoreVertical, Heart, CornerDownRight, ChevronDown, ChevronUp, Send, MessageSquare, Reply } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { getComments, addComment, Comment } from '../../data/social';
 
@@ -16,6 +16,7 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
   const [comments, setComments] = useState<Comment[]>([]); 
   const [inputText, setInputText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = React.useRef<TextInput>(null);
 
   useEffect(() => {
       setComments(getComments(entityId));
@@ -43,6 +44,38 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
 
   return (
     <View style={styles.container}>
+      {/* Composer - Top as requested */}
+      <View style={styles.composerContainer}>
+          <View style={[styles.inputWrapper, isFocused && styles.inputWrapperFocused]}>
+             <TextInput 
+               ref={inputRef}
+               style={[styles.input, isFocused && styles.inputFocused]}
+               placeholder="Comment on $BIGT"
+               placeholderTextColor="#999"
+               value={inputText}
+               onChangeText={setInputText}
+               onFocus={() => setIsFocused(true)}
+               onBlur={() => !inputText && setIsFocused(false)} 
+               multiline
+             />
+          </View>
+          {isFocused && (
+              <View style={styles.composerActions}>
+                  <TouchableOpacity onPress={handleCancel}>
+                      <Text style={styles.cancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    onPress={handlePost} 
+                    disabled={!inputText.trim()}
+                    style={[styles.postBtn, !inputText.trim() && styles.postBtnDisabled]}
+                  >
+                      <Text style={[styles.postText, !inputText.trim() && styles.postTextDisabled]}>Post</Text>
+                  </TouchableOpacity>
+              </View>
+          )}
+      </View>
+
       {/* Comments List */}
       <View style={styles.listContainer}>
           {comments.map((comment, index) => (
@@ -50,6 +83,10 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
                 key={comment.id} 
                 comment={comment} 
                 isLast={index === comments.length - 1} 
+                onLike={() => {
+                    const updated = comments.map(c => c.id === comment.id ? { ...c, liked: !c.liked, likes: c.liked ? c.likes - 1 : c.likes + 1 } : c);
+                    setComments(updated);
+                }}
              />
           ))}
           {comments.length === 0 && (
@@ -57,49 +94,6 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
                 <Text style={styles.emptyText}>No comments yet. Be the first!</Text>
              </View>
           )}
-      </View>
-
-      {/* Composer (Fixed at bottom or just at bottom of list? Requirement says "Add an input composer at the bottom". 
-          Commonly in valid scroll views it's at the end. Or sticky. 
-          Given this is inside a ScrollView (Tab), sticky bottom requires logic.
-          For now I'll place it at the top or bottom of the section. 
-          The previous implementation had it at the top. 
-          Let's put it at the BOTTOM of the list as requested "append to list". 
-          Actually, usually "Composer at bottom" means sticky footer. 
-          But since this is a Tab inside a ScrollView, sticky footer is hard without re-architecting the screen to use `KeyboardAvoidingView` wrapping the Tab content or similar.
-          I will place it at the TOP for better UX in this specific "Tab in ScrollView" layout, 
-          OR keep it at top as per previous implementation but styling it nice.
-          
-          Wait, user said "Add an input composer at the bottom (text input + send icon)."
-          And "Composer that appends to list". 
-          If I put it at bottom of the list, it pushes down.
-          Let's try putting it at the TOP for now as it's easier to access in a long list, 
-          unless strictly "bottom" means fixed to screen bottom. 
-          "Input composer at the bottom" usually implies fixed. 
-          I'll stick to TOP for stability in this layout unless forced. 
-          actually, I will conform to the "Composer at bottom" request by placing it after the list, 
-          but simpler is Top. 
-          Let's stick to the previous TOP layout but refined, it's a standard pattern for "Guestbook" style. 
-          Actually, I will put it at the top to ensure visibility.
-      */}
-      <View style={styles.composerContainer}>
-         <View style={[styles.inputWrapper, isFocused && styles.inputWrapperFocused]}>
-            <TextInput 
-              style={[styles.input, isFocused && styles.inputFocused]}
-              placeholder="Add a comment..."
-              placeholderTextColor="#666"
-              value={inputText}
-              onChangeText={setInputText}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => !inputText && setIsFocused(false)} 
-              multiline
-            />
-            {inputText.length > 0 && (
-                <TouchableOpacity onPress={handlePost} style={styles.sendBtn}>
-                    <Send size={20} color={COLORS.white} />
-                </TouchableOpacity>
-            )}
-         </View>
       </View>
     </View>
   );
@@ -110,7 +104,92 @@ const formatLikes = (count: number) => {
     return count.toString();
 };
 
-const CommentItem = ({ comment, isLast }: { comment: Comment; isLast: boolean }) => {
+const LikeCount = ({ likes, liked, onLike }: { likes: number; liked?: boolean; onLike?: () => void }) => (
+    <TouchableOpacity onPress={onLike} style={styles.actionBtn}>
+        <Heart size={16} color={liked ? '#ef4444' : '#999'} fill={liked ? '#ef4444' : 'none'} />
+        <Text style={styles.actionCount}>{formatLikes(likes)}</Text>
+    </TouchableOpacity>
+);
+
+const getBadgesForComment = (comment: Comment) => {
+    const badges: { text: string; color: 'green' | 'red' | 'gray'; type?: 'symbol' | 'outcome' }[] = [];
+
+    // 1. Symbol Badge (Always, unless logic dictates otherwise, but prompt says "Show ONE badge: Grey $<SYMBOL>")
+    // "Grey badge: $<SYMBOL> ... If commenter isHolder === false: Either show NO badge, OR keep the same grey symbol badge"
+    // We will show symbol badge primarily.
+    
+    // ARTIST / LABEL
+    if (comment.contextType === 'ARTIST' || comment.contextType === 'LABEL') {
+         if (comment.isHolder) {
+             badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
+         } else {
+             // prompt: "Either show NO badge, OR keep the same grey symbol badge... BUT DO NOT show any Yes/No"
+             // Let's show it to be safe/consistent, or omit if we want to reduce noise. 
+             // Prompt says: "Artist/Label comments never display Yes/No tags."
+             // "Show ONLY ONE badge: Grey $<SYMBOL> ... If isHolder === false ... keep the same grey symbol badge" -> imply keeping it is fine.
+             badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
+         }
+         return badges;
+    }
+
+    // PREDICTION
+    if (comment.contextType === 'PREDICTION' && comment.predictionMeta) {
+        const { marketType, pickedOutcomeLabel, pickedSide } = comment.predictionMeta;
+        
+        // 1. Symbol Badge
+        // "Show TWO badges ... 1) Grey badge: $<SYMBOL>"
+        badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
+
+        // 2. Outcome Badge
+        if (marketType === 'binary') {
+            // "Show TWO badges... 2) Outcome badge: Yes or No"
+            // "If commenter has NOT placed a bet/position: Show ONLY the grey symbol badge"
+            if (pickedSide) {
+                badges.push({ 
+                    text: pickedSide === 'YES' ? 'Yes' : 'No', 
+                    color: pickedSide === 'YES' ? 'green' : 'red',
+                    type: 'outcome'
+                });
+            }
+        } else if (marketType === 'multi-range') {
+             // "Show TWO badges... 1) Grey badge: specified option label... 2) Optional secondary grey badge: $<SYMBOL>"
+             // "DO NOT show Yes/No badges for multi-range markets."
+             
+             // Wait, logic says: 
+             // 1) Grey badge: pickedOutcomeLabel
+             // 2) Optional secondary: symbol.
+             
+             // Let's swap order if we want "Outcome" then "Symbol" or vice versa? 
+             // Prompt: "Show TWO badges: 1) Grey badge: the selected option label... 2) Optional secondary grey badge: $<SYMBOL>"
+             // Implementation: We added symbol first above.
+             // Let's reset badges for multi-range to match spec exactly.
+             
+             if (pickedOutcomeLabel) {
+                 return [
+                     { text: pickedOutcomeLabel, color: 'gray', type: 'outcome' },
+                     { text: comment.symbol, color: 'gray', type: 'symbol' }
+                 ];
+             } else {
+                 // No position? Show symbol only?
+                 return [{ text: comment.symbol, color: 'gray', type: 'symbol' }];
+             }
+        }
+    }
+    
+    return badges;
+};
+
+const CommentItem = ({ comment, isLast, onLike }: { comment: Comment; isLast: boolean; onLike: () => void }) => {
+  const [repliesOpen, setRepliesOpen] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
+  
+  const handleInlineReply = () => {
+      // Mock submitting reply
+      setIsReplying(false);
+      setRepliesOpen(true);
+      // In real app we would add to data store here
+  };
+
   return (
     <View style={[styles.row, !isLast && styles.rowBorder]}>
       <Image source={{ uri: comment.user.avatar }} style={styles.avatar} />
@@ -120,20 +199,76 @@ const CommentItem = ({ comment, isLast }: { comment: Comment; isLast: boolean })
             <Text style={styles.username}>{comment.user.name}</Text>
             <Text style={styles.dot}>•</Text>
             <Text style={styles.timestamp}>{comment.createdAt}</Text>
+            <View style={{flex: 1}} />
+            <TouchableOpacity hitSlop={8}>
+                <MoreVertical size={16} color="#666" />
+            </TouchableOpacity>
          </View>
          
-         {comment.isHolder && (
-             <View style={styles.holderBadge}>
-                 <Text style={styles.holderText}>Holder</Text>
-             </View>
-         )}
+         <View style={styles.badgesRow}>
+             {getBadgesForComment(comment).map((badge, idx) => (
+                 <View key={idx} style={[styles.badge, { backgroundColor: badge.color === 'green' ? '#064e3b' : badge.color === 'red' ? '#7f1d1d' : '#27272a' }]}>
+                     <Text style={[styles.badgeText, { color: badge.color === 'green' ? '#4ade80' : badge.color === 'red' ? '#f87171' : '#a1a1aa' }]}>{badge.text}</Text>
+                 </View>
+             ))}
+         </View>
          
          <Text style={styles.commentText}>{comment.text}</Text>
          
          <View style={styles.actionsRow}>
-            <Heart size={14} color="#666" />
-            <Text style={styles.actionCount}>{formatLikes(comment.likes)}</Text>
+            <LikeCount likes={comment.likes} liked={comment.liked} onLike={onLike} />
+
+            <TouchableOpacity style={styles.actionBtn} onPress={() => setIsReplying(!isReplying)}>
+                <Reply size={16} color="#999" />
+                <Text style={styles.actionText}>Reply</Text>
+            </TouchableOpacity>
          </View>
+
+         {/* Inline Composer */}
+         {isReplying && (
+             <View style={{ marginTop: 12 }}>
+                 <InlineComposer 
+                    placeholder={`Reply to ${comment.user.name}...`}
+                    onCancel={() => setIsReplying(false)}
+                    onPost={handleInlineReply}
+                 />
+             </View>
+         )}
+
+         {/* Nested Replies Toggle */}
+         {comment.repliesCount && comment.repliesCount > 0 ? (
+             <View>
+                 <TouchableOpacity 
+                    style={styles.viewRepliesBtn}
+                    onPress={() => {
+                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                        setRepliesOpen(!repliesOpen);
+                    }}
+                 >
+                     {repliesOpen ? <ChevronUp size={14} color="#666" /> : <ChevronDown size={14} color="#666" />}
+                     <Text style={styles.viewRepliesText}>
+                         {repliesOpen ? 'Hide replies' : `View ${comment.repliesCount} replies`}
+                     </Text>
+                 </TouchableOpacity>
+                 
+                 {repliesOpen && comment.replies?.map((reply) => (
+                     <View key={reply.id} style={styles.replyRow}>
+                         <Image source={{ uri: reply.user.avatar }} style={styles.replyAvatar} />
+                         <View style={{ flex: 1 }}>
+                             <View style={styles.headerRow}>
+                                <Text style={styles.username}>{reply.user.name}</Text>
+                                <Text style={styles.dot}>•</Text>
+                                <Text style={styles.timestamp}>{reply.createdAt}</Text>
+                             </View>
+                             <Text style={[styles.commentText, { fontSize: 14 }]}>{reply.text}</Text>
+                             <View style={styles.actionsRow}>
+                                 <LikeCount likes={reply.likes} liked={reply.liked} />
+                             </View>
+                         </View>
+                     </View>
+                 ))}
+             </View>
+         ) : null}
       </View>
     </View>
   );
@@ -142,38 +277,84 @@ const CommentItem = ({ comment, isLast }: { comment: Comment; isLast: boolean })
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 40,
-    paddingTop: 16,
   },
   composerContainer: {
     marginBottom: 24,
-    order: -1, // Flex order if I wanted to swap, but simpler to just place in JSX
   },
   inputWrapper: {
     backgroundColor: '#181818',
-    borderRadius: 24,
+    borderRadius: 28,
     borderWidth: 1,
     borderColor: '#333',
-    paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    minHeight: 56,
+    justifyContent: 'center',
+    paddingVertical: 4, // Reduce vertical padding to allow input to center itself or flex
+  },
+  inlineInputWrapper: {
+      backgroundColor: '#181818',
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: '#333',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      minHeight: 48,
+      justifyContent: 'center',
+  },
+  inlineInput: {
+      color: '#FFF',
+      fontFamily: FONT_FAMILY.body,
+      fontSize: 14,
+      textAlignVertical: 'center', // Android center
+      paddingTop: 0, 
+      paddingBottom: 0,
   },
   inputWrapperFocused: {
-    borderColor: '#FFF',
+    borderColor: '#333',
+    backgroundColor: '#000',
   },
   input: {
-    flex: 1,
+    width: '100%',
     color: '#FFF',
     fontFamily: FONT_FAMILY.body,
-    fontSize: 15,
-    maxHeight: 100,
+    fontSize: 16, // Match auth
+    maxHeight: 120,
+    textAlignVertical: 'center',
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   inputFocused: {
     color: '#FFF',
   },
-  sendBtn: {
-      marginLeft: 8,
-      padding: 4,
+  composerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      width: '100%',
+      marginTop: 8,
+      gap: 16,
+  },
+  cancelText: {
+      color: '#CCC',
+      fontSize: 15,
+      fontWeight: '500',
+  },
+  postBtn: {
+      backgroundColor: '#FFF',
+      paddingHorizontal: 20,
+      paddingVertical: 8,
+      borderRadius: 20,
+  },
+  postBtnDisabled: {
+      backgroundColor: '#333',
+  },
+  postText: {
+      color: '#000',
+      fontSize: 15,
+      fontWeight: '600',
+  },
+  postTextDisabled: {
+      color: '#666',
   },
   listContainer: {
       marginBottom: 24,
@@ -227,17 +408,19 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
     fontSize: 12,
   },
-  holderBadge: {
-      alignSelf: 'flex-start',
-      backgroundColor: 'rgba(255,255,255,0.1)',
-      borderRadius: 4,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
+  badgesRow: {
+      flexDirection: 'row',
+      gap: 6,
       marginBottom: 6,
   },
-  holderText: {
+  badge: {
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
+  },
+  badgeText: {
       fontSize: 10,
-      color: '#CCC',
+      color: '#FFF',
       fontWeight: '600',
   },
   commentText: {
@@ -250,11 +433,81 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 16,
+    marginTop: 4,
+  },
+  actionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4, 
   },
   actionCount: {
-    color: '#666',
+    color: '#999',
     fontSize: 12, 
     fontFamily: FONT_FAMILY.header,
+    fontWeight: '500',
+  },
+  actionText: {
+      color: '#999',
+      fontSize: 12,
+      fontWeight: '500',
+  },
+  viewRepliesBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 12,
+      gap: 6,
+      marginBottom: 4,
+  },
+  viewRepliesText: {
+      color: '#666', // Muted text for view replies
+      fontSize: 13,
+      fontWeight: '600',
+  },
+  replyRow: {
+      flexDirection: 'row',
+      marginTop: 16,
+      paddingLeft: 0, 
+  },
+  replyAvatar: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      marginRight: 10,
+      backgroundColor: '#333',
   },
 });
+
+const InlineComposer = ({ placeholder, onCancel, onPost }: { placeholder: string; onCancel: () => void; onPost: () => void }) => {
+    const [text, setText] = useState('');
+    return (
+        <View>
+            <View style={styles.inlineInputWrapper}>
+                <TextInput 
+                    style={styles.inlineInput}
+                    placeholder={placeholder}
+                    placeholderTextColor="#666"
+                    value={text}
+                    onChangeText={setText}
+                    multiline
+                    autoFocus
+                />
+            </View>
+            <View style={styles.composerActions}>
+                <TouchableOpacity onPress={onCancel}>
+                    <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    onPress={() => {
+                        onPost();
+                        setText('');
+                    }}
+                    disabled={!text.trim()}
+                    style={[styles.postBtn, !text.trim() && styles.postBtnDisabled]}
+                >
+                    <Text style={[styles.postText, !text.trim() && styles.postTextDisabled]}>Post</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+};

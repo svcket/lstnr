@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { Search, ChevronDown } from 'lucide-react-native';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { TopAmountSummary } from '../components/common/TopAmountSummary';
 import { getAllArtists } from '../data/catalog';
 import { FilterPill } from '../components/common/FilterPill';
 import { FilterSheet } from '../components/common/FilterSheet';
@@ -19,9 +20,12 @@ import {
 } from '../utils/filters';
 import { getEntityMetrics } from '../lib/mockMetrics';
 
+import { usePortfolioTotals } from '../hooks/usePortfolioTotals';
+
 export const TrendingArtistsScreen = () => {
     const navigation = useNavigation<any>();
     const [search, setSearch] = useState('');
+    const { artistsValue } = usePortfolioTotals();
     
     // Filter State
     const [rankSort, setRankSort] = useState('rank_asc');
@@ -47,7 +51,8 @@ export const TrendingArtistsScreen = () => {
     const renderItem = ({ item, index }: { item: typeof processedArtists[0], index: number }) => {
         // Generate metrics based on timeframe... simply mocked for now based on '24h' field multiplier check
         // For standard "24h" display:
-        const metrics = item.metrics;
+        // FIX: Verify item.metrics exists. If not, fetch it.
+        const metrics = (item as any).metrics || getEntityMetrics(item.id.split('_')[0]); // Fallback safely
         const volume = timeFrame === '7d' ? metrics.volume24h * 7 : timeFrame === '30d' ? metrics.volume24h * 30 : metrics.volume24h;
         
         return (
@@ -157,6 +162,12 @@ export const TrendingArtistsScreen = () => {
                     <Text style={styles.headerTitle}>Artists</Text>
                     <View style={{ width: 40 }} /> 
                 </View>
+
+                {/* Amount Summary */}
+                <TopAmountSummary 
+                    label="Your Shares" 
+                    amount={artistsValue} 
+                />
 
                 {/* Search Bar */}
                 <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>

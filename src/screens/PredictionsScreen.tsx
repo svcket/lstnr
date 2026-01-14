@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { Search, ChevronDown } from 'lucide-react-native';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { TopAmountSummary } from '../components/common/TopAmountSummary';
+import { usePortfolioTotals } from '../hooks/usePortfolioTotals';
 import { getAllPredictions } from '../data/catalog';
 import { PredictionCard } from '../components/artist/PredictionCard';
 import { FilterPill } from '../components/common/FilterPill';
@@ -20,6 +22,7 @@ import {
 export const PredictionsScreen = () => {
     const navigation = useNavigation<any>();
     const [search, setSearch] = useState('');
+    const { predictionsValue } = usePortfolioTotals(); // Hook usage
     
     // Filters
     const [outcome, setOutcome] = useState('All');
@@ -94,6 +97,12 @@ export const PredictionsScreen = () => {
                     <Text style={styles.headerTitle}>Predictions</Text>
                     <View style={{ width: 40 }} /> 
                 </View>
+
+                {/* Amount Summary */}
+                <TopAmountSummary 
+                    label="Open Positions" 
+                    amount={predictionsValue} 
+                />
 
                 {/* Search Bar */}
                 <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>

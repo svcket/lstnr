@@ -272,13 +272,7 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
                  )}
                  {activeTab === 'Holders' && (
                      <View style={styles.tabContent}>
-                        <ArtistHolders 
-                           holdersList={getHoldersList(label.id, metrics.circulatingSupply)}
-                           totalShares={metrics.circulatingSupply}
-                           sharePrice={metrics.price}
-                           marketCap={metrics.marketCap}
-                           holdersCount={metrics.holders}
-                        /> 
+                        <ArtistHolders entityId={label.id} /> 
                      </View>
                  )}
                  {activeTab === 'Activity' && (
@@ -288,7 +282,7 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
                  )}
                  {activeTab === 'Predictions' && (
                       <View style={styles.tabContent}>
-                          <ArtistPredictions artist={label as any} />
+                          <ArtistPredictions entityId={label.id} name={label.name} />
                       </View>
                  )}
 

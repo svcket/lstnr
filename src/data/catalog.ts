@@ -391,6 +391,20 @@ export const getPortfolio = (): PortfolioItem[] => {
     ];
 };
 
+export interface PredictionPortfolioItem {
+    predictionId: string;
+    outcomeId: string;
+    amount: number; // Value in USD
+}
+
+export const getPredictionPortfolio = (): PredictionPortfolioItem[] => {
+    return [
+        { predictionId: 'p1', outcomeId: 'yes', amount: 500 },
+        { predictionId: 'p2', outcomeId: 'no', amount: 1250 },
+        { predictionId: 'p5', outcomeId: 'yes', amount: 300 }
+    ];
+};
+
 export interface ActivityItem {
     id: string;
     text: string;
@@ -434,20 +448,50 @@ export const getPredictionDetail = (id: string): PredictionDetail | null => {
     const base = PREDICTIONS.find(p => p.id === id);
     if (!base) return null;
 
-    // Deterministic mock chart data based on ID
-    const baseProb = 'chance' in base ? base.chance : 50;
-    const chartData = Array.from({ length: 24 }).map((_, i) => ({
-        t: i,
-        yesProb: Math.min(99, Math.max(1, baseProb + Math.sin(i) * 10 + (Math.random() * 5 - 2.5)))
-    }));
+    // Generate Chart Data
+    // If Binary: Single "Yes" line (or Yes/No if we want). Usually just Yes probability.
+    // If Multi: One line per outcome.
+    
+    let outcomesWithDetails: any[] = [];
+    let chartData: any[] = [];
+
+    if (base.marketType === 'multi-range' && 'outcomes' in base) {
+        // Use defined outcomes
+        outcomesWithDetails = base.outcomes.map((o, i) => ({
+             ...o,
+             probability: o.chance,
+             volume: base.volume * (o.chance/100), // Mock volume share
+             color: ['#00B5D8', '#9F7AEA', '#4ADE80', '#F87171', '#F6E05E'][i % 5] // Mock colors
+        }));
+
+        // Generate Chart Data for each outcome
+        chartData = Array.from({ length: 24 }).map((_, t) => {
+            const point: any = { t };
+            outcomesWithDetails.forEach(o => {
+                // Random walk around chance
+                point[o.id] = Math.max(1, Math.min(99, o.chance + Math.sin(t + o.chance) * 5 + (Math.random() * 4 - 2)));
+            });
+            return point;
+        });
+
+    } else {
+        // Binary Fallback
+        const baseProb = 'chance' in base ? base.chance : 50;
+        outcomesWithDetails = [
+            { id: 'yes', name: 'Yes', probability: baseProb, volume: base.volume * 0.6, color: '#22c55e' },
+            { id: 'no', name: 'No', probability: 100 - baseProb, volume: base.volume * 0.4, color: '#ef4444' }
+        ];
+
+        chartData = Array.from({ length: 24 }).map((_, i) => ({
+            t: i,
+            yes: Math.min(99, Math.max(1, baseProb + Math.sin(i) * 10 + (Math.random() * 5 - 2.5)))
+        }));
+    }
 
     return {
         ...base,
-        description: `This market resolves to "Yes" if ${base.question} happens by the deadline. The resolution source will be official announcements and reputable news outlets.`,
-        outcomes: [
-            { id: 'yes', name: 'Yes', probability: baseProb, volume: base.volume * 0.6, color: '#22c55e' }, // Green-ish
-            { id: 'no', name: 'No', probability: 100 - baseProb, volume: base.volume * 0.4, color: '#ef4444' } // Red-ish
-        ],
+        description: `This market resolves to the correct outcome for "${base.question}" by the deadline. The resolution source will be official announcements and reputable news outlets.`,
+        outcomes: outcomesWithDetails,
         chartData,
         marketOpenAt: base.created,
         marketCloseRule: 'After outcome occurs or at deadline.',
