@@ -72,13 +72,13 @@ export const PredictionDetailScreen = ({ route }: any) => {
                     // YES is primary, NO is background
                     setChartSeries([
                         { ...yesSeries, isActive: true }, 
-                        { ...noSeries, strokeWidth: 2, opacity: 0.5, isActive: false }
+                        { ...noSeries, strokeWidth: 3, opacity: 0.5, isActive: false }
                     ]);
                 } else {
                     // NO is primary, YES is background
                     setChartSeries([
                         { ...noSeries, isActive: true },
-                        { ...yesSeries, strokeWidth: 2, opacity: 0.5, isActive: false }
+                        { ...yesSeries, strokeWidth: 3, opacity: 0.5, isActive: false }
                     ]);
                 }
             }
