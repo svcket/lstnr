@@ -203,7 +203,10 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                         onPress={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
                                         activeOpacity={0.8}
                                      >
-                                         <Text style={[styles.actionText, styles.textYes]}>YES {Math.round(detail.outcomes.find(o => o.id === 'yes')?.probability || 0)}%</Text>
+                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                            <Text style={[styles.actionText, styles.textYes]}>YES</Text>
+                                            <Text style={[styles.actionText, styles.textYes]}>{Math.round(detail.outcomes.find(o => o.id === 'yes')?.probability || 0)}%</Text>
+                                         </View>
                                      </TouchableOpacity>
 
                                      <TouchableOpacity 
@@ -211,7 +214,10 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                         onPress={() => { setViewSide('no'); setTradeSheetOpen(true); }}
                                         activeOpacity={0.8}
                                      >
-                                         <Text style={[styles.actionText, styles.textNo]}>NO {Math.round(detail.outcomes.find(o => o.id === 'no')?.probability || 0)}%</Text>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                            <Text style={[styles.actionText, styles.textNo]}>NO</Text>
+                                            <Text style={[styles.actionText, styles.textNo]}>{Math.round(detail.outcomes.find(o => o.id === 'no')?.probability || 0)}%</Text>
+                                        </View>
                                      </TouchableOpacity>
                                 </View>
                             )}
@@ -541,45 +547,7 @@ const styles = StyleSheet.create({
     },
     
     // BINARY BUTTONS (Two Big Pills)
-    binaryChoiceContainer: {
-        flexDirection: 'row',
-        gap: 12, // Space between buttons
-    },
-    binaryChoiceBtn: {
-        flex: 1,
-        height: 64, // Big touch target
-        borderRadius: 20, 
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-    },
-    btnYes: {
-        backgroundColor: '#1b4d3e', // Deep Green
-        borderWidth: 1,
-        borderColor: '#22c55e', // Bright border
-    },
-    btnNo: {
-        backgroundColor: '#451a1a', // Deep Red
-        borderWidth: 1,
-        borderColor: '#ef4444', // Bright border
-    },
-    binaryBtnContent: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    binaryLabel: {
-        fontSize: 18,
-        fontWeight: '800', // Extra bold
-        color: '#FFF',
-        fontFamily: FONT_FAMILY.balance,
-        letterSpacing: 0.5,
-    },
-    binaryPercent: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#FFF',
-        fontFamily: FONT_FAMILY.balance,
-    },
+
 
     // Outcome Rows
     outcomesList: {
@@ -830,6 +798,38 @@ const styles = StyleSheet.create({
         color: '#666',
         fontSize: 13,
         fontWeight: '600',
+    },
+
+    // BINARY BAR
+    binaryBar: {
+        flexDirection: 'row',
+        gap: 16,
+    },
+    actionBtn: {
+        flex: 1,
+        height: 56,
+        borderRadius: 28, // Pill
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#000',
+        borderWidth: 1,
+    },
+    btnYes: {
+        borderColor: '#00FF94', // Neon Green
+    },
+    btnNo: {
+        borderColor: '#FF3B30', // Soft Red
+    },
+    actionText: {
+        fontFamily: FONT_FAMILY.balance,
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    textYes: {
+        color: '#00FF94',
+    },
+    textNo: {
+        color: '#FF3B30',
     },
 
 
