@@ -461,7 +461,6 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
     },
     heroHeader: {
-        paddingHorizontal: 16,
         marginBottom: 8,
     },
     titleRow: {
@@ -559,7 +558,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.black,
     },
     detailsStack: {
-        gap: 16,
+        gap: 24,
     },
     
     // BINARY BUTTONS (Two Big Pills)
