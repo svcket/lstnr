@@ -106,11 +106,11 @@ describe('PredictionDetailScreen Layout', () => {
         expect(getAllByText('100 shares').length).toBeGreaterThan(0); 
     });
 
-    it('renders the comments tab with composer', () => {
+    it('renders the chat tab with composer', () => {
         const { getByText, getByPlaceholderText } = render(<MockNavigation />);
         
         // Switch to comments
-        fireEvent.press(getByText('Comments'));
+        fireEvent.press(getByText('Chat'));
         
         // Check for input
         // Placeholder is dynamic: "Comment on $SYMBOL"

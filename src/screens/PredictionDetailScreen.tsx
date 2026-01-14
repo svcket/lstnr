@@ -229,7 +229,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 <ArtistTabs 
                     activeTab={activeTab} 
                     onTabPress={setActiveTab} 
-                    tabs={['Details', 'Comments', 'Holders', 'Activity']}
+                    tabs={['Details', 'Chat', 'Holders', 'Activity']}
                     mode="fixed" 
                     style={{ marginBottom: 0 }}
                 />
@@ -312,9 +312,15 @@ export const PredictionDetailScreen = ({ route }: any) => {
                             </View>
                         )}
 
-                        {activeTab === 'Comments' && <ArtistComments entityId={predictionId} />}
+                        {activeTab === 'Chat' && <ArtistComments entityId={predictionId} />}
                         
-                        {activeTab === 'Holders' && <PredictionHolders entityId={predictionId} />}
+                        {activeTab === 'Holders' && (
+                            <PredictionHolders 
+                                entityId={predictionId} 
+                                onBuyYes={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
+                                onBuyNo={() => { setViewSide('no'); setTradeSheetOpen(true); }}
+                            />
+                        )}
                         
                         {activeTab === 'Activity' && <ArtistActivity artist={{ id: predictionId } as any} />}
                     </ScreenContainer>
@@ -381,14 +387,16 @@ const TimelineItem = ({ label, value, isFirst, isLast }: any) => (
     </View>
 );
 
-const PredictionHolders = ({ entityId }: { entityId: string }) => {
+const PredictionHolders = ({ entityId, onBuyYes, onBuyNo }: { entityId: string, onBuyYes: () => void, onBuyNo: () => void }) => {
     const { yes, no } = getPredictionHolders(entityId);
     
     return (
         <View style={styles.holdersContainer}>
             {/* YES Column */}
             <View style={styles.holderColumn}>
-                <Text style={styles.holderHeader}>Yes holders</Text>
+                <View style={styles.holderHeaderRow}>
+                    <Text style={styles.holderHeader}>Yes holders</Text>
+                </View>
                 {yes.map(holder => (
                     <View key={holder.id} style={styles.holderRow}>
                         <Image source={{ uri: holder.avatar }} style={styles.holderAvatar} />
@@ -398,11 +406,16 @@ const PredictionHolders = ({ entityId }: { entityId: string }) => {
                         </View>
                     </View>
                 ))}
+                <TouchableOpacity style={[styles.miniBuyBtn, { borderColor: '#4ADE80' }]} onPress={onBuyYes}>
+                    <Text style={[styles.miniBuyText, { color: '#4ADE80' }]}>Buy Yes</Text>
+                </TouchableOpacity>
             </View>
 
              {/* NO Column */}
              <View style={styles.holderColumn}>
-                <Text style={styles.holderHeader}>No holders</Text>
+                <View style={styles.holderHeaderRow}>
+                     <Text style={styles.holderHeader}>No holders</Text>
+                </View>
                 {no.map(holder => (
                     <View key={holder.id} style={styles.holderRow}>
                         <Image source={{ uri: holder.avatar }} style={styles.holderAvatar} />
@@ -412,6 +425,9 @@ const PredictionHolders = ({ entityId }: { entityId: string }) => {
                         </View>
                     </View>
                 ))}
+                <TouchableOpacity style={[styles.miniBuyBtn, { borderColor: '#F87171' }]} onPress={onBuyNo}>
+                    <Text style={[styles.miniBuyText, { color: '#F87171' }]}>Buy No</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -721,6 +737,22 @@ const styles = StyleSheet.create({
     holderShares: {
         fontSize: 12,
         fontWeight: '500',
+    },
+    holderHeaderRow: {
+        height: 48,
+        justifyContent: 'center',
+    },
+    miniBuyBtn: {
+        borderWidth: 1,
+        borderRadius: 16,
+        paddingVertical: 8,
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    miniBuyText: {
+        fontSize: 13,
+        fontWeight: '700',
+        fontFamily: FONT_FAMILY.header,
     },
 
     // TIMELINE
