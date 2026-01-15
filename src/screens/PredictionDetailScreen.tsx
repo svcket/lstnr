@@ -11,7 +11,7 @@ import { ArtistHolders } from '../components/artist/ArtistHolders';
 import { ArtistActivity } from '../components/artist/ArtistActivity';
 import { getPredictionDetail, PredictionDetail } from '../data/catalog';
 import { FilterSheet } from '../components/common/FilterSheet';
-import { UnifiedMarketChart, ChartSeries } from '../components/charts/UnifiedMarketChart';
+import DualMarketChart from '../components/charts/DualMarketChart';
 import { ScreenContainer } from '../components/common/ScreenContainer';
 import { ShareSheet } from '../components/artist/ShareSheet';
 import { getUserSharesInfo, MIN_SHARES_FOR_CHAT, getPredictionHolders } from '../data/social';
@@ -151,20 +151,43 @@ export const PredictionDetailScreen = ({ route }: any) => {
                         </View>
                      
                         {/* Unified Chart */}
-                        <UnifiedMarketChart 
-                             mode={detail.marketType === 'multi-range' ? 'MULTI' : 'DUAL'}
-                             series={chartSeries as ChartSeries[]} 
-                             height={220} 
-                             // ScreenContainer already subtracts 32px (16*2) from width if we weren't flexible
-                             // But here we want the chart to be mostly full width inside the container?
-                             // Actually user said "Consistent padding (16px)". 
-                             // If ScreenContainer applies padding, width is available width.
-                             width={width - 32} 
-                             onScrub={(val) => setScrubbedProb(val)}
-                             timeframes={TIMEFRAMES}
-                             activeTimeframe={activeTimeframe}
-                             onTimeframeChange={setActiveTimeframe}
-                        />
+                        {/* DualMarketChart Implementation */}
+                        {detail.marketType === 'multi-range' ? (
+                            <View style={{height: 220, justifyContent: 'center', alignItems: 'center'}}>
+                                <Text style={{color: '#666'}}>Multi-outcome chart not supported yet.</Text>
+                            </View>
+                        ) : (
+                            <DualMarketChart 
+                                width={width - 32}
+                                height={260} // Adjusted height as per user request/style
+                                topSeries={{ 
+                                    key: 'NO', 
+                                    color: '#EF4444', 
+                                    pct: Math.round(100 - detail.outcomes[0].probability), 
+                                    data: chartSeries[1]?.data || [] // NO series
+                                }}
+                                bottomSeries={{ 
+                                    key: 'YES', 
+                                    color: '#22C55E', 
+                                    pct: Math.round(detail.outcomes[0].probability), 
+                                    data: chartSeries[0]?.data || [] // YES series
+                                }}
+                                showLeftPriceHints={false}
+                            />
+                        )}
+
+                        {/* Timeframe Pills (moved out of UnifiedMarketChart) */}
+                        <View style={styles.timeframeRow}>
+                            {TIMEFRAMES.map((tf) => (
+                                <TouchableOpacity
+                                    key={tf}
+                                    style={[styles.tfPill, activeTimeframe === tf && styles.tfPillActive]}
+                                    onPress={() => setActiveTimeframe(tf)}
+                                >
+                                    <Text style={[styles.tfText, activeTimeframe === tf && styles.tfTextActive]}>{tf}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
 
                         {/* Make Prediction - Button Bar */}
                         <View style={styles.predictionSection}>
@@ -257,7 +280,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                         }}
                                     >
                                         <Text style={styles.promoBtnText}>
-                                            {hasAccess ? 'Join Chat' : 'Buy to Join'}
+                                            {hasAccess ? 'Join Chat' : 'Join'}
                                         </Text>
                                         {!hasAccess && <Lock size={14} color="#000" style={{marginLeft: 6}} />}
                                     </TouchableOpacity>
@@ -616,7 +639,6 @@ const styles = StyleSheet.create({
         fontFamily: FONT_FAMILY.header,
         color: '#FFF',
         marginBottom: 16,
-        fontWeight: '700',
     },
     bodyText: {
         fontSize: 15,
@@ -853,7 +875,7 @@ const styles = StyleSheet.create({
     actionText: {
         fontFamily: FONT_FAMILY.balance,
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: '600',
     },
     textYes: {
         color: '#00FF94',

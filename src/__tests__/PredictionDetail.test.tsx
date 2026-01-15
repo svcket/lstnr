@@ -77,8 +77,8 @@ describe('PredictionDetailScreen Layout', () => {
         expect(getByText('Start a conversation!')).toBeTruthy();
         
         // Check for correct CTA text (Join Chat for all states per user request)
-        // Default mock user likely has no shares, so 'Buy to Join' is expected
-        const btnText = getByText(/Buy to Join|Join Chat/);
+        // Default mock user likely has no shares, so 'Join' is expected
+        const btnText = getByText(/^Join$|Join Chat/);
         expect(btnText).toBeTruthy();
 
         // Check for Rules/Disclosures Buttons
