@@ -267,16 +267,15 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                 <View style={styles.section}>
                                     <Text style={styles.sectionTitle}>About</Text>
                                     <Text style={styles.bodyText}>{detail.description}</Text>
-                                </View>
-
-                                {/* 3. Rules/Disclosures */}
-                                <View style={styles.rulesRow}>
-                                    <TouchableOpacity style={styles.rulePill}>
-                                        <Text style={styles.ruleText}>View rules</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.rulePill}>
-                                        <Text style={styles.ruleText}>View disclosures</Text>
-                                    </TouchableOpacity>
+                                    
+                                    <View style={[styles.rulesRow, { marginTop: 16 }]}>
+                                        <TouchableOpacity style={styles.rulePill}>
+                                            <Text style={styles.ruleText}>View rules</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.rulePill}>
+                                            <Text style={styles.ruleText}>View disclosures</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
 
                                 {/* 4. Timeline */}
