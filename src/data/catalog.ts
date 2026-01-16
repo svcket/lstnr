@@ -484,7 +484,7 @@ export const getPredictionDetail = (id: string): PredictionDetail | null => {
 
         chartData = Array.from({ length: 24 }).map((_, i) => ({
             t: i,
-            yes: Math.min(99, Math.max(1, baseProb + Math.sin(i) * 10 + (Math.random() * 5 - 2.5)))
+            yes: Math.min(99, Math.max(1, baseProb + Math.sin(i * 0.3) * 3 + (Math.random() * 2 - 1)))
         }));
     }
 

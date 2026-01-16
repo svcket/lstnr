@@ -61,12 +61,12 @@ export default function DualMarketChart({
 
     const yTop = d3
       .scaleLinear()
-      .domain([topMin - pad, topMax + pad])
+      .domain([0, 100])
       .range([topBandBottom - padding, topBandTop + padding]);
 
     const yBottom = d3
       .scaleLinear()
-      .domain([bottomMin - pad, bottomMax + pad])
+      .domain([0, 100])
       .range([bottomBandBottom - padding, bottomBandTop + padding]);
 
     const makeLine = (data: number[], yScale: any) =>
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
   svgRow: { flexDirection: "row", alignItems: "flex-start" },
   rightLabels: { position: "relative", justifyContent: "flex-start" },
   labelBlock: { position: "absolute", right: 0, alignItems: "flex-start" },
-  smallCode: { fontSize: 12, fontWeight: "700", opacity: 0.9, letterSpacing: 0.5 },
-  bigPct: { fontSize: 44, fontWeight: "800", lineHeight: 46 },
+  smallCode: { fontSize: 13, fontWeight: "700", opacity: 0.8, marginBottom: -4, textAlign: 'right', width: '100%' },
+  bigPct: { fontSize: 36, fontWeight: "800", lineHeight: 42, textAlign: 'right', width: '100%' },
   leftHints: { position: "absolute", left: 0, top: 88 },
   hint: { fontSize: 14, fontWeight: "700", opacity: 0.9 },
 });
