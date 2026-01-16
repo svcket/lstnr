@@ -14,6 +14,7 @@ import { FilterSheet } from '../components/common/FilterSheet';
 import DualMarketChart from '../components/charts/DualMarketChart';
 import { ScreenContainer } from '../components/common/ScreenContainer';
 import { ShareSheet } from '../components/artist/ShareSheet';
+import { TradeSheet } from '../components/artist/TradeSheet';
 import { getUserSharesInfo, MIN_SHARES_FOR_CHAT, getPredictionHolders } from '../data/social';
 
 const { width } = Dimensions.get('window');
@@ -352,14 +353,21 @@ export const PredictionDetailScreen = ({ route }: any) => {
 
 
 
-            <FilterSheet
-                 visible={tradeSheetOpen}
-                 onClose={() => setTradeSheetOpen(false)}
-                 title="Trade Position"
-                 options={[{label: 'Buy Yes', value: 'yes'}, {label: 'Buy No', value: 'no'}]}
-                 selectedValues={[]}
-                 onSelect={() => setTradeSheetOpen(false)}
-             />
+            {detail && (
+                <TradeSheet
+                    visible={tradeSheetOpen}
+                    mode="BUY" // For predictions, we usually 'Buy' an outcome
+                    artistName={detail.question}
+                    ticker={viewSide === 'yes' ? 'YES' : 'NO'}
+                    sharePrice={(detail.outcomes.find(o => o.id === viewSide)?.probability || 0) / 100}
+                    mcs={50} // Mock confidence score
+                    onClose={() => setTradeSheetOpen(false)}
+                    onConfirm={(amt, isShares) => {
+                        console.log('Trade confirmed:', amt, isShares);
+                        setTradeSheetOpen(false);
+                    }}
+                />
+            )}
 
             <ShareSheet
                 visible={shareSheetVisible}

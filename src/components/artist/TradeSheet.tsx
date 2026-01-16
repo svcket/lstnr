@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView, Image } from 'react-native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
-import { X, AlertTriangle } from 'lucide-react-native';
+import { ChevronLeft, Sliders, ChevronDown, Repeat, X, CreditCard, Smartphone, Check } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface TradeSheetProps {
   visible: boolean;
@@ -9,306 +10,317 @@ interface TradeSheetProps {
   artistName: string;
   ticker: string;
   sharePrice: number;
-  mcs: number; // New Prop
+  mcs?: number;
   onClose: () => void;
   onConfirm: (amount: number, isShares: boolean) => void;
 }
 
-export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, mcs, onClose, onConfirm }: TradeSheetProps) => {
-  const [step, setStep] = useState<'INPUT' | 'PREVIEW'>('INPUT');
-  const [inputType, setInputType] = useState<'AMOUNT' | 'SHARES'>('AMOUNT');
-  const [value, setValue] = useState('');
+const { width } = Dimensions.get('window');
+
+const AMOUNTS = [50, 100, 250, 500, 1000];
+
+type PaymentMethodId = 'apple' | 'paypal' | 'venmo' | 'revolut' | 'card' | 'phantom' | 'manual';
+
+interface PaymentMethod {
+    id: PaymentMethodId;
+    name: string;
+    section: 'fiat' | 'crypto';
+    iconType: string;
+    badge?: string;
+}
+
+const PAYMENT_METHODS: PaymentMethod[] = [
+    { id: 'apple', name: 'Apple Pay', section: 'fiat', iconType: 'apple', badge: 'Instant' },
+    { id: 'paypal', name: 'PayPal', section: 'fiat', iconType: 'paypal', badge: 'Instant' },
+    { id: 'venmo', name: 'Venmo', section: 'fiat', iconType: 'venmo', badge: 'Instant' },
+    { id: 'revolut', name: 'Revolut Pay', section: 'fiat', iconType: 'revolut', badge: 'Instant' },
+    { id: 'card', name: 'Debit Card', section: 'fiat', iconType: 'card', badge: 'Instant' },
+    { id: 'phantom', name: 'Phantom', section: 'crypto', iconType: 'ghost', badge: 'detected' },
+    { id: 'manual', name: 'Manual transfer', section: 'crypto', iconType: 'qr' },
+];
+
+export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onClose, onConfirm }: TradeSheetProps) => {
+  const [amount, setAmount] = useState('0');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHODS[4]); // Default Debit
+  const [showPaymentSheet, setShowPaymentSheet] = useState(false);
   
   useEffect(() => {
     if (visible) {
-      setStep('INPUT');
-      setValue('');
+        setAmount('0');
+        setShowPaymentSheet(false);
     }
   }, [visible]);
 
-  const numValue = parseFloat(value) || 0;
-  const isLowConfidence = mcs < 40;
-  const slippage = isLowConfidence ? 2.0 : 1.0;
-  
-  // Derived values
-  const totalCost = inputType === 'SHARES' ? numValue * sharePrice : numValue;
-  const totalShares = inputType === 'SHARES' ? numValue : numValue / sharePrice;
-  const fee = totalCost * 0.005; // 0.5% mock fee
-  const finalTotal = mode === 'BUY' ? totalCost + fee : totalCost - fee;
-
-  const handleNext = () => {
-    if (numValue > 0) setStep('PREVIEW');
+  const handlePress = (key: string) => {
+    if (key === 'back') {
+      setAmount(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
+      return;
+    }
+    if (key === '.') {
+      if (amount.includes('.')) return;
+      setAmount(prev => prev + '.');
+      return;
+    }
+    setAmount(prev => {
+        if (prev === '0') return key;
+        return prev + key;
+    });
   };
 
-  const color = mode === 'BUY' ? '#00FF94' : '#FF3B30';
-  const label = mode === 'BUY' ? 'Buy' : 'Sell';
+  const handleAmountSelect = (val: number) => {
+      setAmount(val.toString());
+  };
+
+  const numAmount = parseFloat(amount);
+  const isValid = numAmount > 0;
 
   if (!visible) return null;
 
   return (
-    <Modal animationType="slide" transparent visible={visible}>
-       <View style={styles.overlay}>
-         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.sheet}>
-            
-            {/* Warning for Low MCS */}
-            {isLowConfidence && (
-              <View style={styles.warningBanner}>
-                <AlertTriangle size={16} color="#000" />
-                <Text style={styles.warningText}>Low confidence market — expect higher volatility.</Text>
-              </View>
-            )}
+    <Modal animationType="slide" presentationStyle="pageSheet" visible={visible}>
+       <View style={styles.container}>
+           
+           {/* PAYMENT SHEET OVERLAY */}
+           <Modal 
+             animationType="slide" 
+             transparent={true} 
+             visible={showPaymentSheet}
+             onRequestClose={() => setShowPaymentSheet(false)}
+           >
+               <View style={styles.paymentSheetOverlay}>
+                   <View style={styles.paymentSheetContainer}>
+                        <View style={styles.paymentHeader}>
+                            <TouchableOpacity onPress={() => setShowPaymentSheet(false)}>
+                                <X size={24} color="#666" />
+                            </TouchableOpacity>
+                            <Text style={styles.paymentTitle}>Deposit Methods</Text>
+                            <View style={{width: 24}} /> 
+                        </View>
 
-            {/* Header */}
-            <View style={styles.header}>
-               <Text style={styles.title}>{step === 'INPUT' ? `${label} ${ticker}` : 'Review Order'}</Text>
-               <TouchableOpacity onPress={onClose}>
-                 <X color="#FFF" size={24} />
+                        <ScrollView contentContainerStyle={styles.paymentList}>
+                            <Text style={styles.sectionTitle}>Buy with fiat</Text>
+                            {PAYMENT_METHODS.filter(m => m.section === 'fiat').map(m => (
+                                <PaymentRow 
+                                    key={m.id} 
+                                    item={m} 
+                                    selected={paymentMethod.id === m.id}
+                                    onSelect={(item) => {
+                                        setPaymentMethod(item);
+                                        setShowPaymentSheet(false);
+                                    }} 
+                                />
+                            ))}
+                            
+                            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Crypto transfer</Text>
+                            {PAYMENT_METHODS.filter(m => m.section === 'crypto').map(m => (
+                                <PaymentRow 
+                                    key={m.id} 
+                                    item={m} 
+                                    selected={paymentMethod.id === m.id}
+                                    onSelect={(item) => {
+                                        setPaymentMethod(item);
+                                        setShowPaymentSheet(false);
+                                    }} 
+                                />
+                            ))}
+                        </ScrollView>
+                   </View>
+               </View>
+           </Modal>
+
+           {/* MAIN TRADE CONTENT */}
+           <View style={styles.header}>
+               <TouchableOpacity onPress={onClose} style={styles.iconBtn}>
+                   <ChevronLeft size={28} color="#FFF" />
                </TouchableOpacity>
-            </View>
+               
+               <View style={styles.headerTitles}>
+                   <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                       <View style={styles.coinIcon} /> 
+                       <Text style={styles.headerTitle}>{mode === 'BUY' ? 'Buy' : 'Sell'} {ticker}</Text>
+                       <View style={styles.verifiedBadge}><Text style={{fontSize: 8, color: '#000'}}>✓</Text></View>
+                   </View>
+                   <Text style={styles.headerSubtitle}>• 413 people here</Text>
+               </View>
 
-            {step === 'INPUT' ? (
-              <>
-                 {/* Input Type Toggle */}
-                 <View style={styles.toggleRow}>
-                   <TouchableOpacity onPress={() => setInputType('AMOUNT')} style={[styles.toggleBtn, inputType === 'AMOUNT' && styles.activeToggle]}>
-                     <Text style={[styles.toggleText, inputType === 'AMOUNT' && { color: '#FFF' }]}>Amount ($)</Text>
+               <TouchableOpacity style={styles.iconBtn}>
+                   <Sliders size={24} color="#FFF" style={{transform: [{rotate: '90deg'}]}} />
+               </TouchableOpacity>
+           </View>
+
+           <View style={styles.content}>
+               <View style={styles.displayContainer}>
+                   <Text style={styles.amountDisplay}>${amount}</Text>
+                   <Text style={styles.balanceText}>$0.01 Available</Text>
+               </View>
+
+               {/* Payment Selector */}
+               <View style={styles.paymentRow}>
+                   <TouchableOpacity 
+                        style={styles.paymentSelector}
+                        onPress={() => setShowPaymentSheet(true)}
+                   >
+                       <View style={styles.cardIcon}>
+                           {/* Simple dynamic icon based on selection could go here */}
+                           <View style={{width: 12, height: 8, backgroundColor: '#FFD700', borderRadius: 2}} />
+                       </View>
+                       <Text style={styles.payText}>{paymentMethod.name}</Text>
+                       <ChevronDown size={16} color="#FFF" />
                    </TouchableOpacity>
-                   <TouchableOpacity onPress={() => setInputType('SHARES')} style={[styles.toggleBtn, inputType === 'SHARES' && styles.activeToggle]}>
-                      <Text style={[styles.toggleText, inputType === 'SHARES' && { color: '#FFF' }]}>Shares</Text>
+                   <TouchableOpacity style={styles.swapBtn}>
+                       <Repeat size={18} color="#999" />
                    </TouchableOpacity>
-                 </View>
+               </View>
 
-                 {/* Main Input */}
-                 <View style={styles.inputContainer}>
-                    <Text style={[styles.inputPrefix, { color }]}>{inputType === 'AMOUNT' ? '$' : '#'}</Text>
-                    <TextInput 
-                      style={[styles.input, { color }]}
-                      placeholder="0"
-                      placeholderTextColor="#333"
-                      keyboardType="numeric"
-                      value={value}
-                      onChangeText={setValue}
-                      autoFocus
-                    />
-                 </View>
+               {/* Fixed Amount Pills */}
+               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
+                   {AMOUNTS.map((amt) => (
+                       <TouchableOpacity key={amt} style={styles.pill} onPress={() => handleAmountSelect(amt)}>
+                           <Text style={styles.pillText}>${amt}</Text>
+                       </TouchableOpacity>
+                   ))}
+               </ScrollView>
 
-                 {/* Estimates */}
-                 <View style={styles.estimateRow}>
-                   <Text style={styles.estimateLabel}>
-                     {inputType === 'AMOUNT' ? `~ ${totalShares.toFixed(2)} Shares` : `~ $${totalCost.toFixed(2)}`}
-                   </Text>
-                   <Text style={styles.priceLabel}>@ ${sharePrice.toFixed(2)}</Text>
-                 </View>
-
-                 {/* Quick Chips */}
-                 <View style={styles.chipsRow}>
-                    {[10, 50, 100].map(amt => (
-                      <TouchableOpacity key={amt} style={styles.chip} onPress={() => setValue(amt.toString())}>
-                        <Text style={styles.chipText}>+{amt}</Text>
-                      </TouchableOpacity>
-                    ))}
-                 </View>
-
-                 <TouchableOpacity 
-                   style={[styles.mainBtn, { backgroundColor: color, opacity: numValue > 0 ? 1 : 0.5 }]} 
-                   onPress={handleNext}
-                   disabled={numValue <= 0}
-                 >
-                    <Text style={styles.btnText}>Preview {label}</Text>
-                 </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                {/* PREVIEW STEP */}
-                <View style={styles.previewCard}>
-                   <View style={styles.row}>
-                     <Text style={styles.rowLabel}>Shares</Text>
-                     <Text style={styles.rowValue}>{totalShares.toFixed(4)}</Text>
+               <View style={styles.keypad}>
+                   <View style={styles.keyRow}>
+                       <KeypadBtn label="1" onPress={() => handlePress('1')} />
+                       <KeypadBtn label="2" onPress={() => handlePress('2')} />
+                       <KeypadBtn label="3" onPress={() => handlePress('3')} />
                    </View>
-                   <View style={styles.row}>
-                     <Text style={styles.rowLabel}>Price</Text>
-                     <Text style={styles.rowValue}>${sharePrice.toFixed(2)}</Text>
+                   <View style={styles.keyRow}>
+                       <KeypadBtn label="4" onPress={() => handlePress('4')} />
+                       <KeypadBtn label="5" onPress={() => handlePress('5')} />
+                       <KeypadBtn label="6" onPress={() => handlePress('6')} />
                    </View>
-                   <View style={styles.row}>
-                     <Text style={styles.rowLabel}>Slippage</Text>
-                     <Text style={styles.rowValue}>{slippage.toFixed(1)}%</Text>
+                   <View style={styles.keyRow}>
+                       <KeypadBtn label="7" onPress={() => handlePress('7')} />
+                       <KeypadBtn label="8" onPress={() => handlePress('8')} />
+                       <KeypadBtn label="9" onPress={() => handlePress('9')} />
                    </View>
-                   <View style={styles.row}>
-                     <Text style={styles.rowLabel}>Est. Fee (0.5%)</Text>
-                     <Text style={styles.rowValue}>${fee.toFixed(2)}</Text>
+                   <View style={styles.keyRow}>
+                       <KeypadBtn label="." onPress={() => handlePress('.')} />
+                       <KeypadBtn label="0" onPress={() => handlePress('0')} />
+                       <TouchableOpacity style={styles.key} onPress={() => handlePress('back')}>
+                          <ChevronLeft size={24} color="#FFF" />
+                       </TouchableOpacity>
                    </View>
-                   <View style={styles.divider} />
-                   <View style={styles.row}>
-                     <Text style={styles.totalLabel}>Total</Text>
-                     <Text style={[styles.totalValue, { color }]}>${finalTotal.toFixed(2)}</Text>
-                   </View>
-                </View>
-
-                <TouchableOpacity 
-                   style={[styles.mainBtn, { backgroundColor: color }]} 
-                   onPress={() => onConfirm(inputType === 'SHARES' ? numValue : totalShares, inputType === 'SHARES')}
-                 >
-                    <Text style={styles.btnText}>Confirm {label}</Text>
-                 </TouchableOpacity>
-              </>
-            )}
-
-         </KeyboardAvoidingView>
+               </View>
+           </View>
+           
+           <View style={styles.footerBtnContainer}>
+               <TouchableOpacity 
+                    style={[styles.confirmBtnWrapper, { opacity: isValid ? 1 : 0.5 }]} 
+                    onPress={() => isValid && onConfirm(numAmount, false)}
+                    disabled={!isValid}
+                    activeOpacity={0.8}
+               >
+                   <LinearGradient
+                       colors={COLORS.primaryGradient}
+                       start={{ x: 0, y: 0 }}
+                       end={{ x: 1, y: 1 }}
+                       style={styles.gradientBtn}
+                   >
+                       <Text style={styles.confirmText}>Review</Text>
+                   </LinearGradient>
+               </TouchableOpacity>
+           </View>
        </View>
     </Modal>
   );
 };
 
+const PaymentRow = ({ item, selected, onSelect }: { item: PaymentMethod, selected: boolean, onSelect: (i: PaymentMethod) => void }) => (
+    <TouchableOpacity style={styles.paymentOption} onPress={() => onSelect(item)}>
+        <View style={styles.paymentInfo}>
+             <View style={styles.paymentIconBase}>
+                 {/* Placeholder for icons */}
+                 <Text style={{fontSize: 10, color: '#FFF'}}>{item.name[0]}</Text>
+             </View>
+             <Text style={styles.paymentName}>{item.name}</Text>
+        </View>
+        
+        {item.badge && (
+            <View style={[styles.badge, item.badge === 'Instant' ? styles.badgeInstant : styles.badgeNormal]}>
+                {item.badge === 'Instant' && <Text style={{color:'#4ADE80', fontSize:10, marginRight:2}}>⚡</Text>}
+                <Text style={[styles.badgeText, item.badge === 'Instant' ? {color:'#4ADE80'} : {color:'#888'}]}>
+                    {item.badge}
+                </Text>
+            </View>
+        )}
+    </TouchableOpacity>
+);
+
+const KeypadBtn = ({ label, onPress }: { label: string, onPress: () => void }) => (
+    <TouchableOpacity style={styles.key} onPress={onPress}>
+        <Text style={styles.keyText}>{label}</Text>
+    </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
-  overlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: '#111',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    paddingBottom: 40,
-    gap: 24,
-  },
-  header: {
-    flexDirection: 'row',
+    backgroundColor: '#050505',
+    paddingTop: 60, 
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  title: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 20,
-    color: '#FFF',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    backgroundColor: '#000',
-    borderRadius: 12,
-    padding: 4,
-  },
-  toggleBtn: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  activeToggle: {
-    backgroundColor: '#222',
-  },
-  toggleText: {
-    fontFamily: FONT_FAMILY.body,
-    fontSize: 13,
-    color: '#666',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginVertical: 16,
-  },
-  inputPrefix: {
-    fontSize: 40,
-    fontFamily: FONT_FAMILY.header,
-  },
-  input: {
-    fontSize: 48,
-    fontFamily: FONT_FAMILY.header,
-    minWidth: 100,
-  },
-  estimateRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  estimateLabel: {
-    fontFamily: FONT_FAMILY.body,
-    color: '#FFF',
-    fontSize: 16,
-  },
-  priceLabel: {
-    fontFamily: FONT_FAMILY.body,
-    color: '#999',
-    fontSize: 14,
-  },
-  chipsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  chip: {
-    backgroundColor: '#181818',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  chipText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.body,
-  },
-  mainBtn: {
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnText: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 18,
-    color: '#000',
-    fontWeight: '600',
   },
   
-  // Preview
-  previewCard: {
-    backgroundColor: '#181818',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  rowLabel: {
-    color: '#999',
-    fontSize: 14,
-    fontFamily: FONT_FAMILY.body,
-  },
-  rowValue: {
-    color: '#FFF',
-    fontSize: 14,
-    fontFamily: FONT_FAMILY.body,
-    fontWeight: '600',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#333',
-    marginVertical: 8,
-  },
-  totalLabel: {
-    color: '#FFF',
-    fontSize: 16,
-    fontFamily: FONT_FAMILY.header,
-  },
-  totalValue: {
-    fontSize: 20,
-    fontFamily: FONT_FAMILY.header,
-  },
-  warningBanner: {
-    backgroundColor: '#F5A623',
+  // ... Header & Common ...
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
-    gap: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
-  warningText: {
-    fontFamily: FONT_FAMILY.body,
-    fontSize: 13,
-    color: '#000',
-    fontWeight: '600',
-  }
+  iconBtn: { width: 40, alignItems: 'center' },
+  headerTitles: { alignItems: 'center' },
+  headerTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', fontFamily: FONT_FAMILY.header },
+  headerSubtitle: { color: '#666', fontSize: 13, marginTop: 2, fontWeight: '500' },
+  coinIcon: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#333' },
+  verifiedBadge: { backgroundColor: '#4DA3FF', width: 14, height: 14, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
+
+  content: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      paddingBottom: 20,
+  },
+  displayContainer: { alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 100 },
+  amountDisplay: { fontSize: 80, fontWeight: '600', color: '#FFF', fontFamily: FONT_FAMILY.header, marginBottom: 8 },
+  balanceText: { color: '#888', fontSize: 16, fontWeight: '500' },
+
+  paymentRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 24 },
+  paymentSelector: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  cardIcon: { width: 28, height: 20, backgroundColor: '#333', borderRadius: 4, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#444' },
+  payText: { fontSize: 18, color: '#FFF', fontWeight: '600', marginRight: 4 },
+  swapBtn: { padding: 8 },
+
+  pillsRow: { flexDirection: 'row', paddingHorizontal: 24, gap: 12, marginBottom: 24 },
+  pill: { backgroundColor: '#1A1A1A', paddingHorizontal: 20, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
+  pillText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+
+  keypad: { paddingHorizontal: 24, marginBottom: 10 },
+  keyRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
+  key: { width: width / 3 - 32, height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 30 },
+  keyText: { fontSize: 28, fontWeight: '600', color: '#FFF', fontFamily: FONT_FAMILY.header },
+
+  footerBtnContainer: { paddingHorizontal: 24, paddingBottom: 40 },
+  confirmBtnWrapper: { height: 56, borderRadius: 28, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+  gradientBtn: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  confirmText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
+
+  // PAYMENT SHEET
+  paymentSheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  paymentSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '75%', paddingBottom: 40 },
+  paymentHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#222' },
+  paymentTitle: { fontSize: 18, color: '#FFF', fontWeight: '700', fontFamily: FONT_FAMILY.header },
+  paymentList: { padding: 20 },
+  sectionTitle: { color: '#666', fontSize: 13, marginBottom: 12, fontWeight: '600', textTransform: 'uppercase' },
+  paymentOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A1A1A', padding: 16, borderRadius: 16, marginBottom: 12 },
+  paymentInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  paymentIconBase: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' },
+  paymentName: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
+  badgeInstant: { backgroundColor: 'rgba(74, 222, 128, 0.1)', borderColor: 'transaprent' },
+  badgeNormal: { backgroundColor: '#222', borderColor: '#333' },
+  badgeText: { fontSize: 12, fontWeight: '600' },
 });
