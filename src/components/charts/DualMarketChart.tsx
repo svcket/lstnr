@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   rightLabels: { position: "relative", justifyContent: "flex-start" },
   labelBlock: { position: "absolute", right: 0, alignItems: "flex-start" },
   smallCode: { fontSize: 13, fontWeight: "700", opacity: 0.8, marginBottom: -4, textAlign: 'right', width: '100%' },
-  bigPct: { fontSize: 36, fontWeight: "800", lineHeight: 42, textAlign: 'right', width: '100%' },
+  bigPct: { fontSize: 24, fontWeight: "800", lineHeight: 28, textAlign: 'right', width: '100%' },
   leftHints: { position: "absolute", left: 0, top: 88 },
   hint: { fontSize: 14, fontWeight: "700", opacity: 0.9 },
 });
