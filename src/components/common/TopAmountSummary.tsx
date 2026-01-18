@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     },
     amount: {
         fontFamily: FONT_FAMILY.balance,
-        fontSize: 48,
+        fontSize: 44,
         fontWeight: '600',
         color: COLORS.white,
         letterSpacing: -1,

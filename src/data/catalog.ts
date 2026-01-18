@@ -39,6 +39,7 @@ export interface Label {
         website?: string;
         x?: string;
         instagram?: string;
+        youtube?: string;
     };
     createdBy?: Creator;
 }
@@ -50,9 +51,9 @@ export const ARTISTS: Artist[] = [
         id: 'a1',
         type: 'artist',
         name: 'Kanye West',
-        symbol: '$YE',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kanye_West_at_the_2009_Tribeca_Film_Festival_%28cropped%29.jpg/440px-Kanye_West_at_the_2009_Tribeca_Film_Festival_%28cropped%29.jpg',
-        bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop and popular culture. From "The College Dropout" to "Donda", Ye\'s discography is a testament to his evolving creative genius. He continues to push boundaries in music, fashion, and design.',
+        symbol: '$YZY',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb867008a971fae0f4d913f63a',
+        bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop and popular culture. From "The College Dropout" to "Donda", Ye\'s discography is a testament to his evolving creative genius.',
         region: 'North America',
         genres: ['Hip-Hop', 'Pop'],
         links: { 
@@ -64,7 +65,7 @@ export const ARTISTS: Artist[] = [
         },
         createdBy: {
             name: 'Yeezy Fan Club',
-            avatarUrl: 'https://i.pravatar.cc/150?u=creator1',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Yeezy+Fan+Club&background=random',
             isVerified: true,
             tokenSymbol: '$YZY'
         }
@@ -72,21 +73,20 @@ export const ARTISTS: Artist[] = [
     {
         id: 'a2',
         type: 'artist',
-        name: 'Tems',
-        symbol: '$TEMS',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Tems_Wait_For_U_video_shoot_%28cropped%29.jpg/440px-Tems_Wait_For_U_video_shoot_%28cropped%29.jpg',
-        bio: 'Nigerian singer, songwriter, and record producer who has taken the global stage by storm. Known for her unique vocal style and deep, soulful melodies, Tems has collaborated with giants like Drake, Wizkid, and Beyoncé. A leading voice in the modern Afrobeats movement.',
-        region: 'Africa',
-        genres: ['Afrobeats', 'R&B'],
+        name: 'Drake',
+        symbol: '$6GOD',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9',
+        bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music, Drake has been credited for popularizing singing and R&B sensibilities in hip hop.',
+        region: 'North America',
+        genres: ['Hip-Hop', 'R&B'],
         links: { 
-            instagram: 'https://instagram.com/temsbaby',
-            x: 'https://x.com/temsbaby',
-            spotify: 'https://spotify.com',
-            youtube: 'https://youtube.com'
+            instagram: 'https://instagram.com/champagnepapi',
+            x: 'https://x.com/drake',
+            spotify: 'https://spotify.com'
         },
         createdBy: {
-            name: 'Rebel Gang',
-            avatarUrl: 'https://i.pravatar.cc/150?u=creator2',
+            name: 'OVO Sound',
+            avatarUrl: 'https://ui-avatars.com/api/?name=OVO&background=000&color=fff',
             isVerified: true,
             walletAddress: '0x8...92a'
         }
@@ -94,44 +94,41 @@ export const ARTISTS: Artist[] = [
     {
         id: 'a3',
         type: 'artist',
-        name: 'Burna Boy',
-        symbol: '$ODG',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Burna_Boy_at_The_O2_Arena.jpg/440px-Burna_Boy_at_The_O2_Arena.jpg',
-        bio: 'Grammy-winning Nigerian singer and songwriter, often called the "African Giant". Burna Boy mixes dancehall, reggae, afrobeat, and pop to create a sound that is strictly his own. He is a driving force in bringing African music to the mainstream global audience.',
-        region: 'Africa',
-        genres: ['Afrobeats', 'Dancehall', 'Pop'],
+        name: 'Taylor Swift',
+        symbol: '$TS',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0',
+        bio: 'American singer-songwriter. Her narrative songwriting, which is often inspired by her personal life, has received widespread critical praise and media coverage.',
+        region: 'North America',
+        genres: ['Pop', 'Country'],
         links: { 
-            website: 'https://onspaceship.com',
-            instagram: 'https://instagram.com/burnaboygram',
-            x: 'https://x.com/burnaboy',
-            spotify: 'https://spotify.com',
-            youtube: 'https://youtube.com'
+            website: 'https://taylorswift.com',
+            instagram: 'https://instagram.com/taylorswift',
+            x: 'https://x.com/taylorswift'
         },
         createdBy: {
-            name: 'Spaceship Ent',
-            avatarUrl: 'https://i.pravatar.cc/150?u=creator3',
+            name: 'Swifties',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Swifties&background=random',
             isVerified: true,
-            tokenSymbol: '$SPACE'
+            tokenSymbol: '$SWIFT'
         }
     },
     {
         id: 'a4',
         type: 'artist',
-        name: 'Frank Ocean',
-        symbol: '$BLND',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Frank_Ocean_2014_Coachella_1.jpg/440px-Frank_Ocean_2014_Coachella_1.jpg',
-
-        bio: 'One of the most praised and enigmatic songwriters of his generation. Frank Ocean\'s introspective storytelling and avant-garde R&B style have earned him a cult following. Known for his masterpieces "Channel Orange" and "Blonde".',
+        name: 'The Weeknd',
+        symbol: '$XO',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe713496bc8af8b',
+        bio: 'Abel Tesfaye, known as The Weeknd, is a Canadian singer-songwriter and record producer. He helped expand the R&B palette to incorporate indie and electronic music styles.',
         region: 'North America',
         genres: ['R&B', 'Pop'],
         links: { 
-            website: 'https://blonded.co',
-            instagram: 'https://instagram.com/blonded',
+            website: 'https://theweeknd.com',
+            instagram: 'https://instagram.com/theweeknd',
             spotify: 'https://spotify.com'
         },
         createdBy: {
-            name: 'Blonded',
-            avatarUrl: 'https://i.pravatar.cc/150?u=creator4',
+            name: 'XO',
+            avatarUrl: 'https://ui-avatars.com/api/?name=XO&background=000&color=fff',
             isVerified: true
         }
     },
@@ -140,21 +137,116 @@ export const ARTISTS: Artist[] = [
         type: 'artist',
         name: 'SZA',
         symbol: '$SZA',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/SZA_Ctrl_Tour_Toronto_2017.jpg/440px-SZA_Ctrl_Tour_Toronto_2017.jpg',
-        bio: 'Top Dawg Entertainment\'s first lady, SZA writes honest, deeply personal songs about insecurity, relationships, and self-discovery. Her albums "Ctrl" and "SOS" are critical darlings that have cemented her place as an R&B superstar.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=SZA&background=1DB954&color=fff&size=256',
+        bio: 'Top Dawg Entertainment\'s first lady, SZA writes honest, deeply personal songs about insecurity, relationships, and self-discovery. Her albums "Ctrl" and "SOS" are critical darlings.',
         region: 'North America',
         genres: ['R&B', 'Pop'],
         links: { 
             x: 'https://x.com/sza',
             instagram: 'https://instagram.com/sza',
-            spotify: 'https://spotify.com',
-            website: 'https://szasos.com'
+            spotify: 'https://spotify.com'
         },
         createdBy: {
             name: 'TDE',
-            avatarUrl: 'https://i.pravatar.cc/150?u=creator5',
+            avatarUrl: 'https://ui-avatars.com/api/?name=TDE&background=random',
             isVerified: true,
             tokenSymbol: '$TDE'
+        }
+    },
+    {
+        id: 'a6',
+        type: 'artist',
+        name: 'Billie Eilish',
+        symbol: '$BLSH',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Billie+Eilish&background=bada55&color=000&size=256',
+        bio: 'A generational talent known for her whisper-quiet vocals and dark, innovative pop production. Alongside her brother Finneas, Billie has swept the Grammys and Oscars.',
+        region: 'North America',
+        genres: ['Pop', 'Alternative'],
+        links: {
+            instagram: 'https://instagram.com/billieeilish',
+            spotify: 'https://spotify.com',
+            website: 'https://billieeilish.com'
+        },
+        createdBy: {
+            name: 'Finneas',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Finneas&background=random',
+            isVerified: true
+        }
+    },
+    {
+        id: 'a7',
+        type: 'artist',
+        name: 'Dua Lipa',
+        symbol: '$DUA',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Dua+Lipa&background=ff00cc&color=fff&size=256',
+        bio: 'English and Albanian singer and songwriter. Her disco-influenced pop sound has spawned global hits like "Don\'t Start Now" and "Levitating".',
+        region: 'Europe',
+        genres: ['Pop', 'Disco'],
+        links: {
+            instagram: 'https://instagram.com/dualipa',
+            spotify: 'https://spotify.com'
+        },
+        createdBy: {
+            name: 'Sunny Hill',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Sunny+Hill&background=random',
+            isVerified: true
+        }
+    },
+    {
+        id: 'a8',
+        type: 'artist',
+        name: 'Travis Scott',
+        symbol: '$CACS',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Travis+Scott&background=553311&color=fff&size=256',
+        bio: 'American rapper, singer, songwriter, and record producer. His musical style has been described as a fusion of traditional hip hop, lo-fi and ambient.',
+        region: 'North America',
+        genres: ['Hip-Hop', 'Trap'],
+        links: {
+            instagram: 'https://instagram.com/travisscott',
+            spotify: 'https://spotify.com'
+        },
+        createdBy: {
+            name: 'Cactus Jack',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Cactus+Jack&background=random',
+            isVerified: true
+        }
+    },
+    {
+        id: 'a9',
+        type: 'artist',
+        name: 'Tyler, The Creator',
+        symbol: '$GOLF',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Tyler+Creator&background=FFA500&color=fff&size=256',
+        bio: 'Rapper, producer, and designer who evolved from the leader of Odd Future into a Grammy-winning auteur.',
+        region: 'North America',
+        genres: ['Hip-Hop', 'Alternative'],
+        links: {
+            website: 'https://golfwang.com',
+            instagram: 'https://instagram.com/feliciathegoat'
+        },
+        createdBy: {
+            name: 'Odd Future',
+            avatarUrl: 'https://ui-avatars.com/api/?name=OFWGKTA&background=random',
+            isVerified: true
+        }
+    },
+    {
+        id: 'a10',
+        type: 'artist',
+        name: 'Rosalía',
+        symbol: '$MOTO',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Rosalia&background=FF0000&color=fff&size=256',
+        bio: 'Spanish singer-songwriter known for redefining the sounds of flamenco, fusing it with pop and urban styles.',
+        region: 'Europe',
+        genres: ['Latin', 'Pop', 'Flamenco'],
+        links: {
+            instagram: 'https://instagram.com/rosalia.vt',
+            website: 'https://rosalia.com'
+        },
+        createdBy: {
+            name: 'Motomami',
+            avatarUrl: 'https://ui-avatars.com/api/?name=MM&background=random',
+            isVerified: true
         }
     }
 ];
@@ -163,10 +255,10 @@ export const LABELS: Label[] = [
     {
         id: 'l1',
         type: 'label',
-        name: 'Death Row Records',
+        name: 'Death Row',
         symbol: '$DEATH',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Death_Row_Records_Logo.svg/440px-Death_Row_Records_Logo.svg.png',
-        labelBio: 'The most dangerous record label in history. Founded in 1991, Death Row Records defined the sound of West Coast hip-hop with legendary releases from Dr. Dre, Snoop Dogg, and 2Pac. Now reimagined for the modern era under new ownership.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Death+Row&background=000&color=fff&size=256',
+        labelBio: 'The most dangerous record label in history. Founded in 1991, Death Row Records defined the sound of West Coast hip-hop with legendary releases.',
         signedArtists: ['a1'], 
         links: { 
             website: 'https://deathrow.com',
@@ -175,7 +267,7 @@ export const LABELS: Label[] = [
         },
         createdBy: {
             name: 'Snoop Dogg',
-            avatarUrl: 'https://i.pravatar.cc/150?u=snoop',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Snoop+Dogg&background=random',
             isVerified: true,
             tokenSymbol: '$DOGG'
         }
@@ -185,8 +277,8 @@ export const LABELS: Label[] = [
         type: 'label',
         name: 'Empire',
         symbol: '$EMP',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Empire_Distribution_logo.svg/440px-Empire_Distribution_logo.svg.png',
-        labelBio: 'A premier independent distribution and label services company. Empire empowers artists to maintain control of their careers while providing major-label resources. Home to superstars and rising talent across hip-hop, R&B, and afrobeats.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Empire&background=0033cc&color=fff&size=256',
+        labelBio: 'A premier independent distribution and label services company. Empire empowers artists to maintain control of their careers.',
         signedArtists: ['a3', 'a2'], 
         links: { 
             instagram: 'https://instagram.com/empire',
@@ -195,7 +287,7 @@ export const LABELS: Label[] = [
         },
         createdBy: {
             name: 'Ghazi',
-            avatarUrl: 'https://i.pravatar.cc/150?u=ghazi',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Ghazi&background=random',
             isVerified: true
         }
     },
@@ -204,8 +296,8 @@ export const LABELS: Label[] = [
         type: 'label',
         name: 'OVO Sound',
         symbol: '$OVO',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/OVO_Sound_logo.svg/440px-OVO_Sound_logo.svg.png',
-        labelBio: 'Founded by Drake, Oliver El-Khatib, and Noah "40" Shebib. OVO Sound has become synonymous with the "Toronto Sound", blending moody R&B with sharp hip-hop production. A cultural powerhouse in modern music.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=OVO&background=000&color=F5A623&size=256',
+        labelBio: 'Founded by Drake, Oliver El-Khatib, and Noah "40" Shebib. OVO Sound has become synonymous with the "Toronto Sound".',
         signedArtists: ['a2'], 
         links: { 
             website: 'https://ovosound.com',
@@ -213,7 +305,7 @@ export const LABELS: Label[] = [
         },
         createdBy: {
             name: 'Drake',
-            avatarUrl: 'https://i.pravatar.cc/150?u=drake',
+            avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9',
             isVerified: true,
             tokenSymbol: '$6GOD'
         }
@@ -223,8 +315,8 @@ export const LABELS: Label[] = [
         type: 'label',
         name: 'Roc Nation',
         symbol: '$ROC',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Roc_Nation_Logo.svg/440px-Roc_Nation_Logo.svg.png',
-        labelBio: 'Founded by Jay-Z, Roc Nation is an entertainment company that manages some of the world’s biggest names. It represents a 360-degree approach to music, sports, and media.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Roc+Nation&background=111&color=fff&size=256',
+        labelBio: 'Founded by Jay-Z, Roc Nation is an entertainment company that manages some of the world’s biggest names.',
         signedArtists: ['a1'], 
         links: { 
             website: 'https://rocnation.com',
@@ -232,7 +324,7 @@ export const LABELS: Label[] = [
         },
         createdBy: {
             name: 'Jay-Z',
-            avatarUrl: 'https://i.pravatar.cc/150?u=jayz',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Jay+Z&background=random',
             isVerified: true,
             tokenSymbol: '$HOV'
         }
@@ -242,8 +334,8 @@ export const LABELS: Label[] = [
         type: 'label',
         name: 'Quality Control',
         symbol: '$QC',
-        avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Quality_Control_Music_logo.svg/440px-Quality_Control_Music_logo.svg.png',
-        labelBio: 'Based in Atlanta, QC dominated the hip-hop charts throughout the 2010s. Founded by Kevin "Coach K" Lee and Pierre "P" Thomas, it is the home to Migos, Lil Baby, and City Girls.',
+        avatarUrl: 'https://ui-avatars.com/api/?name=QC&background=FF0000&color=fff&size=256',
+        labelBio: 'Based in Atlanta, QC dominated the hip-hop charts throughout the 2010s.',
         signedArtists: ['a3'], 
         links: { 
             instagram: 'https://instagram.com/qualitycontrolmusic',
@@ -251,7 +343,62 @@ export const LABELS: Label[] = [
         },
         createdBy: {
             name: 'Coach K',
-            avatarUrl: 'https://i.pravatar.cc/150?u=coachk',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Coach+K&background=random',
+            isVerified: true
+        }
+    },
+    {
+        id: 'l6',
+        type: 'label',
+        name: 'XL Recordings',
+        symbol: '$XL',
+        avatarUrl: 'https://ui-avatars.com/api/?name=XL&background=fff&color=000&size=256',
+        labelBio: 'A British independent record label that has released some of the most influential electronic and alternative music.',
+        signedArtists: ['a9'],
+        links: {
+            website: 'https://xlrecordings.com',
+            instagram: 'https://instagram.com/xlrecordings'
+        },
+        createdBy: {
+            name: 'Richard Russell',
+            avatarUrl: 'https://ui-avatars.com/api/?name=RR&background=random',
+            isVerified: false
+        }
+    },
+    {
+        id: 'l7',
+        type: 'label',
+        name: 'Dreamville',
+        symbol: '$DRM',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Dreamville&background=333&color=fff&size=256',
+        labelBio: 'Founded by J. Cole, Dreamville is a record label and media company known for its close-knit roster.',
+        signedArtists: ['a6'],
+        links: {
+            instagram: 'https://instagram.com/dreamville',
+            x: 'https://x.com/dreamville'
+        },
+        createdBy: {
+            name: 'J. Cole',
+            avatarUrl: 'https://ui-avatars.com/api/?name=J+Cole&background=random',
+            isVerified: true,
+            tokenSymbol: '$COLE'
+        }
+    },
+    {
+        id: 'l8',
+        type: 'label',
+        name: '88rising',
+        symbol: '$88',
+        avatarUrl: 'https://ui-avatars.com/api/?name=88&background=EE1C25&color=fff&size=256',
+        labelBio: 'A hybrid record label, video production, and marketing company described as a "bridge" between American and Asian artists.',
+        signedArtists: ['a8'],
+        links: {
+            instagram: 'https://instagram.com/88rising',
+            youtube: 'https://youtube.com/88rising'
+        },
+        createdBy: {
+            name: 'Sean Miyashiro',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Sean&background=random',
             isVerified: true
         }
     }

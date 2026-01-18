@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { BinaryMarket } from '../../types/prediction';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
+import { Check, X } from 'lucide-react-native';
 
 interface BinaryMarketCardProps {
   market: BinaryMarket;
@@ -9,11 +11,25 @@ interface BinaryMarketCardProps {
 }
 
 // Helper for tint
-const getPillStyle = (label: string, index: number) => {
+const getOptionTheme = (label: string, index: number) => {
     const l = label.toLowerCase();
-    if (l === 'yes') return { backgroundColor: 'rgba(74, 222, 128, 0.15)' }; // Green tint
-    if (l === 'no') return { backgroundColor: 'rgba(248, 113, 113, 0.15)' }; // Red tint
-    return { backgroundColor: index === 0 ? '#3A2A2A' : '#2A2A3A' };
+    if (l === 'yes') {
+        return { 
+            bg: 'rgba(34,197,94,0.16)', // Green tint
+            color: '#22C55E'           // Green primary
+        };
+    }
+    if (l === 'no') {
+        return { 
+            bg: 'rgba(239,68,68,0.16)', // Red tint
+            color: '#EF4444'            // Red primary
+        };
+    }
+    // Default neutral
+    return { 
+        bg: '#2A2A2A',
+        color: '#FFFFFF'
+    };
 };
 
 export const BinaryMarketCard = ({ market, onPress }: BinaryMarketCardProps) => {
@@ -39,41 +55,52 @@ export const BinaryMarketCard = ({ market, onPress }: BinaryMarketCardProps) => 
 
       {/* Options List */}
       <View style={[styles.optionsList, !market.isLive && { marginTop: 12 }]}> 
-        {market.options.map((option, index) => (
-          <View key={option.id} style={styles.optionRow}>
-            {/* Left Cluster */}
-            <View style={styles.leftCluster}>
-                <View style={[styles.iconTile, { backgroundColor: option.iconBg || '#2A2A2A' }]}>
-                    {option.iconUrl ? (
-                        <Image 
-                            source={{ uri: option.iconUrl }} 
-                            style={styles.iconImage}
-                            // Graceful fallback logic could be handled by component state, but for now strictly mapping props
-                        />
-                    ) : (
-                        <View style={styles.placeholderGlyph} />
-                    )}
-                </View>
-                <Text style={styles.optionLabel} numberOfLines={1}>{option.label}</Text>
-            </View>
-
-            {/* Right Cluster */}
-            <View style={styles.rightCluster}>
-                {option.score !== undefined && (
-                    <View style={styles.scoreChip}>
-                        <Text style={styles.scoreText}>{option.score}</Text>
+        {market.options.map((option, index) => {
+            const theme = getOptionTheme(option.label, index);
+            const isYes = option.label.toLowerCase() === 'yes';
+            const isNo = option.label.toLowerCase() === 'no';
+            
+            return (
+              <View key={option.id} style={styles.optionRow}>
+                {/* Left Cluster */}
+                <View style={styles.leftCluster}>
+                    <View style={[styles.iconTile, { backgroundColor: theme.bg }]}>
+                        {option.iconUrl ? (
+                            <Image 
+                                source={{ uri: option.iconUrl }} 
+                                style={styles.iconImage}
+                            />
+                        ) : (
+                            // Use Check/X for Yes/No, otherwise placeholder
+                            isYes ? <Check size={18} color={theme.color} strokeWidth={3} /> :
+                            isNo  ? <X size={18} color={theme.color} strokeWidth={3} /> :
+                            <View style={styles.placeholderGlyph} />
+                        )}
                     </View>
-                )}
-                
-                {/* Tinted Pill */}
-                <View style={[styles.percentagePill, getPillStyle(option.label, index)]}> 
-                   <View style={styles.percentagePillInner}>
-                       <Text style={styles.percentageText}>{Math.round(option.percentage)}%</Text>
-                   </View>
+                    <Text style={styles.optionLabel} numberOfLines={1}>{option.label}</Text>
                 </View>
-            </View>
-          </View>
-        ))}
+
+                {/* Right Cluster */}
+                <View style={styles.rightCluster}>
+                    {option.score !== undefined && (
+                        <View style={styles.scoreChip}>
+                            <Text style={styles.scoreText}>{option.score}</Text>
+                        </View>
+                    )}
+                    
+                    {/* Tinted Pill */}
+                    {/* Tinted Pill (Reverted to Neutral per request) */}
+                    <View style={styles.percentagePill}> 
+                       <View style={styles.percentagePillInner}>
+                           <Text style={styles.percentageText}>
+                               {Math.round(option.percentage)}%
+                           </Text>
+                       </View>
+                    </View>
+                </View>
+              </View>
+            );
+        })}
       </View>
 
       <Text style={styles.footerMeta}>
@@ -91,8 +118,6 @@ const styles = StyleSheet.create({
     // Removed border per request
     width: '100%',
   },
-  // ... rest of styles
-
   
   // Title
   title: {

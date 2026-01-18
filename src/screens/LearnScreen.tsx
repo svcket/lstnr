@@ -47,7 +47,6 @@ export const LearnScreen = () => {
           <View style={styles.header}>
               <HeaderBack />
               <Text style={styles.headerTitle}>Learn</Text>
-              <View style={{ width: 40 }} /> 
           </View>
 
           {/* FIXED CARD CONTAINER */}
@@ -76,7 +75,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: 16,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },

@@ -110,7 +110,7 @@ describe('PredictionDetailScreen Layout', () => {
         const { getByText, getByPlaceholderText } = render(<MockNavigation />);
         
         // Switch to comments
-        fireEvent.press(getByText('Chat'));
+        fireEvent.press(getByText('Comments'));
         
         // Check for input
         // Placeholder is dynamic: "Comment on $SYMBOL"

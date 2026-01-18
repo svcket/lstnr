@@ -34,6 +34,7 @@ export const usePortfolioTotals = () => {
 
     return {
         artistsValue: formatCurrency(totals.totalArtistsValue),
-        predictionsValue: formatCurrency(totals.totalPredictionsValue)
+        predictionsValue: formatCurrency(totals.totalPredictionsValue),
+        labelsValue: formatCurrency(0) // Placeholder
     };
 };

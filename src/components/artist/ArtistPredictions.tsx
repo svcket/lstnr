@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { FONT_FAMILY } from '../../constants/theme';
 import { PredictionCard } from './PredictionCard';
-import { getEntityPredictions, EntityPrediction } from '../../data/social';
+import { PREDICTIONS } from '../../data/catalog';
 
 interface ArtistPredictionsProps {
   entityId: string;
@@ -10,11 +10,13 @@ interface ArtistPredictionsProps {
 }
 
 export const ArtistPredictions = ({ entityId, name }: ArtistPredictionsProps) => {
-  const [predictions, setPredictions] = useState<EntityPrediction[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
 
   useEffect(() => {
-      setPredictions(getEntityPredictions(entityId, name));
-  }, [entityId, name]);
+    // Filter real predictions from catalog
+    const related = PREDICTIONS.filter(p => p.relatedEntityId === entityId);
+    setPredictions(related);
+  }, [entityId]);
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>

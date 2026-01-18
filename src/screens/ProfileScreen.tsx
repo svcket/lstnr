@@ -19,10 +19,10 @@ export const ProfileScreen = () => {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
-                <View style={{ position: 'absolute', left: 16, zIndex: 10, bottom: 12 }}>
-                   <HeaderBack />
-                </View>
+            <View style={styles.header}>
+                <HeaderBack />
                 <Text style={styles.title}>Profile</Text>
+            </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.surface,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    gap: 16,
     minHeight: 60,
   },
   title: {

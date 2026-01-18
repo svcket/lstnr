@@ -11,14 +11,15 @@ import { ArtistHolders } from '../components/artist/ArtistHolders';
 import { ArtistActivity } from '../components/artist/ArtistActivity';
 import { getPredictionDetail, PredictionDetail } from '../data/catalog';
 import { FilterSheet } from '../components/common/FilterSheet';
-import DualMarketChart from '../components/charts/DualMarketChart';
+import { UnifiedMarketChart } from '../components/charts/UnifiedMarketChart';
 import { ScreenContainer } from '../components/common/ScreenContainer';
 import { ShareSheet } from '../components/artist/ShareSheet';
+import { InfoSheet } from '../components/common/InfoSheet';
 import { TradeSheet } from '../components/artist/TradeSheet';
 import { getUserSharesInfo, MIN_SHARES_FOR_CHAT, getPredictionHolders } from '../data/social';
 
 const { width } = Dimensions.get('window');
-const TIMEFRAMES = ['1M', '5M', '10M', '1H', '1D', 'ALL'];
+const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -34,14 +35,23 @@ export const PredictionDetailScreen = ({ route }: any) => {
     const [tradeSheetOpen, setTradeSheetOpen] = useState(false);
     const [shareSheetVisible, setShareSheetVisible] = useState(false);
     const [prohibitionsOpen, setProhibitionsOpen] = useState(false);
+    const [infoSheetType, setInfoSheetType] = useState<'rules' | 'disclosures' | null>(null);
     
+    const CHART_WIDTH = Dimensions.get('window').width - 90;
+
+    // Multi-Range Selection
+    const [selectedOutcome, setSelectedOutcome] = useState<any>(null);
+
     // Chart State
     const [viewSide, setViewSide] = useState<'yes' | 'no'>('yes');
-    // Chart State
-    const [chartSeries, setChartSeries] = useState<number[] | ChartSeries[]>([]);
-    const [activeTimeframe, setActiveTimeframe] = useState('1D');
+    const [chartSeries, setChartSeries] = useState<any[]>([]);
+    const [activeTimeframe, setActiveTimeframe] = useState('15m');
     const [scrubbedProb, setScrubbedProb] = useState<number | null>(null);
     const [showAllOutcomes, setShowAllOutcomes] = useState(false);
+    
+    // Info Sheet State
+    const [infoSheetData, setInfoSheetData] = useState<{title: string, content: string} | null>(null);
+    const [scrubbedValues, setScrubbedValues] = useState<Record<string, number> | null>(null);
 
     // Chat Access
     const [hasAccess, setHasAccess] = useState(false);
@@ -50,33 +60,27 @@ export const PredictionDetailScreen = ({ route }: any) => {
         const data = getPredictionDetail(predictionId);
         setDetail(data);
         if (data) {
-            // Check type
             if (data.marketType === 'multi-range') {
-                // Map outcomes to series
-                // Safe cast as we know catalog hydrates this
                 const outcomes: any[] = data.outcomes;
-                const series: ChartSeries[] = outcomes.map(o => ({
+                const series = outcomes.slice(0, 5).map(o => ({
                     data: data.chartData.map((d: any) => d[o.id] || o.probability),
-                    color: o.color
+                    color: o.color,
+                    name: o.name
                 }));
                 setChartSeries(series);
             } else {
-                // Binary
                 const yesData = data.chartData.map(d => d.yesProb || (d as any).yes);
                 const noData = yesData.map(y => 100 - y);
                 
-                // Using slightly more vibrant colors (Tailwind -500 series)
-                const yesSeries: ChartSeries = { data: yesData, color: '#22c55e', strokeWidth: 3, opacity: 1 };
-                const noSeries: ChartSeries = { data: noData, color: '#ef4444', strokeWidth: 3, opacity: 1 };
+                const yesSeries = { data: yesData, color: '#22c55e', strokeWidth: 3, opacity: 1, name: 'YES' };
+                const noSeries = { data: noData, color: '#ef4444', strokeWidth: 3, opacity: 1, name: 'NO' };
                 
                 if (viewSide === 'yes') {
-                    // YES is primary, NO is background
                     setChartSeries([
                         { ...yesSeries, isActive: true }, 
                         { ...noSeries, strokeWidth: 3, opacity: 0.5, isActive: false }
                     ]);
                 } else {
-                    // NO is primary, YES is background
                     setChartSeries([
                         { ...noSeries, isActive: true },
                         { ...yesSeries, strokeWidth: 3, opacity: 0.5, isActive: false }
@@ -84,48 +88,25 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 }
             }
         }
-
         const info = getUserSharesInfo(predictionId); 
         setHasAccess(info.hasAccess);
     }, [predictionId, activeTimeframe, viewSide]);
 
     if (!detail) return <View style={styles.loading}><Text style={{color: '#FFF'}}>Loading...</Text></View>;
 
-    const currentProb = detail.outcomes[0].probability;
-    // Adjust display probability logic for NO side
-    const workingProb = viewSide === 'yes' ? currentProb : (100 - currentProb);
-    const displayProb = scrubbedProb !== null ? scrubbedProb : workingProb;
-
-    // Data for Axis
-    // Calc min/max based on type
-    let minVal = 0, maxVal = 100;
-    if (Array.isArray(chartSeries) && chartSeries.length > 0) {
-        if (typeof chartSeries[0] === 'number') {
-            minVal = Math.min(...(chartSeries as number[]));
-            maxVal = Math.max(...(chartSeries as number[]));
-        } else {
-             // Multi
-             const all = (chartSeries as ChartSeries[]).flatMap(s => s.data);
-             if (all.length > 0) {
-                 minVal = Math.min(...all);
-                 maxVal = Math.max(...all);
-             }
-        }
-    }
-    
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top }]}>
-                 <HeaderBack />
-                 <Text style={styles.headerTitle}>Predictions</Text>
+                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+                    <HeaderBack />
+                    <Text style={styles.headerTitle}>Predictions</Text>
+                 </View>
                  <TouchableOpacity onPress={() => setShareSheetVisible(true)}>
                      <Share size={24} color={COLORS.white} />
                  </TouchableOpacity>
             </View>
 
             <ScrollView stickyHeaderIndices={[1]} showsVerticalScrollIndicator={false}>
-                {/* 1. Hero Chart Section */}
                 <View style={styles.heroSection}>
                      <ScreenContainer px={16}>
                         <View style={styles.heroHeader}>
@@ -133,10 +114,9 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                 <Text style={styles.question}>{detail.question}</Text>
                              </View>
                              
-                             {/* Legend / Prob Display for Multi-Range */}
                              {detail.marketType === 'multi-range' && (
                                  <View style={styles.legendContainer}>
-                                     {detail.outcomes.slice(0, 2).map((o: any) => (
+                                     {detail.outcomes.map((o: any) => (
                                          <View key={o.id} style={styles.legendItem}>
                                              <View style={[styles.legendDot, { backgroundColor: o.color }]} />
                                              <Text style={styles.legendText}>
@@ -144,40 +124,80 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                              </Text>
                                          </View>
                                      ))}
-                                     {detail.outcomes.length > 2 && (
-                                         <Text style={styles.legendMore}>+{detail.outcomes.length - 2} more</Text>
-                                     )}
                                  </View>
                              )}
                         </View>
                      
-                        {/* Unified Chart */}
-                        {/* DualMarketChart Implementation */}
                         {detail.marketType === 'multi-range' ? (
-                            <View style={{height: 220, justifyContent: 'center', alignItems: 'center'}}>
-                                <Text style={{color: '#666'}}>Multi-outcome chart not supported yet.</Text>
+                            <View style={{ marginLeft: -16, width: width, marginBottom: 24 }}>
+                                <UnifiedMarketChart 
+                                    series={chartSeries}
+                                    mode="MULTI"
+                                    width={width} // Full Bleed
+                                    height={220}
+                                    timeframes={[]}
+                                    onScrubIndex={(idx) => {
+                                        if (idx === null || idx < 0 || !detail.chartData[idx]) {
+                                            setScrubbedValues(null);
+                                        } else {
+                                            const point = detail.chartData[idx];
+                                            const values: Record<string, number> = {};
+                                            detail.outcomes.forEach((o: any) => {
+                                                values[o.id] = (point as any)[o.id] || o.probability;
+                                            });
+                                            setScrubbedValues(values);
+                                        }
+                                    }}
+                                />
                             </View>
                         ) : (
-                            <DualMarketChart 
-                                width={width - 32}
-                                height={260} // Adjusted height as per user request/style
-                                topSeries={{ 
-                                    key: 'NO', 
-                                    color: '#EF4444', 
-                                    pct: Math.round(100 - detail.outcomes[0].probability), 
-                                    data: chartSeries[1]?.data || [] // NO series
-                                }}
-                                bottomSeries={{ 
-                                    key: 'YES', 
-                                    color: '#22C55E', 
-                                    pct: Math.round(detail.outcomes[0].probability), 
-                                    data: chartSeries[0]?.data || [] // YES series
-                                }}
-                                showLeftPriceHints={false}
-                            />
+                        <View style={{ marginLeft: -16, width: width, marginBottom: 24 }}>
+                            <View style={{ height: 260 }}>
+                                {/* NO Chart (Top) */}
+                                <View style={{ height: 130, overflow: 'hidden' }}>
+                                    <UnifiedMarketChart 
+                                        series={[{ 
+                                            data: chartSeries[1]?.data || [], 
+                                            color: '#EF4444', 
+                                            strokeWidth: 3 
+                                        }]}
+                                        mode="SINGLE"
+                                        width={CHART_WIDTH}
+                                        height={130}
+                                        onScrub={(val) => {
+                                            // Optional: Sync logic here if we had state
+                                        }}
+                                    />
+                                </View>
+                                {/* YES Chart (Bottom) */}
+                                <View style={{ height: 130, overflow: 'hidden', marginTop: -10 }}>
+                                    <UnifiedMarketChart 
+                                        series={[{ 
+                                            data: chartSeries[0]?.data || [], 
+                                            color: '#22C55E', 
+                                            strokeWidth: 3 
+                                        }]}
+                                        mode="SINGLE"
+                                        width={CHART_WIDTH}
+                                        height={130}
+                                    />
+                                </View>
+
+                                {/* Floating Labels (Right Aligned) */}
+                                <View style={{ position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'space-between', paddingVertical: 40 }} pointerEvents="none">
+                                    <View>
+                                        <Text style={{ color: '#EF4444', fontSize: 13, fontWeight: '700', textAlign: 'right' }}>NO</Text>
+                                        <Text style={{ color: '#EF4444', fontSize: 24, fontWeight: '800', textAlign: 'right' }}>{Math.round(100 - detail.outcomes[0].probability)}%</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={{ color: '#22C55E', fontSize: 13, fontWeight: '700', textAlign: 'right' }}>YES</Text>
+                                        <Text style={{ color: '#22C55E', fontSize: 24, fontWeight: '800', textAlign: 'right' }}>{Math.round(detail.outcomes[0].probability)}%</Text>
+                                    </View>
+                                </View>
+                            </View>
+                         </View>
                         )}
 
-                        {/* Timeframe Pills (moved out of UnifiedMarketChart) */}
                         <View style={styles.timeframeRow}>
                             {TIMEFRAMES.map((tf) => (
                                 <TouchableOpacity
@@ -190,7 +210,6 @@ export const PredictionDetailScreen = ({ route }: any) => {
                             ))}
                         </View>
 
-                        {/* Make Prediction - Button Bar */}
                         <View style={styles.predictionSection}>
                             <Text style={styles.sectionTitle}>Make your prediction</Text>
                             
@@ -201,7 +220,11 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                             key={outcome.id}
                                             outcome={outcome as any}
                                             volume={Math.floor(detail.volume * ((outcome as any).probability / 100))}
-                                            onPress={() => setTradeSheetOpen(true)}
+                                            displayProbability={scrubbedValues ? scrubbedValues[outcome.id] : (outcome as any).probability}
+                                            onPress={() => {
+                                                setSelectedOutcome(outcome);
+                                                setTradeSheetOpen(true);
+                                            }}
                                             isFirst={idx === 0} 
                                             marketType={detail.marketType}
                                         />
@@ -209,6 +232,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     {detail.outcomes.length > 3 && (
                                         <TouchableOpacity 
                                             style={styles.showMoreBtn}
+                                            activeOpacity={1}
                                             onPress={() => {
                                                 LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                                                 setShowAllOutcomes(!showAllOutcomes);
@@ -224,7 +248,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                 <View style={styles.binaryBar}>
                                      <TouchableOpacity 
                                         style={[styles.actionBtn, styles.btnYes]} 
-                                        onPress={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
+                                        onPress={() => { setViewSide('yes'); setSelectedOutcome(detail.outcomes[0]); setTradeSheetOpen(true); }}
                                         activeOpacity={0.8}
                                      >
                                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -235,7 +259,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
 
                                      <TouchableOpacity 
                                         style={[styles.actionBtn, styles.btnNo]} 
-                                        onPress={() => { setViewSide('no'); setTradeSheetOpen(true); }}
+                                        onPress={() => { setViewSide('no'); setSelectedOutcome(detail.outcomes[1]); setTradeSheetOpen(true); }}
                                         activeOpacity={0.8}
                                      >
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -253,18 +277,15 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 <ArtistTabs 
                     activeTab={activeTab} 
                     onTabPress={setActiveTab} 
-                    tabs={['Details', 'Chat', 'Holders', 'Activity']}
+                    tabs={['Details', 'Comments', 'Holders', 'Activity']}
                     mode="fixed" 
                     style={{ marginBottom: 0 }}
                 />
 
-                {/* 3. Tab Content */}
                 <View style={[styles.tabContent, { minHeight: 800 }]}>
                     <ScreenContainer px={16}>
                         {activeTab === 'Details' && (
-                            /* Stack Container with Gap */
                             <View style={styles.detailsStack}>
-                                {/* 1. Chat Promo Card */}
                                 <View style={styles.promoCard}>
                                     <View style={{flexDirection: 'column', gap: 4, flex: 1}}>
                                         <Text style={styles.promoTitleSimple}>Start a conversation!</Text>
@@ -276,6 +297,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                             if (hasAccess) {
                                                 navigation.navigate('HoldersChat', { entityId: predictionId });
                                             } else {
+                                                // Default to generic trade
                                                 setTradeSheetOpen(true);
                                             }
                                         }}
@@ -292,11 +314,11 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     <Text style={styles.sectionTitle}>About</Text>
                                     <Text style={styles.bodyText}>{detail.description}</Text>
                                     
-                                    <View style={[styles.rulesRow, { marginTop: 16 }]}>
-                                        <TouchableOpacity style={styles.rulePill}>
+                                    <View style={[styles.rulesRow, { marginTop: 20 }]}>
+                                        <TouchableOpacity style={styles.rulePill} onPress={() => setInfoSheetType('rules')}>
                                             <Text style={styles.ruleText}>View rules</Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={styles.rulePill}>
+                                        <TouchableOpacity style={styles.rulePill} onPress={() => setInfoSheetType('disclosures')}>
                                             <Text style={styles.ruleText}>View disclosures</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -334,33 +356,29 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                 <View style={{ height: 40 }} />
                             </View>
                         )}
-
-                        {activeTab === 'Chat' && <ArtistComments entityId={predictionId} />}
-                        
-                        {activeTab === 'Holders' && (
-                            <PredictionHolders 
-                                entityId={predictionId} 
-                                onBuyYes={() => { setViewSide('yes'); setTradeSheetOpen(true); }}
-                                onBuyNo={() => { setViewSide('no'); setTradeSheetOpen(true); }}
-                            />
-                        )}
-                        
-                        {activeTab === 'Activity' && <ArtistActivity artist={{ id: predictionId } as any} />}
-                    </ScreenContainer>
-                </View>
-            </ScrollView>
-
-
-
+                {activeTab === 'Comments' && <ArtistComments entityId={predictionId} />}
+                {activeTab === 'Holders' && (
+                    <PredictionHolders 
+                        entityId={predictionId} 
+                        onBuyYes={() => { setViewSide('yes'); setSelectedOutcome(detail.outcomes[0]); setTradeSheetOpen(true); }}
+                        onBuyNo={() => { setViewSide('no'); setSelectedOutcome(detail.outcomes[1]); setTradeSheetOpen(true); }}
+                    />
+                )}
+                {activeTab === 'Activity' && <ArtistActivity artist={{ id: predictionId } as any} />}
+            </ScreenContainer>
+        </View>
+    </ScrollView>
 
             {detail && (
                 <TradeSheet
                     visible={tradeSheetOpen}
-                    mode="BUY" // For predictions, we usually 'Buy' an outcome
-                    artistName={detail.question}
-                    ticker={viewSide === 'yes' ? 'YES' : 'NO'}
-                    sharePrice={(detail.outcomes.find(o => o.id === viewSide)?.probability || 0) / 100}
-                    mcs={50} // Mock confidence score
+                    mode="BUY"
+                    marketType={detail.marketType}
+                    outcomeName={selectedOutcome?.name}
+                    artistName={detail.marketType === 'multi-range' && selectedOutcome ? selectedOutcome.name : detail.question}
+                    ticker={detail.marketType === 'multi-range' ? (selectedOutcome?.name || 'YES') : (viewSide === 'yes' ? 'YES' : 'NO')}
+                    sharePrice={selectedOutcome?.probability ? selectedOutcome.probability / 100 : 0.5}
+                    mcs={50}
                     onClose={() => setTradeSheetOpen(false)}
                     onConfirm={(amt, isShares) => {
                         console.log('Trade confirmed:', amt, isShares);
@@ -374,15 +392,20 @@ export const PredictionDetailScreen = ({ route }: any) => {
                 onClose={() => setShareSheetVisible(false)}
                 artistName={detail.question}
             />
+
+            <InfoSheet 
+                visible={!!infoSheetType}
+                onClose={() => setInfoSheetType(null)}
+                title={infoSheetType === 'rules' ? 'Rules' : 'Disclosures'}
+                content={infoSheetType === 'rules' ? ((detail as any).rules || 'Standard market rules apply.') : 'The following are prohibited from trading this contract: Current and former players, coaches, and staff of the league, association, or organization(s) governing the event.'}
+            />
         </View>
     );
 };
 
-
-
-const OutcomeRow = ({ outcome, volume, onPress, isFirst, marketType }: any) => {
+const OutcomeRow = ({ outcome, volume, onPress, isFirst, marketType, displayProbability }: any) => {
     return (
-        <View style={styles.outcomeRow}>
+        <TouchableOpacity style={styles.outcomeRow} onPress={onPress} activeOpacity={0.7}>
              {/* Icon/Logo */}
              <View style={[styles.outcomeIcon, { backgroundColor: outcome.color }]}>
                  {marketType === 'multi-range' ? (
@@ -398,9 +421,9 @@ const OutcomeRow = ({ outcome, volume, onPress, isFirst, marketType }: any) => {
              </View>
 
              <TouchableOpacity style={styles.outcomeBtn} onPress={onPress}>
-                 <Text style={styles.outcomeBtnText}>{outcome.probability}%</Text>
+                 <Text style={styles.outcomeBtnText}>{Math.round(displayProbability !== undefined ? displayProbability : outcome.probability)}%</Text>
              </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 };
 
@@ -436,8 +459,12 @@ const PredictionHolders = ({ entityId, onBuyYes, onBuyNo }: { entityId: string, 
                         </View>
                     </View>
                 ))}
-                <TouchableOpacity style={[styles.miniBuyBtn, { borderColor: '#4ADE80' }]} onPress={onBuyYes}>
-                    <Text style={[styles.miniBuyText, { color: '#4ADE80' }]}>Buy Yes</Text>
+                <TouchableOpacity 
+                    style={[styles.actionBtn, styles.btnYes, { height: 48, marginTop: 16 }]} 
+                    onPress={onBuyYes}
+                    activeOpacity={0.8}
+                >
+                    <Text style={[styles.actionText, styles.textYes, { fontSize: 16 }]}>Buy Yes</Text>
                 </TouchableOpacity>
             </View>
 
@@ -455,8 +482,12 @@ const PredictionHolders = ({ entityId, onBuyYes, onBuyNo }: { entityId: string, 
                         </View>
                     </View>
                 ))}
-                <TouchableOpacity style={[styles.miniBuyBtn, { borderColor: '#F87171' }]} onPress={onBuyNo}>
-                    <Text style={[styles.miniBuyText, { color: '#F87171' }]}>Buy No</Text>
+                <TouchableOpacity 
+                    style={[styles.actionBtn, styles.btnNo, { height: 48, marginTop: 16 }]} 
+                    onPress={onBuyNo}
+                    activeOpacity={0.8}
+                >
+                    <Text style={[styles.actionText, styles.textNo, { fontSize: 16 }]}>Buy No</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -503,37 +534,32 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         fontWeight: '600',
     },
-    probContainer: {
+    // LEGEND
+    legendContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 16,
     },
-    probValue: {
-        fontSize: 18,
-        fontFamily: FONT_FAMILY.balance,
-        color: COLORS.white,
-        fontWeight: '700',
-    },
-    probLabel: {
-        fontSize: 13,
-        color: COLORS.textSecondary,
-        fontWeight: '500', 
-    },
-    chartToggleRow: {
+    legendItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        gap: 24,
     },
-    chartToggleItem: {
-        alignItems: 'flex-start',
-        paddingVertical: 4,
-        opacity: 0.8,
+    legendDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginRight: 6,
     },
-    chartToggleItemActive: {
-        opacity: 1,
+    legendText: {
+        fontSize: 13,
+        color: '#CCC',
+        fontWeight: '500', 
     },
-    chartToggleDivider: {
-        width: 1,
-        height: 24,
-        backgroundColor: '#333',
+    legendMore: {
+        fontSize: 12,
+        color: '#666',
+        marginTop: 4,
     },
     chartContainer: {
         height: 220,
@@ -578,13 +604,13 @@ const styles = StyleSheet.create({
     
     // Prediction Section (Hero)
     predictionSection: {
-        marginTop: 16,
-        marginBottom: 16,
+        marginTop: 24,
+        marginBottom: 24,
     },
 
     // TAB CONTENT
     tabContent: {
-        paddingTop: 16,
+        paddingTop: 8,
         backgroundColor: COLORS.black,
     },
     detailsStack: {
@@ -822,40 +848,14 @@ const styles = StyleSheet.create({
         color: COLORS.textSecondary,
     },
     
-    // LEGEND
-    legendContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 16,
-        alignItems: 'center',
-    },
-    legendItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    legendDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-    },
-    legendText: {
-        color: '#999',
-        fontSize: 14,
-        fontFamily: FONT_FAMILY.body,
-    },
-    legendMore: {
-        color: '#666',
-        fontSize: 12,
-    },
-    
+
     // SHOW MORE
     showMoreBtn: {
         paddingVertical: 12,
         alignItems: 'center',
     },
     showMoreText: {
-        color: '#666',
+        color: COLORS.textSecondary,
         fontSize: 13,
         fontWeight: '600',
     },

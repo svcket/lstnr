@@ -10,6 +10,7 @@ export type MultiRangeMarket = {
   options: MultiRangeOption[]; // 3 items for now
   volumeLabel: string;    // "$104.5M Vol."
   deadlineLabel: string;  // "Feb 12, 2025 16:00"
+  isOwned?: boolean;
 };
 
 export type BinaryOption = {

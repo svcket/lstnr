@@ -31,20 +31,25 @@ interface UnifiedMarketChartProps {
   timeframes?: string[];
   activeTimeframe?: string;
   onTimeframeChange?: (tf: string) => void;
+  scrubX?: number | null;
+  onScrubChange?: (val: number | null) => void;
+  onScrubIndex?: (index: number | null) => void;
 }
 
 const DEFAULT_TIMEFRAMES = ['1D', '1W', '1M', 'ALL'];
 
-export const UnifiedMarketChart = ({ 
-  series, 
-  mode,
-  height = 220, 
-  width = SCREEN_WIDTH,
-  onScrub,
-  timeframes = DEFAULT_TIMEFRAMES,
-  activeTimeframe,
-  onTimeframeChange
-}: UnifiedMarketChartProps) => {
+
+export const UnifiedMarketChart = (props: UnifiedMarketChartProps) => {
+  const { 
+      series, 
+      mode,
+      height = 220, 
+      width = SCREEN_WIDTH,
+      onScrub,
+      timeframes = DEFAULT_TIMEFRAMES,
+      activeTimeframe,
+      onTimeframeChange
+  } = props;
 
   // Filter out empty series
   const validSeries = useMemo(() => series.filter(s => s.data && s.data.length > 1), [series]);
@@ -116,6 +121,9 @@ export const UnifiedMarketChart = ({
               const activePath = paths.find(p => p.isActive) || paths[0];
               onScrub(activePath.points[index].val, activePath.index);
           }
+          if (props.onScrubIndex) {
+              props.onScrubIndex(index);
+          }
       }
   };
 
@@ -131,10 +139,12 @@ export const UnifiedMarketChart = ({
       onPanResponderRelease: () => {
         setScrubX(null);
         if (onScrub) onScrub(null);
+        if (props.onScrubIndex) props.onScrubIndex(null);
       },
       onPanResponderTerminate: () => {
         setScrubX(null);
         if (onScrub) onScrub(null);
+        if (props.onScrubIndex) props.onScrubIndex(null);
       },
     })
   ).current;
@@ -245,7 +255,7 @@ export const UnifiedMarketChart = ({
         </View>
 
         {/* Timeframe Pills */}
-        {timeframes && (
+        {timeframes && timeframes.length > 0 && (
             <View style={styles.timeframeRow}>
                 {timeframes.map((tf) => (
                     <TouchableOpacity

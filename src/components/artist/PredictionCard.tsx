@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { formatCompact } from '../../mock/artistMarket'; 
 import { useNavigation } from '@react-navigation/native';
-import { Prediction } from '../../data/catalog';
+import { Prediction, getPredictionPortfolio } from '../../data/catalog';
 import { MultiRangeMarketCard } from '../predictions/MultiRangeMarketCard';
 import { BinaryMarketCard } from '../predictions/BinaryMarketCard';
 import { MultiRangeMarket, BinaryMarket, BinaryOption } from '../../types/prediction';
@@ -16,6 +16,8 @@ interface PredictionCardProps {
 
 export const PredictionCard = ({ prediction }: PredictionCardProps) => {
   const navigation = useNavigation<any>();
+  const portfolio = getPredictionPortfolio();
+  const isOwned = portfolio.some(p => p.predictionId === prediction.id);
 
   const handlePress = () => {
     navigation.navigate('PredictionDetail', { predictionId: prediction.id });
@@ -33,7 +35,8 @@ export const PredictionCard = ({ prediction }: PredictionCardProps) => {
         options: prediction.outcomes.map(o => ({
             label: o.name,
             percentage: o.chance
-        }))
+        })),
+        isOwned
     };
     return <MultiRangeMarketCard market={marketData} onPress={handlePress} />;
   }

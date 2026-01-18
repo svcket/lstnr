@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { MultiRangeMarket } from '../../types/prediction';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
+import { ICONS } from '../../constants/assets';
 
 interface MultiRangeMarketCardProps {
   market: MultiRangeMarket;
@@ -27,7 +28,16 @@ export const MultiRangeMarketCard = ({ market, onPress }: MultiRangeMarketCardPr
           )}
         </View>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{market.title}</Text>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+              <Text style={[styles.title, { flex: 1 }]} numberOfLines={2} ellipsizeMode="tail">{market.title}</Text>
+              {market.isOwned && (
+                  <Image 
+                      source={ICONS.navWalletActive} 
+                      style={{ width: 14, height: 14, tintColor: COLORS.textSecondary, marginTop: 4 }} 
+                      resizeMode="contain"
+                  />
+              )}
+          </View>
           <Text style={styles.subtitle}>{market.categoryLabel}</Text>
         </View>
       </View>
@@ -79,7 +89,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#202020',
+    backgroundColor: 'rgba(139,92,246,0.16)', // Purple Tint
     justifyContent: 'center',
     alignItems: 'center',
   },

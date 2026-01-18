@@ -15,7 +15,7 @@ import { Search, ChevronRight, Bookmark, Bell } from 'lucide-react-native';
 import Svg, { Circle, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 // --- TYPES ---
-type FilterType = 'All' | 'Artists' | 'Predictions' | 'Ending soon';
+type FilterType = 'All' | 'Artists' | 'Labels' | 'Predictions' | 'Ending soon';
 
 // --- COMPONENTS ---
 
@@ -201,14 +201,16 @@ export const ExploreScreen = () => {
 
                     <View style={{ marginBottom: 24 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: PX_16, gap: PX_8 }}>
-                            {(['All', 'Artists', 'Predictions', 'Ending soon'] as FilterType[]).map(f => (
+                            {(['All', 'Artists', 'Labels', 'Predictions', 'Ending soon'] as FilterType[]).map(f => (
                                 <FilterChip 
                                     key={f} 
                                     label={f} 
                                     isActive={filter === f} 
                                     onPress={() => {
                                         if (f === 'Artists') {
-                                            navigation.navigate('TrendingArtists');
+                                            navigation.navigate('Artists');
+                                        } else if (f === 'Labels') {
+                                            navigation.navigate('Labels');
                                         } else if (f === 'Predictions') {
                                             navigation.navigate('Predictions');
                                         } else if (f === 'Ending soon') {

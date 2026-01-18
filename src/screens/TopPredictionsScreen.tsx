@@ -26,7 +26,6 @@ export const TopPredictionsScreen = () => {
                 <View style={styles.header}>
                     <HeaderBack />
                     <Text style={styles.headerTitle}>Top Predictions</Text>
-                    <View style={{ width: 40 }} /> 
                 </View>
 
                 <FlatList
@@ -47,14 +46,14 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingTop: 8, 
         paddingBottom: 16,
+        gap: 8,
     },
     backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-start' },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 20,
         fontFamily: FONT_FAMILY.medium,
         fontWeight: '600',
         color: '#FFF',

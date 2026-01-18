@@ -11,6 +11,8 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import { UpdatesScreen } from '../screens/UpdatesScreen';
 import { ArtistDetailScreen } from '../screens/ArtistDetailScreen';
 import { LabelDetailScreen } from '../screens/LabelDetailScreen';
+import { ArtistsScreen } from '../screens/ArtistsScreen';
+import { LabelsScreen } from '../screens/LabelsScreen';
 import { TrendingArtistsScreen } from '../screens/TrendingArtistsScreen';
 import { PopularLabelsScreen } from '../screens/PopularLabelsScreen';
 import { TopPredictionsScreen } from '../screens/TopPredictionsScreen';
@@ -61,7 +63,10 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} detachInactiveScreens={false}>
       <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen name="Labels" component={LabelsScreen} />
       <Stack.Screen name="ArtistDetail" component={ArtistDetailScreen} />
+
+      <Stack.Screen name="Artists" component={ArtistsScreen} />
       <Stack.Screen name="TrendingArtists" component={TrendingArtistsScreen} />
       <Stack.Screen name="PopularLabels" component={PopularLabelsScreen} />
       <Stack.Screen name="TopPredictions" component={TopPredictionsScreen} />
