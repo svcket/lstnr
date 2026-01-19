@@ -53,22 +53,10 @@ export const ARTISTS: Artist[] = [
         name: 'Kanye West',
         symbol: '$YZY',
         avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb867008a971fae0f4d913f63a',
-        bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop and popular culture. From "The College Dropout" to "Donda", Ye\'s discography is a testament to his evolving creative genius.',
+        bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop.',
         region: 'North America',
         genres: ['Hip-Hop', 'Pop'],
-        links: { 
-            spotify: 'https://spotify.com',
-            appleMusic: 'https://apple.com',
-            x: 'https://x.com/kanyewest',
-            website: 'https://yeezy.com',
-            instagram: 'https://instagram.com'
-        },
-        createdBy: {
-            name: 'Yeezy Fan Club',
-            avatarUrl: 'https://ui-avatars.com/api/?name=Yeezy+Fan+Club&background=random',
-            isVerified: true,
-            tokenSymbol: '$YZY'
-        }
+        links: { spotify: 'https://spotify.com' }
     },
     {
         id: 'a2',
@@ -76,20 +64,10 @@ export const ARTISTS: Artist[] = [
         name: 'Drake',
         symbol: '$6GOD',
         avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9',
-        bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music, Drake has been credited for popularizing singing and R&B sensibilities in hip hop.',
+        bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music.',
         region: 'North America',
         genres: ['Hip-Hop', 'R&B'],
-        links: { 
-            instagram: 'https://instagram.com/champagnepapi',
-            x: 'https://x.com/drake',
-            spotify: 'https://spotify.com'
-        },
-        createdBy: {
-            name: 'OVO Sound',
-            avatarUrl: 'https://ui-avatars.com/api/?name=OVO&background=000&color=fff',
-            isVerified: true,
-            walletAddress: '0x8...92a'
-        }
+        links: { spotify: 'https://spotify.com' }
     },
     {
         id: 'a3',
@@ -97,20 +75,10 @@ export const ARTISTS: Artist[] = [
         name: 'Taylor Swift',
         symbol: '$TS',
         avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0',
-        bio: 'American singer-songwriter. Her narrative songwriting, which is often inspired by her personal life, has received widespread critical praise and media coverage.',
+        bio: 'American singer-songwriter. Her narrative songwriting has received widespread critical praise.',
         region: 'North America',
         genres: ['Pop', 'Country'],
-        links: { 
-            website: 'https://taylorswift.com',
-            instagram: 'https://instagram.com/taylorswift',
-            x: 'https://x.com/taylorswift'
-        },
-        createdBy: {
-            name: 'Swifties',
-            avatarUrl: 'https://ui-avatars.com/api/?name=Swifties&background=random',
-            isVerified: true,
-            tokenSymbol: '$SWIFT'
-        }
+        links: { website: 'https://taylorswift.com' }
     },
     {
         id: 'a4',
@@ -118,136 +86,98 @@ export const ARTISTS: Artist[] = [
         name: 'The Weeknd',
         symbol: '$XO',
         avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe713496bc8af8b',
-        bio: 'Abel Tesfaye, known as The Weeknd, is a Canadian singer-songwriter and record producer. He helped expand the R&B palette to incorporate indie and electronic music styles.',
+        bio: 'Canadian singer-songwriter known for his falsetto and dark lyricism.',
         region: 'North America',
         genres: ['R&B', 'Pop'],
-        links: { 
-            website: 'https://theweeknd.com',
-            instagram: 'https://instagram.com/theweeknd',
-            spotify: 'https://spotify.com'
-        },
-        createdBy: {
-            name: 'XO',
-            avatarUrl: 'https://ui-avatars.com/api/?name=XO&background=000&color=fff',
-            isVerified: true
-        }
+        links: { website: 'https://theweeknd.com' }
     },
     {
         id: 'a5',
         type: 'artist',
-        name: 'SZA',
-        symbol: '$SZA',
-        avatarUrl: 'https://ui-avatars.com/api/?name=SZA&background=1DB954&color=fff&size=256',
-        bio: 'Top Dawg Entertainment\'s first lady, SZA writes honest, deeply personal songs about insecurity, relationships, and self-discovery. Her albums "Ctrl" and "SOS" are critical darlings.',
-        region: 'North America',
-        genres: ['R&B', 'Pop'],
-        links: { 
-            x: 'https://x.com/sza',
-            instagram: 'https://instagram.com/sza',
-            spotify: 'https://spotify.com'
-        },
-        createdBy: {
-            name: 'TDE',
-            avatarUrl: 'https://ui-avatars.com/api/?name=TDE&background=random',
-            isVerified: true,
-            tokenSymbol: '$TDE'
-        }
+        name: 'Burna Boy',
+        symbol: '$ODG',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9', // Fallback or find specific
+        bio: 'Nigerian singer, songwriter, and record producer. An Afro-fusion pioneer.',
+        region: 'Africa',
+        genres: ['Afrobeats', 'Reggae'],
+        links: { instagram: 'https://instagram.com/burnaboygram' }
     },
     {
         id: 'a6',
         type: 'artist',
-        name: 'Billie Eilish',
-        symbol: '$BLSH',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Billie+Eilish&background=bada55&color=000&size=256',
-        bio: 'A generational talent known for her whisper-quiet vocals and dark, innovative pop production. Alongside her brother Finneas, Billie has swept the Grammys and Oscars.',
-        region: 'North America',
-        genres: ['Pop', 'Alternative'],
-        links: {
-            instagram: 'https://instagram.com/billieeilish',
-            spotify: 'https://spotify.com',
-            website: 'https://billieeilish.com'
-        },
-        createdBy: {
-            name: 'Finneas',
-            avatarUrl: 'https://ui-avatars.com/api/?name=Finneas&background=random',
-            isVerified: true
-        }
+        name: 'Bad Bunny',
+        symbol: '$BB',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb9ad50926f95d8f6945a085d7',
+        bio: 'Puerto Rican rapper and singer. The King of Latin Trap.',
+        region: 'South America',
+        genres: ['Latin', 'Reggaeton'],
+        links: { instagram: 'https://instagram.com/badbunnypr' }
     },
     {
         id: 'a7',
         type: 'artist',
-        name: 'Dua Lipa',
-        symbol: '$DUA',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Dua+Lipa&background=ff00cc&color=fff&size=256',
-        bio: 'English and Albanian singer and songwriter. Her disco-influenced pop sound has spawned global hits like "Don\'t Start Now" and "Levitating".',
-        region: 'Europe',
-        genres: ['Pop', 'Disco'],
-        links: {
-            instagram: 'https://instagram.com/dualipa',
-            spotify: 'https://spotify.com'
-        },
-        createdBy: {
-            name: 'Sunny Hill',
-            avatarUrl: 'https://ui-avatars.com/api/?name=Sunny+Hill&background=random',
-            isVerified: true
-        }
+        name: 'BTS',
+        symbol: '$BTS',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb82a5d58059f81867b871d8b6',
+        bio: 'South Korean boy band that has transcended K-Pop to become a global phenomenon.',
+        region: 'Asia',
+        genres: ['K-Pop', 'Pop'],
+        links: { website: 'https://ibighit.com/bts' }
     },
     {
         id: 'a8',
         type: 'artist',
-        name: 'Travis Scott',
-        symbol: '$CACS',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Travis+Scott&background=553311&color=fff&size=256',
-        bio: 'American rapper, singer, songwriter, and record producer. His musical style has been described as a fusion of traditional hip hop, lo-fi and ambient.',
-        region: 'North America',
-        genres: ['Hip-Hop', 'Trap'],
-        links: {
-            instagram: 'https://instagram.com/travisscott',
-            spotify: 'https://spotify.com'
-        },
-        createdBy: {
-            name: 'Cactus Jack',
-            avatarUrl: 'https://ui-avatars.com/api/?name=Cactus+Jack&background=random',
-            isVerified: true
-        }
+        name: 'Tems',
+        symbol: '$TEMS',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5ebc98096238382da4E075677d2',
+        bio: 'Nigerian singer, songwriter, and record producer having a breakout global moment.',
+        region: 'Africa',
+        genres: ['Afrobeats', 'R&B'],
+        links: { instagram: 'https://instagram.com/temsbaby' }
     },
     {
         id: 'a9',
         type: 'artist',
-        name: 'Tyler, The Creator',
-        symbol: '$GOLF',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Tyler+Creator&background=FFA500&color=fff&size=256',
-        bio: 'Rapper, producer, and designer who evolved from the leader of Odd Future into a Grammy-winning auteur.',
-        region: 'North America',
-        genres: ['Hip-Hop', 'Alternative'],
-        links: {
-            website: 'https://golfwang.com',
-            instagram: 'https://instagram.com/feliciathegoat'
-        },
-        createdBy: {
-            name: 'Odd Future',
-            avatarUrl: 'https://ui-avatars.com/api/?name=OFWGKTA&background=random',
-            isVerified: true
-        }
+        name: 'Rosalía',
+        symbol: '$MOTO',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb7a13c907aeb77202377a075c',
+        bio: 'Spanish singer-songwriter known for redefining the sounds of flamenco.',
+        region: 'Europe',
+        genres: ['Latin', 'Pop'],
+        links: { website: 'https://rosalia.com' }
     },
     {
         id: 'a10',
         type: 'artist',
-        name: 'Rosalía',
-        symbol: '$MOTO',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Rosalia&background=FF0000&color=fff&size=256',
-        bio: 'Spanish singer-songwriter known for redefining the sounds of flamenco, fusing it with pop and urban styles.',
+        name: 'Central Cee',
+        symbol: '$CC',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb5d35272a720137583626786c',
+        bio: 'British rapper from Shepherd\'s Bush, London. A leading figure in UK Drill.',
         region: 'Europe',
-        genres: ['Latin', 'Pop', 'Flamenco'],
-        links: {
-            instagram: 'https://instagram.com/rosalia.vt',
-            website: 'https://rosalia.com'
-        },
-        createdBy: {
-            name: 'Motomami',
-            avatarUrl: 'https://ui-avatars.com/api/?name=MM&background=random',
-            isVerified: true
-        }
+        genres: ['Hip-Hop', 'Drill'],
+        links: { instagram: 'https://instagram.com/centralcee' }
+    },
+    {
+        id: 'a11',
+        type: 'artist',
+        name: 'NewJeans',
+        symbol: '$NWJNS',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb0e090f230756461979927b5e',
+        bio: 'South Korean girl group formed by ADOR. Known for their fresh, retro-inspired sound.',
+        region: 'Asia',
+        genres: ['K-Pop'],
+        links: { website: 'https://newjeans.kr' }
+    },
+    {
+        id: 'a12',
+        type: 'artist',
+        name: 'Rema',
+        symbol: '$RAVR',
+        avatarUrl: 'https://i.scdn.co/image/ab6761610000e5eb4e600874e073c66bf97a06ee',
+        bio: 'Nigerian singer and rapper. He rose to stardom with the release of the song "Dumebi".',
+        region: 'Africa',
+        genres: ['Afrobeats'],
+        links: { instagram: 'https://instagram.com/heisrema' }
     }
 ];
 

@@ -232,7 +232,7 @@ export const ExploreScreen = () => {
                                 onPress={() => navigation.navigate('TrendingArtists')}
                             />
                             <BigCard>
-                                {filteredArtists.map((artist, index) => {
+                                {filteredArtists.slice(0, 6).map((artist, index, arr) => {
                                     const metrics = getEntityMetrics(artist.id);
                                     return (
                                     <EntityRow 
@@ -243,7 +243,7 @@ export const ExploreScreen = () => {
                                       price={formatCurrency(metrics.price)}
                                       changePct={metrics.changeTodayPct}
                                       volume={formatCompact(metrics.volume24h)}
-                                      isLast={index === filteredArtists.length - 1} 
+                                      isLast={index === arr.length - 1} 
                                       onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
                                     />
                                 )})}
@@ -259,7 +259,7 @@ export const ExploreScreen = () => {
                                 onPress={() => navigation.navigate('PopularLabels')}
                             />
                             <BigCard>
-                                {filteredLabels.map((label, index) => {
+                                {filteredLabels.slice(0, 6).map((label, index, arr) => {
                                     const metrics = getEntityMetrics(label.id);
                                     return (
                                     <EntityRow 
@@ -270,7 +270,7 @@ export const ExploreScreen = () => {
                                       price={formatCurrency(metrics.price)} // Using Price for consistency, could be MCap
                                       changePct={metrics.changeTodayPct}
                                       volume={formatCompact(metrics.volume24h)}
-                                      isLast={index === filteredLabels.length - 1} 
+                                      isLast={index === arr.length - 1} 
                                       onPress={() => navigation.navigate('LabelDetail', { labelId: label.id })} 
                                     />
                                 )})}

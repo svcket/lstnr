@@ -1,4 +1,4 @@
-export type MultiRangeOption = { label: string; percentage: number };
+export type MultiRangeOption = { label: string; percentage: number; isOwned?: boolean };
 
 export type MultiRangeMarket = {
   id: string;
@@ -20,6 +20,7 @@ export type BinaryOption = {
   score?: number;       // optional, for LIVE markets or score-like display
   iconUrl?: string;     // optional
   iconBg?: string;      // optional, default to #2A2A2A
+  isOwned?: boolean;
 };
 
 export type BinaryMarket = {

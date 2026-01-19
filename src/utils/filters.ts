@@ -34,15 +34,17 @@ export const TIME_FRAMES = [
 
 // ARTIST FILTERS
 export const ARTIST_GENRES = [
-    { label: 'All', value: 'All', isDefault: true }, // Logic: Empty array or 'All' = all
-    { label: 'Afrobeats', value: 'Afrobeats' },
+    { label: 'All', value: 'All', isDefault: true },
     { label: 'Hip-Hop', value: 'Hip-Hop' },
-    { label: 'R&B', value: 'R&B' },
     { label: 'Pop', value: 'Pop' },
-    { label: 'Amapiano', value: 'Amapiano' },
+    { label: 'R&B', value: 'R&B' },
+    { label: 'Afrobeats', value: 'Afrobeats' },
+    { label: 'Amipiano', value: 'Amapiano' },
+    { label: 'Latin', value: 'Latin' },
+    { label: 'K-Pop', value: 'K-Pop' },
     { label: 'Alté', value: 'Alté' },
-    { label: 'Dance', value: 'Dance' },
-    { label: 'Gospel', value: 'Gospel' },
+    { label: 'Rock', value: 'Rock' },
+    { label: 'Electronic', value: 'Electronic' },
 ];
 
 export const ARTIST_RANK_SORT = [
@@ -79,6 +81,13 @@ export const EVENT_CATEGORIES = [
 ];
 
 // --- LOGIC ---
+
+// Date helper
+const isSameDay = (d1: Date, d2: Date) => {
+    return d1.getFullYear() === d2.getFullYear() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getDate() === d2.getDate();
+};
 
 export const filterArtists = (
     artists: Artist[], 
@@ -175,9 +184,14 @@ export const filterPredictions = (
     });
 };
 
-// Date helper
-const isSameDay = (d1: Date, d2: Date) => {
-    return d1.getFullYear() === d2.getFullYear() &&
-           d1.getMonth() === d2.getMonth() &&
-           d1.getDate() === d2.getDate();
+export const filterLabels = (
+    labels: any[],
+    filters: { search?: string, region?: string }
+): any[] => {
+    return labels.filter(l => {
+        if (filters.search && !l.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+        if (filters.region && filters.region !== 'Global' && l.region !== filters.region) return false;
+        return true;
+    });
 };
+

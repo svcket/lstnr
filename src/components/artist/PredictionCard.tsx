@@ -34,7 +34,8 @@ export const PredictionCard = ({ prediction }: PredictionCardProps) => {
         deadlineLabel: new Date(prediction.deadline).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }), 
         options: prediction.outcomes.map(o => ({
             label: o.name,
-            percentage: o.chance
+            percentage: o.chance,
+            isOwned: portfolio.some(p => p.predictionId === prediction.id && p.outcomeId === o.id)
         })),
         isOwned
     };
@@ -55,13 +56,26 @@ export const PredictionCard = ({ prediction }: PredictionCardProps) => {
               percentage: o.percentage,
               score: o.score,
               iconBg: o.iconBg,
-              iconUrl: o.iconUrl
+              iconUrl: o.iconUrl,
+              isOwned: portfolio.some(p => p.predictionId === prediction.id && p.outcomeId === o.id)
           })) as [BinaryOption, BinaryOption];
       } else {
           // Synthesize Yes/No from simple 'chance'
           options = [
-              { id: 'yes', label: 'Yes', percentage: prediction.chance, iconBg: '#2A2A2A' },
-              { id: 'no', label: 'No', percentage: 100 - prediction.chance, iconBg: '#2A2A2A' }
+              { 
+                  id: 'yes', 
+                  label: 'Yes', 
+                  percentage: prediction.chance, 
+                  iconBg: '#2A2A2A',
+                  isOwned: portfolio.some(p => p.predictionId === prediction.id && p.outcomeId === 'yes')
+              },
+              { 
+                  id: 'no', 
+                  label: 'No', 
+                  percentage: 100 - prediction.chance, 
+                  iconBg: '#2A2A2A',
+                  isOwned: portfolio.some(p => p.predictionId === prediction.id && p.outcomeId === 'no')
+              }
           ];
       }
 

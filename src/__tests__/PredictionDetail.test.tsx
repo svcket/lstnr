@@ -18,7 +18,9 @@ jest.mock('../data/catalog', () => ({
       { id: '2', name: 'No', color: '#FF0000', probability: 50 }
     ],
     volume: 1000
-  })
+  }),
+  getPortfolio: () => [],
+  getPredictionPortfolio: () => []
 }));
 
 jest.mock('../components/common/HeaderBack', () => ({
@@ -113,7 +115,7 @@ describe('PredictionDetailScreen Layout', () => {
         fireEvent.press(getByText('Comments'));
         
         // Check for input
-        // Placeholder is dynamic: "Comment on $SYMBOL"
-        expect(getByPlaceholderText(/Comment on/)).toBeTruthy();
+        // Placeholder is dynamic: "Hold 50 shares to comment" (since mock user has no shares)
+        expect(getByPlaceholderText(/Hold 50 shares/)).toBeTruthy();
     });
 });

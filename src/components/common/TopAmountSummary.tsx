@@ -21,8 +21,8 @@ export const TopAmountSummary = ({ label, amount, subLabel }: TopAmountSummaryPr
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 16,
-        marginTop: 8,
-        marginBottom: 24,
+        marginTop: 0,
+        marginBottom: 8,
     },
     label: {
         fontFamily: FONT_FAMILY.medium,

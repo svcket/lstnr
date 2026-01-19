@@ -46,7 +46,21 @@ export const MultiRangeMarketCard = ({ market, onPress }: MultiRangeMarketCardPr
       <View style={styles.optionsList}>
         {market.options.slice(0, 3).map((option, index) => (
           <View key={`${option.label}-${index}`} style={styles.optionRow}>
-            <Text style={styles.optionLabel} numberOfLines={1}>{option.label}</Text>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', marginRight: 12 }}>
+                <Text 
+                    style={[styles.optionLabel, { flex: 0, marginRight: 6, flexShrink: 1 }]} 
+                    numberOfLines={1}
+                >
+                    {option.label}
+                </Text>
+                {option.isOwned && (
+                    <Image 
+                        source={ICONS.navWalletActive} 
+                        style={{ width: 14, height: 14, tintColor: COLORS.textSecondary }} 
+                        resizeMode="contain"
+                    />
+                )}
+            </View>
             <View style={styles.percentagePill}>
               <Text style={styles.percentageText}>{Math.round(option.percentage)}%</Text>
             </View>

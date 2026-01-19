@@ -5,10 +5,10 @@ import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
 import { ICONS } from '../constants/assets';
 // Dynamic Data
-import { getRecentActivity } from '../data/catalog';
+import { getInboxItems } from '../data/inbox';
 
 export const ActivityScreen = () => {
-  const activityData = getRecentActivity();
+  const activityData = getInboxItems();
 
   // Using FlatList for infinite scrolling potential
   const renderItem = ({ item, index }: { item: any, index: number }) => (
@@ -20,11 +20,17 @@ export const ActivityScreen = () => {
             resizeMode="contain"
          />
          <View>
-            <Text style={styles.title}>{item.text}</Text>
-            <Text style={styles.date}>{item.time}</Text>
+            <Text style={styles.title}>{item.title || item.text}</Text>
+            <Text style={styles.date}>{item.timestamp || item.time}</Text>
+            {/* Show body for System Events if present */}
+            {item.body && item.type !== 'FINANCIAL' && (
+                <Text style={styles.bodyText} numberOfLines={1}>{item.body}</Text>
+            )}
          </View>
        </View>
-       <Text style={styles.amount}>{item.amount}</Text>
+       <Text style={[styles.amount, !item.isMoneyOut && { color: COLORS.success }]}>
+           {item.amountDisplay || item.amount}
+       </Text>
        
        {/* Divider (except last) */}
        {index < activityData.length - 1 && <View style={styles.separator} />}
@@ -37,7 +43,7 @@ export const ActivityScreen = () => {
           {/* Header */}
           <View style={styles.header}>
               <HeaderBack />
-              <Text style={styles.headerTitle}>Activity</Text>
+              <Text style={styles.headerTitle}>Inbox</Text>
               <View style={{ width: 40 }} /> 
           </View>
 
@@ -119,6 +125,12 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
     fontSize: 13,
     color: '#666',
+  },
+  bodyText: {
+      fontFamily: FONT_FAMILY.body,
+      fontSize: 13,
+      color: '#888',
+      marginTop: 2,
   },
   amount: {
     fontFamily: FONT_FAMILY.balance, // Bold

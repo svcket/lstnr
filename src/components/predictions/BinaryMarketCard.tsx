@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { BinaryMarket } from '../../types/prediction';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { Check, X } from 'lucide-react-native';
+import { ICONS } from '../../constants/assets';
 
 interface BinaryMarketCardProps {
   market: BinaryMarket;
@@ -77,7 +78,19 @@ export const BinaryMarketCard = ({ market, onPress }: BinaryMarketCardProps) => 
                             <View style={styles.placeholderGlyph} />
                         )}
                     </View>
-                    <Text style={styles.optionLabel} numberOfLines={1}>{option.label}</Text>
+                    <Text 
+                        style={[styles.optionLabel, { flex: 0, flexShrink: 1 }]} 
+                        numberOfLines={1}
+                    >
+                        {option.label}
+                    </Text>
+                    {option.isOwned && (
+                        <Image 
+                            source={ICONS.navWalletActive} 
+                            style={{ width: 14, height: 14, tintColor: COLORS.textSecondary, marginLeft: 6 }} 
+                            resizeMode="contain"
+                        />
+                    )}
                 </View>
 
                 {/* Right Cluster */}

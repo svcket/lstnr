@@ -31,6 +31,7 @@ export const PredictionsScreen = () => {
     const [region, setRegion] = useState('Global');
 
     const [activeSheet, setActiveSheet] = useState<string | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Populate list
     const basePreds = getAllPredictions();
@@ -92,11 +93,41 @@ export const PredictionsScreen = () => {
         <View style={styles.container}>
             <StatusBar barStyle="light-content" />
             <SafeAreaView style={styles.safeArea}>
-                <View style={styles.header}>
-                    <HeaderBack />
-                    <Text style={styles.headerTitle}>Predictions</Text>
-                    <View style={{ width: 40 }} /> 
-                </View>
+                {!isSearching ? (
+                     <View style={styles.header}>
+                        <View style={styles.headerLeft}>
+                            <HeaderBack /> 
+                            <Text style={styles.pageTitle}>Predictions</Text>
+                        </View>
+                        <TouchableOpacity 
+                            style={styles.searchButton}
+                            onPress={() => setIsSearching(true)}
+                            activeOpacity={0.7}
+                        >
+                            <Search size={24} color="#FFF" />
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.searchHeader}>
+                        <View style={styles.searchInputContainer}>
+                            <Search size={20} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
+                            <TextInput 
+                                style={styles.headerInput}
+                                placeholder="Search predictions..."
+                                placeholderTextColor={COLORS.textSecondary}
+                                value={search}
+                                onChangeText={setSearch}
+                                autoFocus
+                            />
+                        </View>
+                        <TouchableOpacity onPress={() => {
+                            setIsSearching(false);
+                            setSearch('');
+                        }}>
+                            <Text style={styles.cancelText}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* Amount Summary */}
                 <TopAmountSummary 
@@ -104,19 +135,7 @@ export const PredictionsScreen = () => {
                     amount={predictionsValue} 
                 />
 
-                {/* Search Bar */}
-                <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-                     <View style={styles.searchContainer}>
-                        <Search size={20} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
-                        <TextInput 
-                          style={styles.searchInput}
-                          placeholder="Artists, labels, predictions, URL"
-                          placeholderTextColor={COLORS.textSecondary}
-                          value={search}
-                          onChangeText={setSearch}
-                        />
-                      </View>
-                </View>
+
 
                 {/* Filters */}
                 <View style={{ marginBottom: 16 }}>
@@ -161,7 +180,50 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingTop: 8, 
+        paddingBottom: 8,
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    pageTitle: {
+        fontSize: 20,
+        fontFamily: FONT_FAMILY.balance,
+        fontWeight: '700',
+        color: '#FFF',
+    },
+    searchButton: {
+        padding: 8,
+    },
+    searchHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingTop: 8,
         paddingBottom: 16,
+        gap: 12,
+    },
+    searchInputContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#1C1C1E',
+        height: 40,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+    },
+    headerInput: {
+        flex: 1,
+        fontFamily: FONT_FAMILY.body,
+        fontSize: 16,
+        color: '#FFF',
+        height: '100%',
+    },
+    cancelText: {
+        fontFamily: FONT_FAMILY.body,
+        fontSize: 16,
+        color: '#FFF',
     },
     backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-start' },
     headerTitle: {

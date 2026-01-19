@@ -4,10 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { 
     getHolders, 
-    getUserSharesInfo, 
     Holder, 
     MIN_SHARES_FOR_CHAT 
 } from '../../data/social';
+import { checkAccess } from '../../lib/permissions';
 import { Lock, MessageCircle } from 'lucide-react-native';
 
 const GAP = 8;
@@ -25,9 +25,9 @@ export const ArtistHolders = ({ entityId = 'a1' }: ArtistHoldersProps) => {
 
   useEffect(() => {
       setHolders(getHolders(entityId));
-      const info = getUserSharesInfo(entityId);
-      setUserShares(info.shares);
-      setHasAccess(info.hasAccess);
+      const accessInfo = checkAccess('me', entityId);
+      setUserShares(accessInfo.shares);
+      setHasAccess(accessInfo.canRead);
   }, [entityId]);
 
   const renderHeader = () => (

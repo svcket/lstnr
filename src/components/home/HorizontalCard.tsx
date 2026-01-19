@@ -11,11 +11,12 @@ interface HorizontalCardProps {
   change?: string; 
   isPositive?: boolean;
   type: 'prediction' | 'perp';
+  onPress?: () => void;
 }
 
-export const HorizontalCard = ({ title, subtitle, value, change, isPositive, type }: HorizontalCardProps) => {
+export const HorizontalCard = ({ title, subtitle, value, change, isPositive, type, onPress }: HorizontalCardProps) => {
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.top}>
         <View style={styles.iconPlaceholder}>
             {type === 'perp' ? (

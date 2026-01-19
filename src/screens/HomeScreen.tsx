@@ -284,6 +284,7 @@ export const HomeScreen = () => {
                             title={pred.question}
                             subtitle={`Ends ${new Date(pred.deadline).toLocaleDateString()}`}
                             type="prediction"
+                            onPress={() => navigation.navigate('PredictionDetail', { predictionId: pred.id })}
                           />
                       ))}
                   </ScrollView>

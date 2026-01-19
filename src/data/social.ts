@@ -126,7 +126,7 @@ export const getComments = (entityId: string): Comment[] => {
     return commentsStore[entityId];
 };
 
-export const addComment = (entityId: string, text: string) => {
+export const addComment = (entityId: string, text: string, isHolder: boolean = false) => {
     const list = getComments(entityId);
     const newComment: Comment = {
         id: Date.now().toString(),
@@ -135,7 +135,7 @@ export const addComment = (entityId: string, text: string) => {
         createdAt: 'Just now',
         likes: 0,
         liked: false,
-        isHolder: true,
+        isHolder,
         contextType: entityId.startsWith('p') ? 'PREDICTION' : 'ARTIST',
         symbol: '$BIGT'
     };

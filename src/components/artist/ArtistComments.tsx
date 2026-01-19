@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Platform, K
 import { MoreVertical, Heart, CornerDownRight, ChevronDown, ChevronUp, Send, MessageSquare, Reply } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { getComments, addComment, Comment } from '../../data/social';
+import { checkAccess } from '../../lib/permissions';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -18,15 +19,17 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = React.useRef<TextInput>(null);
 
+  const { canWrite, requiredWrite, isHolder } = checkAccess('me', entityId);
+
   useEffect(() => {
       setComments(getComments(entityId));
   }, [entityId]);
 
   const handlePost = () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !canWrite) return;
     
     // Add to store
-    const newComment = addComment(entityId, inputText.trim());
+    const newComment = addComment(entityId, inputText.trim(), isHolder);
     
     // Update UI
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -46,16 +49,17 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
     <View style={styles.container}>
       {/* Composer - Top as requested */}
       <View style={styles.composerContainer}>
-          <View style={[styles.inputWrapper, isFocused && styles.inputWrapperFocused]}>
+          <View style={[styles.inputWrapper, isFocused && styles.inputWrapperFocused, !canWrite && styles.inputWrapperDisabled]}>
              <TextInput 
                ref={inputRef}
-               style={[styles.input, isFocused && styles.inputFocused]}
-               placeholder="Comment on $BIGT"
+               style={[styles.input, isFocused && styles.inputFocused, !canWrite && styles.inputDisabled]}
+               placeholder={canWrite ? "Comment on $BIGT" : `Hold ${requiredWrite} shares to comment`}
                placeholderTextColor="#999"
                value={inputText}
                onChangeText={setInputText}
-               onFocus={() => setIsFocused(true)}
+               onFocus={() => canWrite && setIsFocused(true)}
                onBlur={() => !inputText && setIsFocused(false)} 
+               editable={canWrite}
                multiline
              />
           </View>
@@ -322,6 +326,14 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     paddingTop: 0,
     paddingBottom: 0,
+  },
+  inputWrapperDisabled: {
+      backgroundColor: '#111',
+      borderColor: '#222',
+      opacity: 0.7,
+  },
+  inputDisabled: {
+      color: '#666',
   },
   inputFocused: {
     color: '#FFF',
