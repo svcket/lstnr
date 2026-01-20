@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
-import { getLabelById, Label, getArtistById } from '../data/catalog';
+import { getLabelById, Label, getArtistById, getAllLabels } from '../data/catalog';
 import { getEntityMetrics, mockSeries, getHoldersList } from '../lib/mockMetrics';
 import { HeaderBack } from '../components/common/HeaderBack';
 import { CreatorCard } from '../components/common/CreatorCard';
@@ -261,6 +261,27 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
                          {label.createdBy && (
                              <CreatorCard creator={label.createdBy} />
                          )}
+
+                         {/* Similar Labels */}
+                         <Text style={styles.sectionHeader}>Similar Labels</Text>
+                         <View style={styles.similarCard}>
+                            {((global as any).getAllLabels ? (global as any).getAllLabels() : getAllLabels()).filter((l: any) => l.id !== label.id).slice(0, 3).map((simLabel: any, index: number, arr: any[]) => {
+                                // Mock metrics for labels if they share the same ID space or just reuse getEntityMetrics
+                                const simMetrics = getEntityMetrics(simLabel.id);
+                                return (
+                                    <EntityRow 
+                                        key={simLabel.id}
+                                        name={simLabel.name}
+                                        avatarUrl={simLabel.avatarUrl}
+                                        price={'$' + simMetrics.price.toFixed(2)}
+                                        changePct={simMetrics.changeTodayPct}
+                                        volume={formatCompact(simMetrics.volume24h)}
+                                        isLast={index === arr.length - 1}
+                                        onPress={() => navigation.push('LabelDetail', { labelId: simLabel.id })}
+                                    />
+                                );
+                            })}
+                         </View>
                      </View>
                  )}
 
@@ -575,5 +596,11 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 14,
         fontFamily: FONT_FAMILY.header, 
+    },
+    similarCard: {
+        backgroundColor: '#111',
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        marginBottom: 40,
     },
 });

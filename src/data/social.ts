@@ -34,6 +34,8 @@ export interface ChatMessage {
     text: string;
     createdAt: string; // ISO or human readble
     isMe?: boolean;
+    type?: 'TEXT' | 'ACTION';
+    actionType?: 'BUY' | 'SELL';
 }
 
 export interface Holder {
@@ -143,15 +145,49 @@ export const addComment = (entityId: string, text: string, isHolder: boolean = f
     return newComment;
 };
 
+const CHAT_PHRASES = [
+    "LFG 🚀", "When is the album dropping?", "This is undervalued tbh", "Buying more", 
+    "Just got in, hope I'm not late", "Moon soon 🌕", "Anyone see the latest tweet?", 
+    "Huge volume coming in", "Paper hands selling lol", "Holding till $10", 
+    "Is this legit?", "Love this artist", "Chart looking bullish 📈", "Bearish divergence...",
+    "Community is strong 💪", "Next big thing", "Volume loading..."
+];
+
 export const getHoldersChat = (entityId: string): ChatMessage[] => {
     if (!chatStore[entityId]) {
-        chatStore[entityId] = Array.from({ length: 20 }).map((_, i) => ({
-            id: `msg_${entityId}_${i}`,
-            user: MOCK_USERS[i % MOCK_USERS.length],
-            text: `Only holders know this alpha about ${entityId}.`,
-            createdAt: new Date(Date.now() - i * 60000 * 10).toISOString(),
-            isMe: false
-        })).reverse();
+        const msgs: ChatMessage[] = [];
+        const count = 25;
+        
+        for (let i = 0; i < count; i++) {
+            const isAction = Math.random() > 0.8; // 20% actions
+            const user = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
+            const timeOffset = i * 1000 * 60 * (Math.random() * 60); // Random intervals within hours
+
+            if (isAction) {
+                // Force at least one sell if we haven't seen one, or random
+                const isBuy = i === 5 ? false : Math.random() > 0.3;
+                msgs.push({
+                    id: `act_${entityId}_${i}`,
+                    user,
+                    text: isBuy ? `bought ${Math.floor(Math.random() * 1000)} shares` : `sold ${Math.floor(Math.random() * 500)} shares`,
+                    createdAt: new Date(Date.now() - timeOffset).toISOString(),
+                    isMe: false,
+                    type: 'ACTION',
+                    actionType: isBuy ? 'BUY' : 'SELL'
+                });
+            } else {
+                const text = CHAT_PHRASES[Math.floor(Math.random() * CHAT_PHRASES.length)];
+                msgs.push({
+                    id: `msg_${entityId}_${i}`,
+                    user,
+                    text,
+                    createdAt: new Date(Date.now() - timeOffset).toISOString(),
+                    isMe: false,
+                    type: 'TEXT'
+                });
+            }
+        }
+        chatStore[entityId] = msgs.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }
     return chatStore[entityId];
 };

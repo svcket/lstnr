@@ -19,6 +19,8 @@ jest.mock('../data/catalog', () => ({
     ],
     volume: 1000
   }),
+  getAllPredictions: () => [],
+  getArtistById: () => ({ name: 'Test Artist' }),
   getPortfolio: () => [],
   getPredictionPortfolio: () => []
 }));

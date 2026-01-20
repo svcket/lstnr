@@ -9,7 +9,7 @@ import { ArtistTabs, TabType } from '../components/artist/ArtistTabs';
 import { ArtistComments } from '../components/artist/ArtistComments';
 import { ArtistHolders } from '../components/artist/ArtistHolders';
 import { ArtistActivity } from '../components/artist/ArtistActivity';
-import { getPredictionDetail, PredictionDetail } from '../data/catalog';
+import { getPredictionDetail, PredictionDetail, getAllPredictions, getArtistById, formatCompact } from '../data/catalog';
 import { FilterSheet } from '../components/common/FilterSheet';
 import { UnifiedMarketChart } from '../components/charts/UnifiedMarketChart';
 import { ScreenContainer } from '../components/common/ScreenContainer';
@@ -26,12 +26,19 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 export const PredictionDetailScreen = ({ route }: any) => {
-    const { predictionId } = route.params || { predictionId: 'p1' };
+    const { predictionId, initialTab } = route.params || { predictionId: 'p1' };
     const navigation = useNavigation<any>();
     const insets = useSafeAreaInsets();
 
     const [detail, setDetail] = useState<PredictionDetail | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('Details');
+
+    useEffect(() => {
+        if (initialTab) {
+            setActiveTab(initialTab);
+        }
+    }, [initialTab]);
+
     const [tradeSheetOpen, setTradeSheetOpen] = useState(false);
     const [shareSheetVisible, setShareSheetVisible] = useState(false);
     const [prohibitionsOpen, setProhibitionsOpen] = useState(false);
@@ -353,6 +360,38 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     )}
                                 </View>
                                 
+                                <View style={{ height: 40 }} />
+                                
+                                {/* Similar Predictions */}
+                                <Text style={styles.sectionTitle}>Similar Predictions</Text>
+                                <View style={styles.similarList}>
+                                    {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
+                                        const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
+                                        const chanceStr = simPred.marketType === 'binary' 
+                                            ? (simPred.chance + '%') 
+                                            : ((simPred as any).outcomes[0]?.chance + '%'); // Top outcome chance
+                                        
+                                        return (
+                                            <TouchableOpacity 
+                                                key={simPred.id}
+                                                style={[styles.simRow, index === arr.length - 1 && { borderBottomWidth: 0 }]}
+                                                onPress={() => navigation.push('PredictionDetail', { predictionId: simPred.id })}
+                                            >
+                                                <Image 
+                                                    source={{ uri: relatedArtist?.avatarUrl || 'https://i.pravatar.cc/150' }} 
+                                                    style={styles.simAvatar} 
+                                                />
+                                                <View style={{ flex: 1, gap: 4 }}>
+                                                    <Text style={styles.simQuestion} numberOfLines={2}>{simPred.question}</Text>
+                                                    <Text style={styles.simMeta}>{formatCompact(simPred.volume)} Vol • {chanceStr} Chance</Text>
+                                                </View>
+                                                <View style={styles.chevron}>
+                                                     <Share size={16} color="#444" style={{ transform: [{ rotate: '-90deg' }] }}  />
+                                                </View>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
                                 <View style={{ height: 40 }} />
                             </View>
                         )}
@@ -791,6 +830,41 @@ const styles = StyleSheet.create({
     holderShares: {
         fontSize: 12,
         fontWeight: '500',
+    },
+    
+    // Similar Predictions
+    similarList: {
+        backgroundColor: '#111',
+        borderRadius: 16,
+        paddingHorizontal: 16,
+    },
+    simRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#222',
+        gap: 12,
+    },
+    simAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: '#222',
+    },
+    simQuestion: {
+        color: '#FFF',
+        fontSize: 14,
+        fontFamily: FONT_FAMILY.medium,
+        lineHeight: 20,
+    },
+    simMeta: {
+        color: '#888',
+        fontSize: 12,
+        fontFamily: FONT_FAMILY.body,
+    },
+    chevron: {
+        opacity: 0.5,
     },
     holderHeaderRow: {
         height: 48,

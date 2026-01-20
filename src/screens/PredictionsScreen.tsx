@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { Search, ChevronDown } from 'lucide-react-native';
 import { HeaderBack } from '../components/common/HeaderBack';
-import { TopAmountSummary } from '../components/common/TopAmountSummary';
+import { TopSummaryBlock } from '../components/common/TopSummaryBlock';
 import { usePortfolioTotals } from '../hooks/usePortfolioTotals';
 import { getAllPredictions } from '../data/catalog';
 import { PredictionCard } from '../components/artist/PredictionCard';
@@ -130,9 +130,9 @@ export const PredictionsScreen = () => {
                 )}
 
                 {/* Amount Summary */}
-                <TopAmountSummary 
+                <TopSummaryBlock 
                     label="Open Positions" 
-                    amount={predictionsValue} 
+                    value={predictionsValue} 
                 />
 
 

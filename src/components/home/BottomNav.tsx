@@ -34,7 +34,7 @@ export const BottomNav = ({ activeTab = 'Home' }: { activeTab?: string }) => {
         <TouchableOpacity 
           style={styles.navItem} 
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('Updates')}
+          onPress={() => navigation.navigate('Inbox')}
         >
           <Image 
             source={activeTab === 'Inbox' ? ICONS.navInboxActive : ICONS.navInboxInactive} 

@@ -1,14 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
-import { ICONS } from '../constants/assets';
-
-// Reuse RowItem logic if exported, or duplicate small component for isolation (cleaner here)
-// Actually we can export RowItem from HomeScreen or copy it. Copying for speed/isolation as per "Do not introduce deps" preference usually.
-// But better to export. Let's start with local definition to strictly match specs without breaking Home.
+import { Bell, ArrowUpRight, CheckCircle2, Info } from 'lucide-react-native';
 
 const ROW_GAP = 12;
 const STACK_GAP = 4;
@@ -16,23 +12,19 @@ const CARD_PAD = 16;
 const PAGE_X = 16;
 
 const MOCK_UPDATES = [
-  { id: 'u1', text: 'Neon Dust +3.1% today', time: '1h ago', type: 'gain' },
-  { id: 'u2', text: 'Your prediction "Album Release" moved to 68%', time: '4h ago', type: 'neutral' },
-  { id: 'u3', text: 'Market settled: Headies Next Rated', time: '1d ago', type: 'settled' },
-  { id: 'u4', text: 'New Artist: "Fuji" is now live', time: '2d ago', type: 'neutral' },
-  { id: 'u5', text: 'System maintenance scheduled', time: '1w ago', type: 'system' },
+  { id: 'u1', text: 'Neon Dust +3.1% today', time: '1h ago', type: 'gain', icon: ArrowUpRight, color: COLORS.success },
+  { id: 'u2', text: 'Your prediction "Album Release" moved to 68%', time: '4h ago', type: 'neutral', icon: Bell, color: '#FFD700' },
+  { id: 'u3', text: 'Market settled: Headies Next Rated', time: '1d ago', type: 'settled', icon: CheckCircle2, color: COLORS.primary },
+  { id: 'u4', text: 'New Artist: "Fuji" is now live', time: '2d ago', type: 'neutral', icon: Info, color: '#888' },
+  { id: 'u5', text: 'System maintenance scheduled', time: '1w ago', type: 'system', icon: Info, color: '#FF4444' },
 ];
 
-const UpdateRow = ({ title, subtitle, hasDivider }: { title: string; subtitle: string; hasDivider: boolean }) => (
+const UpdateRow = ({ title, subtitle, hasDivider, icon: Icon, color }: any) => (
   <View style={styles.rowWrapper}>
     <View style={styles.rowContent}>
       <View style={styles.rowLeft}>
-        <View style={styles.iconContainer}>
-          <Image 
-             source={ICONS.updates} 
-             style={styles.feedIcon} 
-             resizeMode="contain" 
-          />
+        <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+          <Icon size={20} color={color} />
         </View>
         <View style={styles.textStack}>
           <Text style={styles.rowTitle} numberOfLines={2}>{title}</Text>
@@ -52,11 +44,10 @@ export const UpdatesScreen = () => {
       <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
         
-        {/* Header */}
+        {/* Header - Left Aligned */}
         <View style={styles.header}>
           <HeaderBack />
           <Text style={styles.headerTitle}>Updates</Text>
-          <View style={{ width: 24 }} /> 
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -67,6 +58,8 @@ export const UpdatesScreen = () => {
                  title={item.text}
                  subtitle={item.time}
                  hasDivider={index < MOCK_UPDATES.length - 1}
+                 icon={item.icon || Bell}
+                 color={item.color || COLORS.white}
                />
              ))}
            </View>
@@ -87,24 +80,20 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: PAGE_X,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    paddingBottom: 16,
+    gap: 12,
   },
   headerTitle: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '600',
     fontSize: 18,
     color: COLORS.text,
-    letterSpacing: 1,
-  },
-  backButton: {
-    padding: 4,
+    letterSpacing: 0.5,
   },
   scrollContent: {
     padding: PAGE_X,
+    paddingTop: 0,
   },
   card: {
     backgroundColor: '#111111',
@@ -127,24 +116,21 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     width: 40, 
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center', 
     justifyContent: 'center',
     marginRight: ROW_GAP,
-  },
-  feedIcon: {
-    width: 40,
-    height: 40,
-    tintColor: COLORS.primary, // Using primary tint for consistency
   },
   textStack: {
     flex: 1,
     gap: STACK_GAP,
   },
   rowTitle: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
+    fontFamily: FONT_FAMILY.medium,
+    fontSize: 15,
     color: COLORS.text,
-    letterSpacing: 1,
+    lineHeight: 20,
   },
   rowSubtitle: {
     fontFamily: FONT_FAMILY.body,

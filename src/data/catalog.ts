@@ -56,7 +56,16 @@ export const ARTISTS: Artist[] = [
         bio: 'A visionary artist, producer, and fashion icon who has consistently redefined hip-hop.',
         region: 'North America',
         genres: ['Hip-Hop', 'Pop'],
-        links: { spotify: 'https://spotify.com' }
+        links: { 
+            spotify: 'https://spotify.com/kanyewest',
+            website: 'https://kanyewest.com',
+            instagram: 'https://instagram.com/kanyewest'
+        },
+        createdBy: {
+            name: 'Roc Nation',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Roc+Nation&background=111&color=fff&size=256',
+            isVerified: true
+        }
     },
     {
         id: 'a2',
@@ -67,7 +76,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music.',
         region: 'North America',
         genres: ['Hip-Hop', 'R&B'],
-        links: { spotify: 'https://spotify.com' }
+        links: { 
+            spotify: 'https://spotify.com/drake',
+            instagram: 'https://instagram.com/champagnepapi',
+            website: 'https://drakerelated.com'
+        },
+        createdBy: {
+            name: 'Lil Wayne',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Lil+Wayne&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a3',
@@ -78,7 +96,16 @@ export const ARTISTS: Artist[] = [
         bio: 'American singer-songwriter. Her narrative songwriting has received widespread critical praise.',
         region: 'North America',
         genres: ['Pop', 'Country'],
-        links: { website: 'https://taylorswift.com' }
+        links: { 
+            website: 'https://taylorswift.com',
+            spotify: 'https://spotify.com/taylorswift',
+            instagram: 'https://instagram.com/taylorswift'
+        },
+        createdBy: {
+            name: 'Scott Borchetta',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Scott+B&background=random',
+            isVerified: false
+        }
     },
     {
         id: 'a4',
@@ -89,7 +116,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Canadian singer-songwriter known for his falsetto and dark lyricism.',
         region: 'North America',
         genres: ['R&B', 'Pop'],
-        links: { website: 'https://theweeknd.com' }
+        links: { 
+            website: 'https://theweeknd.com',
+            spotify: 'https://spotify.com/theweeknd',
+            x: 'https://x.com/theweeknd'
+        },
+        createdBy: {
+            name: 'XO Records',
+            avatarUrl: 'https://ui-avatars.com/api/?name=XO&background=000&color=fff',
+            isVerified: true
+        }
     },
     {
         id: 'a5',
@@ -100,7 +136,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Nigerian singer, songwriter, and record producer. An Afro-fusion pioneer.',
         region: 'Africa',
         genres: ['Afrobeats', 'Reggae'],
-        links: { instagram: 'https://instagram.com/burnaboygram' }
+        links: { 
+            instagram: 'https://instagram.com/burnaboygram',
+            spotify: 'https://spotify.com/burnaboy',
+            youtube: 'https://youtube.com/burnaboy'
+        },
+        createdBy: {
+            name: 'Spaceship Ent',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Spaceship&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a6',
@@ -111,7 +156,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Puerto Rican rapper and singer. The King of Latin Trap.',
         region: 'South America',
         genres: ['Latin', 'Reggaeton'],
-        links: { instagram: 'https://instagram.com/badbunnypr' }
+        links: { 
+            instagram: 'https://instagram.com/badbunnypr',
+            spotify: 'https://spotify.com/badbunny',
+            website: 'https://unveranosinti.com'
+        },
+        createdBy: {
+            name: 'Rimas Ent',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Rimas&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a7',
@@ -122,7 +176,16 @@ export const ARTISTS: Artist[] = [
         bio: 'South Korean boy band that has transcended K-Pop to become a global phenomenon.',
         region: 'Asia',
         genres: ['K-Pop', 'Pop'],
-        links: { website: 'https://ibighit.com/bts' }
+        links: { 
+            website: 'https://ibighit.com/bts',
+            youtube: 'https://youtube.com/bts',
+            x: 'https://x.com/bts_bighit'
+        },
+        createdBy: {
+            name: 'Big Hit',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Big+Hit&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a8',
@@ -133,7 +196,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Nigerian singer, songwriter, and record producer having a breakout global moment.',
         region: 'Africa',
         genres: ['Afrobeats', 'R&B'],
-        links: { instagram: 'https://instagram.com/temsbaby' }
+        links: { 
+            instagram: 'https://instagram.com/temsbaby',
+            spotify: 'https://spotify.com/tems',
+            x: 'https://x.com/temsbaby'
+        },
+        createdBy: {
+            name: 'Leading Vibe',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Vibe&background=random',
+            isVerified: false
+        }
     },
     {
         id: 'a9',
@@ -144,7 +216,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Spanish singer-songwriter known for redefining the sounds of flamenco.',
         region: 'Europe',
         genres: ['Latin', 'Pop'],
-        links: { website: 'https://rosalia.com' }
+        links: { 
+            website: 'https://rosalia.com',
+            instagram: 'https://instagram.com/rosalia.vt',
+            spotify: 'https://spotify.com/rosalia'
+        },
+        createdBy: {
+            name: 'Columbia',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a10',
@@ -155,7 +236,16 @@ export const ARTISTS: Artist[] = [
         bio: 'British rapper from Shepherd\'s Bush, London. A leading figure in UK Drill.',
         region: 'Europe',
         genres: ['Hip-Hop', 'Drill'],
-        links: { instagram: 'https://instagram.com/centralcee' }
+        links: { 
+            instagram: 'https://instagram.com/centralcee',
+            spotify: 'https://spotify.com/centralcee',
+            youtube: 'https://youtube.com/centralcee'
+        },
+        createdBy: {
+            name: 'Live Yours',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Live+Yours&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a11',
@@ -166,7 +256,16 @@ export const ARTISTS: Artist[] = [
         bio: 'South Korean girl group formed by ADOR. Known for their fresh, retro-inspired sound.',
         region: 'Asia',
         genres: ['K-Pop'],
-        links: { website: 'https://newjeans.kr' }
+        links: { 
+            website: 'https://newjeans.kr',
+            youtube: 'https://youtube.com/newjeans',
+            spotify: 'https://spotify.com/newjeans'
+        },
+        createdBy: {
+            name: 'Min Hee-jin',
+            avatarUrl: 'https://ui-avatars.com/api/?name=MHJ&background=random',
+            isVerified: true
+        }
     },
     {
         id: 'a12',
@@ -177,7 +276,16 @@ export const ARTISTS: Artist[] = [
         bio: 'Nigerian singer and rapper. He rose to stardom with the release of the song "Dumebi".',
         region: 'Africa',
         genres: ['Afrobeats'],
-        links: { instagram: 'https://instagram.com/heisrema' }
+        links: { 
+            instagram: 'https://instagram.com/heisrema',
+            spotify: 'https://spotify.com/rema',
+            x: 'https://x.com/heisrema'
+        },
+        createdBy: {
+            name: 'Mavin Records',
+            avatarUrl: 'https://ui-avatars.com/api/?name=Mavin&background=random',
+            isVerified: true
+        }
     }
 ];
 
@@ -464,7 +572,12 @@ export const getPortfolio = (): PortfolioItem[] => {
     return [
         { artistId: 'a1', shares: 120, avgBuyPrice: 12.45 },
         { artistId: 'a2', shares: 450, avgBuyPrice: 8.50 },
-        { artistId: 'a4', shares: 60, avgBuyPrice: 14.20 }
+        { artistId: 'a4', shares: 60, avgBuyPrice: 14.20 },
+        { artistId: 'a3', shares: 85, avgBuyPrice: 22.10 },
+        { artistId: 'a5', shares: 200, avgBuyPrice: 5.40 },
+        { artistId: 'a6', shares: 310, avgBuyPrice: 9.75 },
+        { artistId: 'a7', shares: 1500, avgBuyPrice: 1.20 },
+        { artistId: 'a8', shares: 75, avgBuyPrice: 18.50 }
     ];
 };
 
@@ -488,15 +601,33 @@ export interface ActivityItem {
     time: string;
     amount: string;
     isMoneyOut: boolean;
+    type: 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW' | 'PREDICTION' | 'PAYOUT';
+    status: 'COMPLETED' | 'PENDING' | 'FAILED';
+    date: string; // Full date for detail
 }
 
 export const getRecentActivity = (): ActivityItem[] => {
     return [
-        { id: 'act_1', text: 'Bought 40 $YE shares', time: '2h ago', amount: '-$180', isMoneyOut: true },
-        { id: 'act_2', text: 'Sold 12 $TEMS shares', time: 'Yesterday', amount: '+$64', isMoneyOut: false },
-        { id: 'act_3', text: 'Predicted YES: Album 2026', time: '2d ago', amount: '-$50', isMoneyOut: true },
-        { id: 'act_4', text: 'Added funds', time: '3d ago', amount: '+$200', isMoneyOut: false },
-        { id: 'act_5', text: 'Claimed payout: $SZA', time: '1w ago', amount: '+$92', isMoneyOut: false },
+        { id: 'act_1', text: 'Bought 40 $YE shares', time: '2h ago', amount: '-$180.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Jan 20, 2026' },
+        { id: 'act_2', text: 'Sold 12 $TEMS shares', time: 'Yesterday', amount: '+$64.50', isMoneyOut: false, type: 'SELL', status: 'COMPLETED', date: 'Jan 19, 2026' },
+        { id: 'act_3', text: 'Predicted YES: Album 2026', time: '2d ago', amount: '-$50.00', isMoneyOut: true, type: 'PREDICTION', status: 'COMPLETED', date: 'Jan 18, 2026' },
+        { id: 'act_4', text: 'Added funds', time: '3d ago', amount: '+$200.00', isMoneyOut: false, type: 'DEPOSIT', status: 'COMPLETED', date: 'Jan 17, 2026' },
+        { id: 'act_5', text: 'Claimed payout: $SZA', time: '1w ago', amount: '+$92.10', isMoneyOut: false, type: 'PAYOUT', status: 'COMPLETED', date: 'Jan 12, 2026' },
+        { id: 'act_6', text: 'Bought 100 $DRAKE', time: '1w ago', amount: '-$450.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Jan 11, 2026' },
+        { id: 'act_7', text: 'Sold 5 $KENDRICK', time: '2w ago', amount: '+$22.00', isMoneyOut: false, type: 'SELL', status: 'COMPLETED', date: 'Jan 05, 2026' },
+        { id: 'act_8', text: 'Withdrawal to Bank', time: '2w ago', amount: '-$1,000.00', isMoneyOut: true, type: 'WITHDRAW', status: 'COMPLETED', date: 'Jan 04, 2026' },
+        { id: 'act_9', text: 'Bought 50 $FUTURE', time: '3w ago', amount: '-$210.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Dec 28, 2025' },
+        { id: 'act_10', text: 'Predicted NO: Tour 2025', time: '3w ago', amount: '-$100.00', isMoneyOut: true, type: 'PREDICTION', status: 'COMPLETED', date: 'Dec 27, 2025' },
+        { id: 'act_11', text: 'Referral Bonus', time: '1mo ago', amount: '+$25.00', isMoneyOut: false, type: 'PAYOUT', status: 'COMPLETED', date: 'Dec 20, 2025' },
+        { id: 'act_12', text: 'Bought 10 $CARTI', time: '1mo ago', amount: '-$45.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Dec 18, 2025' },
+        { id: 'act_13', text: 'Sold 20 $YE', time: '1mo ago', amount: '+$98.00', isMoneyOut: false, type: 'SELL', status: 'COMPLETED', date: 'Dec 15, 2025' },
+        { id: 'act_14', text: 'Added funds', time: '2mo ago', amount: '+$500.00', isMoneyOut: false, type: 'DEPOSIT', status: 'COMPLETED', date: 'Nov 10, 2025' },
+        { id: 'act_15', text: 'Predicted YES: Grammy Win', time: '2mo ago', amount: '-$75.00', isMoneyOut: true, type: 'PREDICTION', status: 'COMPLETED', date: 'Nov 05, 2025' },
+        { id: 'act_16', text: 'Bought 200 $TRIVIA', time: '3mo ago', amount: '-$50.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Oct 20, 2025' },
+        { id: 'act_17', text: 'Sold 50 $TRIVIA', time: '3mo ago', amount: '+$20.00', isMoneyOut: false, type: 'SELL', status: 'COMPLETED', date: 'Oct 22, 2025' },
+        { id: 'act_18', text: 'Deposit Failed', time: '4mo ago', amount: '$0.00', isMoneyOut: false, type: 'DEPOSIT', status: 'FAILED', date: 'Sep 15, 2025' },
+        { id: 'act_19', text: 'Bought 5 $JCOLE', time: '5mo ago', amount: '-$25.00', isMoneyOut: true, type: 'BUY', status: 'COMPLETED', date: 'Aug 10, 2025' },
+        { id: 'act_20', text: 'Welcome Bonus', time: '6mo ago', amount: '+$10.00', isMoneyOut: false, type: 'PAYOUT', status: 'COMPLETED', date: 'Jul 01, 2025' },
     ];
 };
 export const formatCompact = (num: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);

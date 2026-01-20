@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { Search, ChevronDown } from 'lucide-react-native';
 import { HeaderBack } from '../components/common/HeaderBack';
-import { TopAmountSummary } from '../components/common/TopAmountSummary';
+import { TopSummaryBlock } from '../components/common/TopSummaryBlock';
 import { getAllArtists, getPortfolio } from '../data/catalog';
 import { FilterPill } from '../components/common/FilterPill';
 import { FilterSheet } from '../components/common/FilterSheet';
@@ -206,9 +206,9 @@ export const ArtistsScreen = () => {
                 )}
 
                 {/* Amount Summary */}
-                <TopAmountSummary 
+                <TopSummaryBlock 
                     label="Your Shares" 
-                    amount={artistsValue} 
+                    value={artistsValue} 
                 />
 
 

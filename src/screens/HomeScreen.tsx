@@ -214,10 +214,10 @@ export const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
-            {renderQuickAction(ICONS.actionAdd, 'Add Cash', '#111111', '#FFFFFF', true)}
-            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw', '#111111', '#FFFFFF', true)}
-            {renderQuickAction(ICONS.actionBuy, 'Shares', '#FFFFFF', '#000000', false)}
-            {renderQuickAction(ICONS.actionPredict, 'Predict', '#181818', '#FFFFFF', true)}
+            {renderQuickAction(ICONS.actionBuy, 'Shares', '#FFFFFF', '#000000', false, () => navigation.navigate('Shares'))}
+            {renderQuickAction(ICONS.actionPredict, 'Predict', '#181818', '#FFFFFF', true, () => navigation.navigate('Predictions'))}
+            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw', '#111111', '#FFFFFF', true, () => navigation.navigate('Withdraw'))}
+            <View style={{ flex: 1 }} />
           </View>
 
           {/* GAP C: Quick Actions -> Sections (28px) */}
@@ -245,7 +245,7 @@ export const HomeScreen = () => {
                    onPress={() => navigation.navigate('Shares')}
                  />
                  <View style={[styles.card, { paddingVertical: 0 }]}>
-                    {portfolio.map((item, index) => {
+                    {portfolio.slice(0, 3).map((item, index) => {
                          const artist = getArtistById(item.artistId);
                          if (!artist) return null;
                          const metrics = getEntityMetrics(artist.id);
@@ -294,25 +294,30 @@ export const HomeScreen = () => {
               <View style={styles.section}>
                  <SectionHeader 
                     title="Recent activity" 
-                    onPress={() => navigation.navigate('Activity')}
+                    onPress={() => navigation.navigate('History')}
                  />
                   <View style={styles.card}>
-                     {getRecentActivity().map((item, index) => {
+                     {getRecentActivity().slice(0, 5).map((item, index) => {
                         return (
-                           <RowItem 
-                              key={item.id}
-                              leftIcon={
-                                <Image 
-                                  source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
-                                  style={styles.feedIcon} 
-                                  resizeMode="contain" 
-                                />
-                              } 
-                              title={item.text}
-                              subtitle={item.time}
-                              rightTop={item.amount}
-                              hasDivider={index < getRecentActivity().length - 1}
-                           />
+                           <TouchableOpacity
+                             key={item.id}
+                             activeOpacity={0.7}
+                             onPress={() => navigation.navigate('TransactionDetail', { activity: item })}
+                           >
+                               <RowItem 
+                                  leftIcon={
+                                    <Image 
+                                      source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
+                                      style={styles.feedIcon} 
+                                      resizeMode="contain" 
+                                    />
+                                  } 
+                                  title={item.text}
+                                  subtitle={item.time}
+                                  rightTop={item.amount}
+                                  hasDivider={index < 4}
+                               />
+                           </TouchableOpacity>
                         );
                      })}
                   </View>
@@ -420,7 +425,7 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Distribute evenly
+    justifyContent: 'flex-start',
     paddingHorizontal: PAGE_X,
     gap: 12, // Visual gap precaution
   },

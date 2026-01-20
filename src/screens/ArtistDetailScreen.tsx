@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_FAMILY } from '../constants/theme';
-import { getArtistById, Artist } from '../data/catalog';
+import { getArtistById, Artist, getAllArtists } from '../data/catalog';
 import { getEntityMetrics, mockSeries, getHoldersList } from '../lib/mockMetrics';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { EntityRow } from '../components/common/EntityRow';
 import { CreatorCard } from '../components/common/CreatorCard';
 import { Eye, Share, Copy, Info, Globe, Music, PlayCircle, Twitter, Instagram, MessageCircle, Disc } from 'lucide-react-native';
 import { LineChart } from '../components/LineChart'; 
@@ -256,6 +257,26 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
                  {artist.createdBy && (
                     <CreatorCard creator={artist.createdBy} />
                  )}
+
+                 {/* Similar Artists */}
+                 <Text style={styles.sectionHeader}>Similar Artists</Text>
+                 <View style={styles.similarCard}>
+                    {getAllArtists().filter(a => a.id !== artist.id).slice(0, 3).map((simArtist, index, arr) => {
+                        const simMetrics = getEntityMetrics(simArtist.id);
+                        return (
+                            <EntityRow 
+                                key={simArtist.id}
+                                name={simArtist.name}
+                                avatarUrl={simArtist.avatarUrl}
+                                price={'$' + simMetrics.price.toFixed(2)}
+                                changePct={simMetrics.changeTodayPct}
+                                volume={formatCompact(simMetrics.volume24h)}
+                                isLast={index === arr.length - 1}
+                                onPress={() => navigation.push('ArtistDetail', { artistId: simArtist.id })}
+                            />
+                        );
+                    })}
+                 </View>
                </View>
             )}
       </ScrollView>
@@ -534,5 +555,11 @@ const styles = StyleSheet.create({
     fontSize: 18, // UPDATED: Standardized to 18px
     fontFamily: FONT_FAMILY.header,
     marginBottom: 16,
+  },
+  similarCard: {
+      backgroundColor: '#111',
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      marginBottom: 40,
   },
 });

@@ -1,90 +1,158 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
-import { HeaderBack } from '../components/common/HeaderBack';
 import { getHoldersChat, addChatMessage, ChatMessage } from '../data/social';
-import { Send } from 'lucide-react-native';
+import { X, Users, ChevronLeft } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { getArtistById } from '../data/catalog';
+import { getEntityMetrics } from '../lib/mockMetrics';
 
 export const HoldersChatScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
-  const { entityId } = route.params || { entityId: 'a1' };
+  const { entityId, type = 'ARTIST' } = route.params || { entityId: 'a1' };
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [entity, setEntity] = useState<any>(null);
+  const [metrics, setMetrics] = useState<any>(null);
 
   useEffect(() => {
+    // Determine entity details (Mock: Assuming Artist for now, or adapt based on type)
+    if (type === 'ARTIST') {
+        const artist = getArtistById(entityId);
+        setEntity(artist);
+        setMetrics(getEntityMetrics(entityId));
+    }
     setMessages(getHoldersChat(entityId));
-  }, [entityId]);
+  }, [entityId, type]);
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
-    const msg = addChatMessage(entityId, inputText.trim());
-    setMessages([...messages, msg]);
-    setInputText('');
+  const renderMessage = ({ item }: { item: ChatMessage }) => {
+    // 1. ACTION MESSAGE (Buy/Sell Pill)
+    if (item.type === 'ACTION') {
+        const isBuy = item.actionType === 'BUY';
+        const actionColor = isBuy ? '#00FF9D' : '#FF4B4B'; // Green vs Red/Orange
+        
+        return (
+            <View style={styles.actionRow}>
+                 <View style={styles.actionPill}>
+                    <Image source={{ uri: item.user.avatar }} style={styles.actionAvatar} />
+                    <Text style={styles.actionText}>
+                        <Text style={{ color: actionColor, fontWeight: '700' }}>@{item.user.name}</Text>
+                        <Text style={{ color: actionColor }}> {item.text}</Text>
+                    </Text>
+                 </View>
+            </View>
+        );
+    }
+
+    // 2. STANDARD TEXT MESSAGE
+    return (
+        <View style={styles.msgRow}>
+            <Image source={{ uri: item.user.avatar }} style={styles.msgAvatar} />
+            <View style={styles.msgContent}>
+                {/* Name Header */}
+                <Text style={styles.msgUser}>@{item.user.name}</Text>
+                
+                {/* Text Bubble - Transparent/None background, just text? 
+                    Screenshot shows just text under name for generic messages? 
+                    Actually screenshot shows:
+                    "@test1234... \n This has very high chances..."
+                    It looks like raw text, no bubble background for user messages?
+                    Or maybe a very subtle dark card.
+                    I will use a clean look: Name (Header), Text (Body). No Bubble color, or very subtle.
+                */}
+                <Text style={styles.msgText}>{item.text}</Text>
+            </View>
+             {/* Timestamp (Optional, maybe implied or on side) */}
+        </View>
+    );
   };
+
+  const handleHeaderPress = () => {
+      if (type === 'ARTIST') {
+          (navigation as any).navigate('ArtistDetail', { artistId: entityId });
+      } else if (type === 'PREDICTION') {
+          (navigation as any).navigate('PredictionDetail', { predictionId: entityId });
+      } else if (type === 'LABEL') {
+          (navigation as any).navigate('LabelDetail', { labelId: entityId });
+      }
+  };
+
+  const activePeopleCount = Math.max(2, Math.floor(messages.length / 3));
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header */}
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        
+        {/* Custom Header */}
         <View style={styles.header}>
-            <HeaderBack />
-            <View style={styles.headerTitleContainer}>
-                <Text style={styles.headerTitle}>Holders Chat</Text>
-                <Text style={styles.headerSubtitle}>{messages.length * 52} members online</Text>
+            <View style={styles.headerLeft}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingRight: 8 }}>
+                    <ChevronLeft size={28} color="#FFF" />
+                </TouchableOpacity>
+                
+                <TouchableOpacity onPress={handleHeaderPress} activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Image 
+                        source={{ uri: entity?.avatarUrl || 'https://i.pravatar.cc/150' }} 
+                        style={styles.headerAvatar} 
+                    />
+                    <View>
+                        <Text style={styles.headerTitle}>{entity?.symbol || 'SYMBOL'}</Text>
+                        <View style={styles.memberRow}>
+                            <Users size={12} color="#888" />
+                            <Text style={styles.memberCount}>{activePeopleCount} people chatting</Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
             </View>
-            <View style={{ width: 40 }} />
+
+            <View style={styles.headerRight}>
+                <View style={styles.priceContainer}>
+                    <Text style={styles.priceText}>${metrics?.price?.toFixed(2) || '0.00'}</Text>
+                    <Text style={[styles.changeText, { color: (metrics?.changeTodayPct || 0) >= 0 ? '#4ADE80' : '#F87171' }]}>
+                        {metrics?.changeTodayPct ? metrics.changeTodayPct.toFixed(2) + '%' : '0.00%'}
+                    </Text>
+                </View>
+            </View>
         </View>
 
         <KeyboardAvoidingView 
            behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
            style={{ flex: 1 }}
-           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
             <FlatList
                 data={messages}
                 keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                    <View style={[styles.msgRow, item.isMe ? styles.msgRowRight : styles.msgRowLeft]}>
-                        {!item.isMe && (
-                            <Image source={{ uri: item.user.avatar }} style={styles.msgAvatar} />
-                        )}
-                        <View style={[styles.msgBubble, item.isMe ? styles.msgBubbleRight : styles.msgBubbleLeft]}>
-                            {!item.isMe && <Text style={styles.msgUser}>{item.user.name}</Text>}
-                            <Text style={[styles.msgText, item.isMe ? styles.msgTextRight : styles.msgTextLeft]}>
-                                {item.text}
-                            </Text>
-                            <Text style={styles.msgTime}>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
-                        </View>
-                    </View>
-                )}
+                renderItem={renderMessage}
                 contentContainerStyle={styles.listContent}
-                inverted={false} // Data is currently newest last, if using inverted list need to reverse data
-                // Usually chat is NEWEST at bottom. 
-                // My `getHoldersChat` reverses mock data so [Oldest ... Newest]?
-                // Let's check social.ts: 
-                // .map((_, i) => ... createdAt: Now - i ).reverse() -> Oldest First.
-                // So standard list renders Oldest at Top. Correct.
             />
 
-            {/* Composer */}
-            <View style={styles.composerContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Message holders..."
-                    placeholderTextColor="#666"
-                    value={inputText}
-                    onChangeText={setInputText}
-                    multiline
-                />
-                <TouchableOpacity onPress={handleSendMessage} disabled={!inputText.trim()}>
-                    <View style={[styles.sendBtn, !inputText.trim() && { opacity: 0.5 }]}>
-                        <Send size={20} color="#000" />
-                    </View>
+            {/* Footer */}
+            <View style={styles.footer}>
+                {/* Gradient Buy CTA */}
+                <TouchableOpacity activeOpacity={0.8} style={styles.buyButtonWrapper}>
+                    <LinearGradient
+                        colors={COLORS.primaryGradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.buyButton}
+                    >
+                        <Text style={styles.buyButtonText}>Buy</Text>
+                    </LinearGradient>
                 </TouchableOpacity>
+
+                {/* Input Area */}
+                <View style={styles.inputContainer}>
+                     <TextInput
+                        style={styles.input}
+                        placeholder="You can't send messages"
+                        placeholderTextColor="#444"
+                        editable={false} 
+                     />
+                </View>
             </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -95,116 +163,160 @@ export const HoldersChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050505', // Very dark bg
   },
   safeArea: {
       flex: 1,
   },
+  // Header
   header: {
       flexDirection: 'row',
-      alignItems: 'center',
       justifyContent: 'space-between',
+      alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 12,
       borderBottomWidth: 1,
       borderBottomColor: 'rgba(255,255,255,0.06)',
   },
-  headerTitleContainer: {
+  headerLeft: {
+      flexDirection: 'row',
       alignItems: 'center',
+      gap: 12,
+  },
+  headerAvatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: '#222',
   },
   headerTitle: {
-      fontFamily: FONT_FAMILY.header,
-      fontWeight: '600',
-      fontSize: 16,
+      fontFamily: FONT_FAMILY.medium,
+      fontSize: 18,
       color: '#FFF',
+      fontWeight: '600',
   },
-  headerSubtitle: {
+  memberRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginTop: 2,
+  },
+  memberCount: {
+      fontFamily: FONT_FAMILY.body,
       fontSize: 12,
-      color: '#666',
+      color: '#888',
   },
+  headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+  },
+  priceContainer: {
+      alignItems: 'flex-end',
+  },
+  priceText: {
+      fontFamily: FONT_FAMILY.mono,
+      fontSize: 14,
+      color: '#FFF',
+      fontWeight: '600',
+  },
+  changeText: {
+      fontFamily: FONT_FAMILY.mono,
+      fontSize: 12,
+  },
+  closeBtn: {
+      padding: 4,
+  },
+
+  // List
   listContent: {
       padding: 16,
       paddingBottom: 20,
   },
+  
+  // Messages
   msgRow: {
       flexDirection: 'row',
-      marginBottom: 16,
-      alignItems: 'flex-end',
-      maxWidth: '85%',
-  },
-  msgRowLeft: {
-      alignSelf: 'flex-start',
-  },
-  msgRowRight: {
-      alignSelf: 'flex-end',
+      marginBottom: 20, // Spacious
+      alignItems: 'flex-start',
   },
   msgAvatar: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      marginRight: 8,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      marginRight: 10,
       backgroundColor: '#333',
   },
-  msgBubble: {
-      padding: 12,
-      borderRadius: 16,
-  },
-  msgBubbleLeft: {
-      backgroundColor: '#222',
-      borderBottomLeftRadius: 4,
-  },
-  msgBubbleRight: {
-      backgroundColor: COLORS.primary,
-      borderBottomRightRadius: 4,
+  msgContent: {
+      flex: 1,
   },
   msgUser: {
-      fontSize: 11,
-      color: '#999',
+      fontSize: 14,
+      color: '#FFF',
+      fontWeight: '700',
       marginBottom: 4,
   },
   msgText: {
       fontSize: 15,
-      lineHeight: 20,
+      color: '#CCC',
+      lineHeight: 22,
   },
-  msgTextLeft: {
-      color: '#FFF',
+
+  // Actions
+  actionRow: {
+      marginBottom: 16,
+      width: '100%',
   },
-  msgTextRight: {
-      color: '#000',
-  },
-  msgTime: {
-      fontSize: 10,
-      marginTop: 4,
-      alignSelf: 'flex-end',
-      opacity: 0.7,
-      color: 'rgba(255,255,255,0.5)',
-  },
-  composerContainer: {
-      padding: 12, // slightly more padding
-      paddingBottom: Platform.OS === 'ios' ? 12 : 12, // Adjust if needed
-      borderTopWidth: 1,
-      borderTopColor: 'rgba(255,255,255,0.06)',
+  actionPill: {
       flexDirection: 'row',
-      alignItems: 'flex-end',
-      backgroundColor: '#000',
-  },
-  input: {
-      flex: 1,
-      backgroundColor: '#111',
-      borderRadius: 20,
-      paddingHorizontal: 16,
+      alignItems: 'center',
+      backgroundColor: '#111', // Dark pill
+      borderRadius: 12, // Rounded corners
       paddingVertical: 10,
-      maxHeight: 100,
-      color: '#FFF',
-      fontSize: 15,
-      marginRight: 12,
+      paddingHorizontal: 12,
+      width: '100%', // Full Width
   },
-  sendBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: '#FFF',
+  actionAvatar: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      marginRight: 8,
+  },
+  actionText: {
+      fontSize: 14,
+      fontFamily: FONT_FAMILY.body,
+  },
+
+  // Footer
+  footer: {
+      padding: 16,
+      backgroundColor: '#050505',
+  },
+  buyButtonWrapper: {
+      marginBottom: 16,
+  },
+  buyButton: {
+      height: 50,
+      borderRadius: 25, // Pill shape
       alignItems: 'center',
       justifyContent: 'center',
+  },
+  buyButtonText: {
+      color: '#FFF',
+      fontSize: 16,
+      fontWeight: '700',
+      fontFamily: FONT_FAMILY.medium,
+  },
+  inputContainer: {
+      height: 50,
+      backgroundColor: '#111',
+      borderRadius: 25, // Pill shape
+      paddingHorizontal: 20,
+      justifyContent: 'center',
+  },
+  input: {
+      color: '#666',
+      fontSize: 15,
+      padding: 0, 
   },
 });

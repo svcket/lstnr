@@ -43,14 +43,13 @@ export const SharesScreen = () => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-          {/* Header */}
+          {/* Header (Left Aligned) */}
           <View style={styles.header}>
               <HeaderBack />
               <Text style={styles.headerTitle}>Shares</Text>
-              <View style={{ width: 40 }} /> 
           </View>
 
-           {/* Optional Summary (Fixed at top, outside scrollable card) */}
+           {/* Summary Section */}
            <View style={styles.summaryTop}>
                <View>
                   <Text style={styles.summaryLabel}>Portfolio Value</Text>
@@ -62,8 +61,8 @@ export const SharesScreen = () => {
                </View>
             </View>
 
-          {/* FIXED CARD CONTAINER */}
-          <View style={styles.cardContainer}>
+          {/* Full Width List (No Card) */}
+          <View style={{ flex: 1, width: '100%' }}>
               <FlatList
                 data={portfolio}
                 keyExtractor={item => item.artistId}
@@ -88,13 +87,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start', // Left align
+    gap: 12, // Space between arrow and title
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
   headerTitle: {
     fontFamily: FONT_FAMILY.header,
-    fontWeight: '600', // Semibold
+    fontWeight: '600',
     fontSize: 18,
     color: '#FFF',
   },
@@ -111,30 +111,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   summaryValue: {
-    fontFamily: FONT_FAMILY.balance, // Bold
-    fontWeight: '700', // Explicit Bold
+    fontFamily: FONT_FAMILY.balance,
+    fontWeight: '700',
     fontSize: 24,
     color: '#FFF',
   },
   summaryChange: {
-    fontFamily: FONT_FAMILY.balance, // Bold (Currency-like)
-    fontWeight: '700', // Explicit Bold
+    fontFamily: FONT_FAMILY.balance,
+    fontWeight: '700',
     fontSize: 16,
   },
   
-  // FIXED CARD
-  cardContainer: {
-    flex: 1, // Take remaining space
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 16, // 16px bottom margin
-    marginTop: 0, 
-    overflow: 'hidden', 
-  },
+  // List Content
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 0,
-    paddingTop: 0,
+    paddingBottom: 24, 
+    paddingTop: 4, // Reduced from 8px as requested
   },
 });

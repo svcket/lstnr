@@ -1,62 +1,100 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
-import { HeaderBack } from '../components/common/HeaderBack';
 import { ICONS } from '../constants/assets';
-// Dynamic Data
-import { getInboxItems } from '../data/inbox';
+import { getInboxThreads, InboxThread } from '../data/inbox';
+import { Pin, Bell } from 'lucide-react-native';
+import { BottomNav } from '../components/home/BottomNav';
 
 export const ActivityScreen = () => {
-  const activityData = getInboxItems();
+  const navigation = useNavigation<any>();
+  const threads = getInboxThreads();
 
-  // Using FlatList for infinite scrolling potential
-  const renderItem = ({ item, index }: { item: any, index: number }) => (
-    <View style={styles.itemContainer}>
+  const renderItem = ({ item, index }: { item: InboxThread, index: number }) => (
+    <TouchableOpacity 
+        style={styles.itemContainer}
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate(item.context.screen, item.context.params)}
+    >
        <View style={styles.left}>
-         <Image 
-            source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
-            style={styles.icon}
-            resizeMode="contain"
-         />
-         <View>
-            <Text style={styles.title}>{item.title || item.text}</Text>
-            <Text style={styles.date}>{item.timestamp || item.time}</Text>
-            {/* Show body for System Events if present */}
-            {item.body && item.type !== 'FINANCIAL' && (
-                <Text style={styles.bodyText} numberOfLines={1}>{item.body}</Text>
-            )}
+         {/* Avatar Logic */}
+         <View style={styles.avatarContainer}>
+             {item.avatar ? (
+                 <Image source={{ uri: item.avatar }} style={styles.avatar} />
+             ) : (
+                 <Image 
+                    source={item.type === 'PREDICTION' ? ICONS.learnPredictions : ICONS.activityIn} 
+                    style={styles.placeholderIcon} 
+                 />
+             )}
+         </View>
+         
+         <View style={styles.textContainer}>
+            <View style={styles.titleRow}>
+                <Text style={styles.title}>{item.title}</Text>
+                {item.isPinned && <Pin size={12} color="#888" style={{ marginLeft: 4 }} />}
+            </View>
+            <Text style={[styles.subtitle, item.unreadCount > 0 && styles.subtitleBold]} numberOfLines={1}>
+                {item.subtitle}
+            </Text>
          </View>
        </View>
-       <Text style={[styles.amount, !item.isMoneyOut && { color: COLORS.success }]}>
-           {item.amountDisplay || item.amount}
-       </Text>
+
+       <View style={styles.right}>
+           <Text style={styles.date}>{item.timestamp}</Text>
+           {item.unreadCount > 0 && (
+               <View style={styles.unreadBadge}>
+                   <Text style={styles.unreadText}>{item.unreadCount}</Text>
+               </View>
+           )}
+       </View>
        
-       {/* Divider (except last) */}
-       {index < activityData.length - 1 && <View style={styles.separator} />}
-    </View>
+       {index < threads.length - 1 && <View style={styles.separator} />}
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
-          {/* Header */}
+          {/* Main Tab Header */}
           <View style={styles.header}>
-              <HeaderBack />
-              <Text style={styles.headerTitle}>Inbox</Text>
-              <View style={{ width: 40 }} /> 
+              <Text style={styles.greeting}>Inbox</Text>
+              <View style={styles.headerRight}>
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate('Updates')}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  >
+                    <View>
+                      <Bell size={24} color="#FFF" />
+                      {true && ( 
+                        <View style={styles.unreadDot} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
+                      <View style={[styles.headerIconContainer, styles.avatarContainerHeader]}>
+                        <Text style={{ fontSize: 20 }}>👻</Text>
+                      </View>
+                  </TouchableOpacity>
+              </View>
           </View>
 
-          {/* FIXED CARD CONTAINER */}
-           <View style={styles.cardContainer}>
+           <View style={{ flex: 1 }}>
               <FlatList 
-                data={activityData}
+                data={threads}
                 keyExtractor={item => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
               />
            </View>
+
+           <BottomNav activeTab="Inbox" />
       </SafeAreaView>
     </View>
   );
@@ -72,30 +110,50 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 16,
   },
-  headerTitle: {
-    fontFamily: FONT_FAMILY.medium, // Explicit Medium
-    fontWeight: '600', // Semibold
-    fontSize: 18,
-    color: '#FFF',
+  greeting: {
+    fontFamily: FONT_FAMILY.balance,
+    fontWeight: '600',
+    fontSize: 24,
+    color: COLORS.text,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerIconContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#181818',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+  },
+  avatarContainerHeader: {
+    backgroundColor: '#181818',
+    borderColor: '#333',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: -2,
+    right: 0,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.error, 
   },
   
-  // FIXED CARD
-  cardContainer: {
-    flex: 1,
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 16, // 16px bottom margin
-    overflow: 'hidden',
-  },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 0,
+    paddingBottom: 120, // Space for BottomNav
     paddingTop: 0,
   },
 
@@ -109,39 +167,86 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
     gap: 12,
   },
-  icon: {
-    width: 40,
-    height: 40,
+  avatarContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: '#222',
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+  avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+  },
+  placeholderIcon: {
+      width: 24,
+      height: 24,
+      tintColor: '#666',
+  },
+  textContainer: {
+      flex: 1,
+      justifyContent: 'center',
+  },
+  titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 2,
   },
   title: {
     fontFamily: FONT_FAMILY.medium, // Explicit Medium
-    fontSize: 15,
+    fontSize: 16,
     color: '#FFF',
-    marginBottom: 4,
+  },
+  subtitle: {
+    fontFamily: FONT_FAMILY.body,
+    fontSize: 14,
+    color: '#888',
+  },
+  subtitleBold: {
+      color: '#FFF',
+      fontWeight: '600',
+  },
+  pinIcon: {
+      width: 12,
+      height: 12,
+      tintColor: '#888',
+  },
+  
+  // Right
+  right: {
+      alignItems: 'flex-end',
+      gap: 6,
   },
   date: {
     fontFamily: FONT_FAMILY.body,
-    fontSize: 13,
+    fontSize: 12,
     color: '#666',
   },
-  bodyText: {
-      fontFamily: FONT_FAMILY.body,
-      fontSize: 13,
-      color: '#888',
-      marginTop: 2,
+  unreadBadge: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
   },
-  amount: {
-    fontFamily: FONT_FAMILY.balance, // Bold
-    fontWeight: '700', // Explicit
-    fontSize: 16,
-    color: '#FFF',
+  unreadText: {
+      fontFamily: FONT_FAMILY.medium,
+      fontSize: 10,
+      color: '#000',
+      fontWeight: '700',
   },
   separator: {
     position: 'absolute',
     bottom: 0,
-    left: 0, 
+    left: 72, // Indent for avatar
     right: 0,
     height: 1,
     backgroundColor: '#1A1A1A',
