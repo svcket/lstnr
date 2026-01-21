@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { COLORS, FONT_FAMILY, SPACING } from '../../constants/theme';
+import { COLORS, FONT_FAMILY, SPACING, VIBRANT_COLORS, LIGHT_PASTELS } from '../../constants/theme';
 import { ICONS } from '../../constants/assets';
 import { Infinity } from 'lucide-react-native';
 
@@ -14,17 +14,27 @@ interface HorizontalCardProps {
   onPress?: () => void;
 }
 
+const getAccentColor = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return LIGHT_PASTELS[Math.abs(hash) % LIGHT_PASTELS.length];
+};
+
 export const HorizontalCard = ({ title, subtitle, value, change, isPositive, type, onPress }: HorizontalCardProps) => {
+  const accentColor = getAccentColor(title);
+  
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.top}>
-        <View style={styles.iconPlaceholder}>
+        <View style={[styles.iconPlaceholder, { backgroundColor: accentColor }]}> 
             {type === 'perp' ? (
-                <Infinity size={16} color="#FFF" />
+                <Infinity size={18} color="#000000" />
             ) : (
                 <Image 
                     source={ICONS.actionPredict} 
-                    style={{ width: 24, height: 24, tintColor: '#FFFFFF' }} 
+                    style={{ width: 22, height: 22, tintColor: '#000000' }} 
                     resizeMode="contain"
                 />
             )}

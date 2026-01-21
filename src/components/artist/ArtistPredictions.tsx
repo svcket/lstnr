@@ -33,6 +33,7 @@ export const ArtistPredictions = ({ entityId, name }: ArtistPredictionsProps) =>
         renderItem={({ item }) => (
           <PredictionCard prediction={item as any} /> 
         )}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.listContent}
         scrollEnabled={false}

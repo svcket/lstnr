@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { Card } from '../components/Card';
-import { TrendingUp, TrendingDown, DollarSign, History } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, DollarSign, History, Mic2, Disc, Sparkles, Download } from 'lucide-react-native';
 
 const MOCK_HOLDINGS = [
   { id: 'h1', name: 'Neon Dust', shares: 15, avgPrice: 40.50, currentPrice: 45.20 },
@@ -21,6 +22,7 @@ const MOCK_HISTORY = [
 ];
 
 export const PortfolioScreen = () => {
+    const navigation = useNavigation();
     const { user } = useAuth();
 
     const portfolioValue = MOCK_HOLDINGS.reduce((acc, h) => acc + (h.shares * h.currentPrice), 0);
@@ -37,17 +39,59 @@ export const PortfolioScreen = () => {
                 <View style={styles.balanceContainer}>
                     <Text style={styles.balanceLabel}>Total Balance</Text>
                     <Text style={styles.balanceValue}>${totalBalance.toFixed(2)}</Text>
-                    <View style={styles.breakdown}>
-                        <View style={styles.breakdownItem}>
-                            <Text style={styles.breakdownLabel}>Cash</Text>
-                            <Text style={styles.breakdownValue}>${user?.balance.toFixed(2)}</Text>
-                        </View>
-                        <View style={styles.breakdownItem}>
-                            <Text style={styles.breakdownLabel}>Assets</Text>
-                            <Text style={styles.breakdownValue}>${(portfolioValue + positionsValue).toFixed(2)}</Text>
-                        </View>
-                    </View>
+                    <Text style={{ color: COLORS.success, fontWeight: 'bold' }}>+$612.40 (+4.8%) <Text style={{ color: '#888', fontWeight: 'normal' }}>today</Text></Text>
                 </View>
+
+                {/* Quick Actions */}
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={styles.actionsContainer}
+                >
+                    <TouchableOpacity 
+                        style={styles.actionBtn} 
+                        onPress={() => (navigation as any).navigate('Artists')}
+                        activeOpacity={0.7}
+                    >
+                         <View style={styles.iconCircle}>
+                            <Mic2 size={24} color="#FFF" />
+                         </View>
+                         <Text style={styles.actionLabel}>Artists</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        style={styles.actionBtn} 
+                        onPress={() => (navigation as any).navigate('Labels')}
+                        activeOpacity={0.7}
+                    >
+                         <View style={styles.iconCircle}>
+                            <Disc size={24} color="#FFF" />
+                         </View>
+                         <Text style={styles.actionLabel}>Labels</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        style={styles.actionBtn} 
+                        onPress={() => (navigation as any).navigate('Predictions')}
+                        activeOpacity={0.7}
+                    >
+                         <View style={styles.iconCircle}>
+                            <Sparkles size={24} color="#FFF" />
+                         </View>
+                         <Text style={styles.actionLabel}>Predict</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        style={styles.actionBtn} 
+                        onPress={() => (navigation as any).navigate('Withdraw')}
+                        activeOpacity={0.7}
+                    >
+                         <View style={styles.iconCircle}>
+                            <Download size={24} color="#FFF" />
+                         </View>
+                         <Text style={styles.actionLabel}>Withdraw</Text>
+                    </TouchableOpacity>
+                </ScrollView>
 
                 <Text style={styles.sectionTitle}>Artist Shares</Text>
                 {MOCK_HOLDINGS.map((item) => {
@@ -224,6 +268,31 @@ const styles = StyleSheet.create({
       color: COLORS.background,
       fontWeight: 'bold',
       fontSize: 10,
+  },
+  actionsContainer: {
+      flexDirection: 'row',
+      gap: 12, // Gap between buttons
+      marginBottom: SPACING.xl,
+      paddingRight: 16, // Padding for scroll end
+  },
+  actionBtn: {
+      width: 100, // Fixed width for square-ish look
+      height: 100,
+      backgroundColor: '#151515', // Dark background
+      borderRadius: 24, // Soft rounded corners
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.08)',
+  },
+  iconCircle: {
+      marginBottom: 8,
+  },
+  actionLabel: {
+      color: '#FFF',
+      fontFamily: 'ClashDisplay-Medium',
+      fontSize: 14,
+      fontWeight: '600',
   },
   historyRow: {
       flexDirection: 'row',

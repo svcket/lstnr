@@ -1,4 +1,5 @@
 import { ICONS } from '../constants/assets';
+import { getArtistById, getLabelById } from './catalog';
 
 export interface InboxThread {
     id: string;
@@ -21,10 +22,10 @@ const MOCK_THREADS: InboxThread[] = [
         id: 't1',
         type: 'ARTIST',
         entityId: 'a1',
-        title: '$YZY Holders',
+        title: 'Kanye West',
         subtitle: 'CryptoKing: Price is moving! 🚀',
         timestamp: '2m ago',
-        avatar: 'https://i.pravatar.cc/150?u=1', // Placeholder or artist image
+        avatar: 'https://ui-avatars.com/api/?name=Kanye+West&background=000&color=fff&size=256', // Kanye
         unreadCount: 3,
         isPinned: true,
         context: { 
@@ -36,10 +37,10 @@ const MOCK_THREADS: InboxThread[] = [
         id: 't2',
         type: 'PREDICTION',
         entityId: 'p1',
-        title: 'Album Drop 2026',
+        title: 'Will Kanye West release "Y3"?',
         subtitle: 'Sarah J: I think it’s delayed...',
         timestamp: '1h ago',
-        avatar: null, // Use icon fallback in UI
+        avatar: 'https://ui-avatars.com/api/?name=Kanye+West&background=000&color=fff&size=256', // Kanye for Prediction
         unreadCount: 0,
         context: { 
             screen: 'HoldersChat', 
@@ -50,10 +51,10 @@ const MOCK_THREADS: InboxThread[] = [
         id: 't3',
         type: 'ARTIST',
         entityId: 'a2',
-        title: '$TEMS Inner Circle',
+        title: 'Drake',
         subtitle: 'You: Just bought more!',
         timestamp: '1d ago',
-        avatar: 'https://i.pravatar.cc/150?u=2',
+        avatar: 'https://ui-avatars.com/api/?name=Drake&background=F5A623&color=000&size=256', // Drake
         unreadCount: 0,
         context: { 
             screen: 'HoldersChat', 
@@ -64,14 +65,14 @@ const MOCK_THREADS: InboxThread[] = [
         id: 't4',
         type: 'LABEL',
         entityId: 'l1',
-        title: 'Opium Label Chat',
+        title: 'Death Row Records',
         subtitle: 'Mod: New signing announcement soon',
         timestamp: '2d ago',
-        avatar: null,
+        avatar: 'https://ui-avatars.com/api/?name=Death+Row&background=000&color=fff&size=256',
         unreadCount: 5,
         context: { 
-            screen: 'LabelDetail', 
-            params: { labelId: 'l1' } 
+            screen: 'HoldersChat', // Fixed navigation
+            params: { entityId: 'l1', type: 'LABEL' } 
         }
     }
 ];

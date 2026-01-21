@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { MultiRangeMarket } from '../../types/prediction';
-import { COLORS, FONT_FAMILY } from '../../constants/theme';
+import { COLORS, FONT_FAMILY, VIBRANT_COLORS, LIGHT_PASTELS } from '../../constants/theme';
 import { ICONS } from '../../constants/assets';
 
 interface MultiRangeMarketCardProps {
@@ -9,7 +9,17 @@ interface MultiRangeMarketCardProps {
   onPress: (market: MultiRangeMarket) => void;
 }
 
+const getAccentColor = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return LIGHT_PASTELS[Math.abs(hash) % LIGHT_PASTELS.length];
+};
+
 export const MultiRangeMarketCard = ({ market, onPress }: MultiRangeMarketCardProps) => {
+  const accentColor = getAccentColor(market.title);
+
   return (
     <Pressable 
       style={({ pressed }) => [
@@ -20,7 +30,7 @@ export const MultiRangeMarketCard = ({ market, onPress }: MultiRangeMarketCardPr
     >
       {/* Header Row */}
       <View style={styles.headerRow}>
-        <View style={styles.iconContainer}>
+        <View style={[styles.iconContainer, { backgroundColor: accentColor }]}>
           {market.iconUrl ? (
             <Image source={{ uri: market.iconUrl }} style={styles.iconImage} />
           ) : (

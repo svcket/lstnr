@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView, Switch, ActivityIndicator, Image } from 'react-native';
 import { COLORS, FONT_FAMILY, BUTTON_HEIGHT } from '../../constants/theme';
-import { ChevronLeft, Settings2, ChevronDown, X, Check, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react-native';
+import { ChevronLeft, Settings2, ChevronDown, X, Check, DollarSign, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // --- Session Persistence (Simple In-Memory) ---
@@ -19,6 +19,7 @@ interface TradeSheetProps {
   mcs?: number;
   marketType?: 'binary' | 'multi-range';
   outcomeName?: string;
+  avatarUrl?: string;
   onClose: () => void;
   onConfirm: (amount: number, isShares: boolean) => void;
 }
@@ -69,7 +70,7 @@ const GradientSwitch = ({ value, onValueChange }: { value: boolean, onValueChang
     </TouchableOpacity>
 );
 
-export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onClose, onConfirm, marketType = 'binary', outcomeName }: TradeSheetProps) => {
+export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onClose, onConfirm, marketType = 'binary', outcomeName, avatarUrl }: TradeSheetProps) => {
   const isMulti = marketType === 'multi-range';
 
   const [amount, setAmount] = useState('0');
@@ -342,7 +343,7 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
                 {/* Left Group (Back + Title) - Flex Grow to push Right Icon */}
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                     <TouchableOpacity onPress={onClose} style={styles.iconBtn}>
-                        <ChevronLeft size={28} color="#FFF" />
+                        <ArrowLeft size={28} color="#FFF" />
                     </TouchableOpacity>
                     
                     {/* Title Container - Left Aligned next to Back Arrow */}
@@ -365,7 +366,11 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
                             // Standard Header
                             <> 
                                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
-                                    <View style={styles.coinIcon} /> 
+                                    {avatarUrl ? (
+                                        <Image source={{ uri: avatarUrl }} style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#333' }} />
+                                    ) : (
+                                        <View style={styles.coinIcon} /> 
+                                    )}
                                     <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
                                         <Text style={styles.headerTitle}>{mode === 'BUY' ? 'Buy' : 'Sell'} {ticker}</Text>
                                         <View style={styles.verifiedBadge}><Text style={{fontSize: 8, color: '#000'}}>✓</Text></View>

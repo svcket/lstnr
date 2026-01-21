@@ -46,9 +46,12 @@ export const PredictionsScreen = () => {
         });
     }, [predictions, search, outcome, endDate, region]);
 
-    const renderItem = ({ item }: { item: typeof predictions[0] }) => (
-        <PredictionCard prediction={item as any} />
-    );
+    const renderItem = ({ item }: { item: typeof predictions[0] }) => {
+        // Restore original ID for navigation/logic (strip _index suffix)
+        const originalId = item.id.split('_')[0];
+        const realPrediction = { ...item, id: originalId };
+        return <PredictionCard prediction={realPrediction as any} />;
+    };
 
     const getSheetConfig = () => {
         switch (activeSheet) {

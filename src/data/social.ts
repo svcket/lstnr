@@ -159,24 +159,29 @@ export const getHoldersChat = (entityId: string): ChatMessage[] => {
         const count = 25;
         
         for (let i = 0; i < count; i++) {
-            const isAction = Math.random() > 0.8; // 20% actions
-            const user = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
-            const timeOffset = i * 1000 * 60 * (Math.random() * 60); // Random intervals within hours
+            // Deterministic "Randomness" based on i + entityId length
+            const seed = i + entityId.length;
+            const isAction = (seed % 5) === 0; // Every 5th message is an action
+            // deterministic user selection
+            const userIndex = (i + entityId.charCodeAt(0)) % MOCK_USERS.length;
+            const user = MOCK_USERS[userIndex];
+            
+            const timeOffset = i * 1000 * 60 * ((seed % 60) + 1); // Random intervals
 
             if (isAction) {
-                // Force at least one sell if we haven't seen one, or random
-                const isBuy = i === 5 ? false : Math.random() > 0.3;
+                const isBuy = (seed % 2) === 0;
                 msgs.push({
                     id: `act_${entityId}_${i}`,
                     user,
-                    text: isBuy ? `bought ${Math.floor(Math.random() * 1000)} shares` : `sold ${Math.floor(Math.random() * 500)} shares`,
+                    text: isBuy ? `bought ${((seed * 10) % 1000) + 10} shares` : `sold ${((seed * 5) % 500) + 10} shares`,
                     createdAt: new Date(Date.now() - timeOffset).toISOString(),
                     isMe: false,
                     type: 'ACTION',
                     actionType: isBuy ? 'BUY' : 'SELL'
                 });
             } else {
-                const text = CHAT_PHRASES[Math.floor(Math.random() * CHAT_PHRASES.length)];
+                const phraseIndex = (seed + i) % CHAT_PHRASES.length;
+                const text = CHAT_PHRASES[phraseIndex];
                 msgs.push({
                     id: `msg_${entityId}_${i}`,
                     user,

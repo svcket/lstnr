@@ -294,6 +294,7 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
          ticker={artist.symbol}
          sharePrice={metrics.price}
          mcs={metrics.marketConfidenceScore.value}
+         avatarUrl={artist.avatarUrl}
          onClose={() => setTradeSheetMode(null)}
          onConfirm={(val: any) => { console.log('Trade', val); setTradeSheetMode(null); }}
        />

@@ -301,12 +301,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     <TouchableOpacity 
                                         style={styles.promoBtn}
                                         onPress={() => {
-                                            if (hasAccess) {
-                                                navigation.navigate('HoldersChat', { entityId: predictionId });
-                                            } else {
-                                                // Default to generic trade
-                                                setTradeSheetOpen(true);
-                                            }
+                                            navigation.navigate('HoldersChat', { entityId: predictionId, type: 'PREDICTION' });
                                         }}
                                     >
                                         <Text style={styles.promoBtnText}>
@@ -360,7 +355,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     )}
                                 </View>
                                 
-                                <View style={{ height: 40 }} />
+                                <View style={{ height: 24 }} />
                                 
                                 {/* Similar Predictions */}
                                 <Text style={styles.sectionTitle}>Similar Predictions</Text>

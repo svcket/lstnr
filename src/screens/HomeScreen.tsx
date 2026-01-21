@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell } from 'lucide-react-native';
+import { Bell, Mic2, Disc, Sparkles, Download } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
@@ -214,10 +214,53 @@ export const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
-            {renderQuickAction(ICONS.actionBuy, 'Shares', '#FFFFFF', '#000000', false, () => navigation.navigate('Shares'))}
-            {renderQuickAction(ICONS.actionPredict, 'Predict', '#181818', '#FFFFFF', true, () => navigation.navigate('Predictions'))}
-            {renderQuickAction(ICONS.actionWithdraw, 'Withdraw', '#111111', '#FFFFFF', true, () => navigation.navigate('Withdraw'))}
-            <View style={{ flex: 1 }} />
+            <TouchableOpacity 
+                style={styles.quickActionDark} 
+                onPress={() => navigation.navigate('Artists')}
+                activeOpacity={0.7}
+            >
+                <View style={{ marginBottom: 8 }}>
+                   <Mic2 size={24} color="#FFF" />
+                </View>
+                <Text style={styles.quickActionLabelDark}>Artists</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.quickActionDark} 
+                onPress={() => navigation.navigate('Labels')}
+                activeOpacity={0.7}
+            >
+                <View style={{ marginBottom: 8 }}>
+                   <Disc size={24} color="#FFF" />
+                </View>
+                <Text style={styles.quickActionLabelDark}>Labels</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.quickActionDark} 
+                onPress={() => navigation.navigate('Predictions')}
+                activeOpacity={0.7}
+            >
+                <View style={{ marginBottom: 8 }}>
+                   <Image 
+                       source={ICONS.actionPredict} 
+                       style={{ width: 24, height: 24, tintColor: '#FFF' }} 
+                       resizeMode="contain"
+                    />
+                </View>
+                <Text style={styles.quickActionLabelDark}>Predict</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.quickActionDark} 
+                onPress={() => navigation.navigate('Withdraw')}
+                activeOpacity={0.7}
+            >
+                <View style={{ marginBottom: 8 }}>
+                   <Download size={24} color="#FFF" />
+                </View>
+                <Text style={styles.quickActionLabelDark}>Withdraw</Text>
+            </TouchableOpacity>
           </View>
 
           {/* GAP C: Quick Actions -> Sections (28px) */}
@@ -425,10 +468,29 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
     paddingHorizontal: PAGE_X,
-    gap: 12, // Visual gap precaution
+    gap: 12, 
   },
+  quickActionDark: {
+    flex: 1, // Fill available width
+    aspectRatio: 1, // Keep square
+    backgroundColor: '#151515', 
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 12, // Ensure vertical padding
+  },
+  quickActionLabelDark: {
+    fontFamily: FONT_FAMILY.medium,
+    fontWeight: '600',
+    fontSize: 12, // Slightly smaller to fit if needed, or 13
+    color: '#FFF',
+    letterSpacing: 0,
+    marginTop: 4,
+  },
+  // Deprecated Styles (Left for safety or remove if unused)
   quickAction: {
     flex: 1, 
     aspectRatio: 1, 
