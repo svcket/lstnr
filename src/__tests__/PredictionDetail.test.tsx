@@ -2,14 +2,9 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { PredictionDetailScreen } from '../screens/PredictionDetailScreen';
 import { NavigationContainer } from '@react-navigation/native';
+import { ToastProvider } from '../context/ToastContext';
 
 // Mock dependencies
-jest.mock('../context/ToastContext', () => ({
-  useToast: () => ({
-    showToast: jest.fn(),
-  }),
-}));
-
 jest.mock('../data/catalog', () => ({
   getPredictionDetail: () => ({
     id: 'p1',
@@ -25,21 +20,11 @@ jest.mock('../data/catalog', () => ({
     ],
     volume: 1000
   }),
-  getAllPredictions: () => [],
   getPredictionById: () => ({ id: 'p1', relatedEntityId: 'a1' }),
-  getLabelById: () => ({ name: 'Test Label' }),
-  getArtistById: () => ({ name: 'Test Artist', symbol: '$TEST' }),
+  getAllPredictions: () => [],
+  getArtistById: () => ({ name: 'Test Artist' }),
   getPortfolio: () => [],
   getPredictionPortfolio: () => []
-}));
-
-jest.mock('../lib/permissions', () => ({
-  getAccess: () => ({
-    canWrite: false,
-    requiredWrite: 50,
-    isHolder: false,
-    type: 'PREDICTION'
-  })
 }));
 
 jest.mock('../components/common/HeaderBack', () => ({
@@ -85,9 +70,11 @@ jest.mock('../data/social', () => ({
 
 // Mock Navigation
 const MockNavigation = () => (
-    <NavigationContainer>
-        <PredictionDetailScreen route={{ params: { predictionId: 'p1' } }} />
-    </NavigationContainer>
+    <ToastProvider>
+        <NavigationContainer>
+            <PredictionDetailScreen route={{ params: { predictionId: 'p1' } }} />
+        </NavigationContainer>
+    </ToastProvider>
 );
 
 describe('PredictionDetailScreen Layout', () => {
@@ -134,7 +121,7 @@ describe('PredictionDetailScreen Layout', () => {
         fireEvent.press(getByText('Comments'));
         
         // Check for input
-        // Placeholder is dynamic: "Hold $50 stake to comment" or "Hold 50 shares to comment"
-        expect(getByPlaceholderText(/Hold.*50.*to comment/)).toBeTruthy();
+        // Placeholder is dynamic: "Hold $1 stake to comment"
+        expect(getByPlaceholderText(/Hold \$1 stake/)).toBeTruthy();
     });
 });

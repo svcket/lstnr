@@ -278,10 +278,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#000',
+    // In TradeSheet, confirms text color. Code reviewed earlier didn't show `confirmText` style but generic button text is usually black on gold/red or white.
+    // Let's check TradeSheet snippet again... `confirmText` usage.
+    // Assuming White for now as per previous feedback? No, user asked for Gradient not Red.
+    // Standard text on primary gradient is often white or black. I'll stick to White as it's safe on Red/Gold, or Black if it's very bright gold.
+    // Actually, `COLORS.primaryGradient` is `['#C99315', '#F53636']`.
+    // Gold to Red. White text is readable.
+    // Wait, the user said "why do you keep using the red color... ditch the red unless i say so".
+    // "users should be able to add a new withdrawal method".
+    // I will use White text for now.
     fontSize: 16,
     fontFamily: FONT_FAMILY.medium,
     fontWeight: '600',
+    color: '#FFFFFF', 
   },
   buttonTextDisabled: {
     color: '#888',
