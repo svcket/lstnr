@@ -278,10 +278,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
+    color: '#000',
     fontSize: 16,
     fontFamily: FONT_FAMILY.medium,
     fontWeight: '600',
-    color: '#FFFFFF', 
   },
   buttonTextDisabled: {
     color: '#888',

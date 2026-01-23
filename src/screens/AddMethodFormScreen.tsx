@@ -57,10 +57,8 @@ export const AddMethodFormScreen = () => {
                 icon: methodType.icon
             };
 
-            navigation.navigate({
-                name: 'Withdraw',
-                params: { newMethod: { ...newMethod, typeId: methodType.id } },
-                merge: true,
+            navigation.navigate('Withdraw', { 
+                newMethod: { ...newMethod, typeId: methodType.id } 
             });
         }
     };
