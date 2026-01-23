@@ -11,6 +11,8 @@ import TestScreen from './src/screens/TestScreen';
 
 import { runDataIntegrityChecks } from './src/utils/devAssertions';
 
+import { ToastProvider } from './src/context/ToastContext';
+
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
@@ -42,7 +44,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <RootNavigator />
+        <ToastProvider>
+          <RootNavigator />
+        </ToastProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

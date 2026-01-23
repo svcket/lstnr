@@ -5,6 +5,10 @@ import { NavigationContainer } from '@react-navigation/native';
 
 // Mock dependencies
 jest.mock('../data/catalog', () => ({
+  getPredictionById: () => ({
+    id: 'p1',
+    relatedEntityId: 'a1'
+  }),
   getPredictionDetail: () => ({
     id: 'p1',
     question: 'Test Prediction?',
@@ -20,7 +24,7 @@ jest.mock('../data/catalog', () => ({
     volume: 1000
   }),
   getAllPredictions: () => [],
-  getArtistById: () => ({ name: 'Test Artist' }),
+  getArtistById: () => ({ id: 'a1', name: 'Test Artist', symbol: '$TEST' }),
   getPortfolio: () => [],
   getPredictionPortfolio: () => []
 }));
@@ -53,6 +57,12 @@ jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation', () => ({
   ...jest.requireActual('react-native/Libraries/LayoutAnimation/LayoutAnimation'),
   configureNext: jest.fn(),
   Presets: { easeInEaseOut: {} },
+}));
+
+jest.mock('../context/ToastContext', () => ({
+  useToast: () => ({
+    showToast: jest.fn(),
+  }),
 }));
 
 jest.mock('../data/social', () => ({
@@ -118,6 +128,6 @@ describe('PredictionDetailScreen Layout', () => {
         
         // Check for input
         // Placeholder is dynamic: "Hold 50 shares to comment" (since mock user has no shares)
-        expect(getByPlaceholderText(/Hold 50 shares/)).toBeTruthy();
+        expect(getByPlaceholderText(/\$1 stake/)).toBeTruthy();
     });
 });

@@ -12,6 +12,8 @@ import { getEntityMetrics } from '../lib/mockMetrics';
 import { EntityRow } from '../components/common/EntityRow';
 import { PredictionCard } from '../components/artist/PredictionCard'; // Unified Card
 import { Search, ChevronRight, Bookmark, Bell } from 'lucide-react-native';
+import { getDeterministicAvatar } from '../lib/avatarResolver';
+import { useAuth } from '../context/AuthContext';
 import Svg, { Circle, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 // --- TYPES ---
@@ -72,6 +74,7 @@ const BigCard = ({ children }: { children: React.ReactNode }) => (
 // --- MAIN SCREEN ---
 // --- MAIN SCREEN ---
 export const ExploreScreen = () => {
+    const { user } = useAuth();
     const navigation = useNavigation<any>();
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<FilterType>('All');
@@ -185,7 +188,10 @@ export const ExploreScreen = () => {
 
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                        <View style={[styles.headerIconContainer, styles.avatarContainer]}>
-                         <Text style={{ fontSize: 20 }}>👻</Text>
+                         <Image 
+                            source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                            style={{ width: 40, height: 40, borderRadius: 12 }} 
+                         />
                        </View>
                     </TouchableOpacity>
                   </View>

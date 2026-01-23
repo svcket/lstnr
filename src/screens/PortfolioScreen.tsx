@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
@@ -7,14 +7,10 @@ import { useNavigation } from '@react-navigation/native';
 import { Card } from '../components/Card';
 import { TrendingUp, TrendingDown, DollarSign, History, Mic2, Disc, Sparkles, Download } from 'lucide-react-native';
 
-const MOCK_HOLDINGS = [
-  { id: 'h1', name: 'Neon Dust', shares: 15, avgPrice: 40.50, currentPrice: 45.20 },
-  { id: 'h2', name: 'Luna Tide', shares: 8, avgPrice: 32.00, currentPrice: 28.90 },
-];
+import { getPortfolio, getArtistById, getPredictionPortfolio, getPredictionById, getRecentActivity } from '../data/catalog';
+import { getDeterministicAvatar } from '../lib/avatarResolver';
 
-const MOCK_POSITIONS = [
-  { id: 'p1', question: 'Neon Dust Top 50', type: 'YES', amount: 50, price: 0.65, value: 50 },
-];
+// Removed hardcoded MOCK_HOLDINGS and MOCK_POSITIONS. Using catalog data.
 
 const MOCK_HISTORY = [
     { id: 't1', type: 'BUY', asset: 'Neon Dust', amount: 200, date: '2025-05-15' },
@@ -25,8 +21,17 @@ export const PortfolioScreen = () => {
     const navigation = useNavigation();
     const { user } = useAuth();
 
-    const portfolioValue = MOCK_HOLDINGS.reduce((acc, h) => acc + (h.shares * h.currentPrice), 0);
-    const positionsValue = MOCK_POSITIONS.reduce((acc, p) => acc + (p.amount * p.price), 0); // Simplified value
+    const portfolio = getPortfolio();
+    const positions = getPredictionPortfolio();
+    const history = getRecentActivity();
+
+    const portfolioValue = portfolio.reduce((acc, h) => {
+        const artist = getArtistById(h.artistId);
+        const currentPrice = 15; // Mock current price from metrics or logic
+        return acc + (h.shares * currentPrice);
+    }, 0);
+    
+    const positionsValue = positions.reduce((acc, p) => acc + p.amount, 0);
     const totalBalance = (user?.balance || 0) + portfolioValue + positionsValue;
 
     return (
@@ -94,15 +99,28 @@ export const PortfolioScreen = () => {
                 </ScrollView>
 
                 <Text style={styles.sectionTitle}>Artist Shares</Text>
-                {MOCK_HOLDINGS.map((item) => {
-                    const value = item.shares * item.currentPrice;
-                    const roi = ((item.currentPrice - item.avgPrice) / item.avgPrice) * 100;
+                {portfolio.map((item) => {
+                    const artist = getArtistById(item.artistId);
+                    const currentPrice = 15; // Mock
+                    const value = item.shares * currentPrice;
+                    const roi = ((currentPrice - item.avgBuyPrice) / item.avgBuyPrice) * 100;
+                    
                     return (
-                        <Card key={item.id} style={styles.holdingCard}>
-                            <View style={styles.holdingRow}>
-                                <View>
-                                    <Text style={styles.holdingName}>{item.name}</Text>
-                                    <Text style={styles.holdingShares}>{item.shares} shares</Text>
+                        <Card key={item.artistId} style={styles.holdingCard}>
+                            <TouchableOpacity 
+                                style={styles.holdingRow}
+                                activeOpacity={0.7}
+                                onPress={() => (navigation as any).navigate('ArtistDetail', { artistId: item.artistId })}
+                            >
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                    <Image 
+                                        source={{ uri: getDeterministicAvatar(artist?.name || 'Artist', item.artistId, artist?.avatarUrl) }} 
+                                        style={{ width: 40, height: 40, borderRadius: 10 }} 
+                                    />
+                                    <View>
+                                        <Text style={styles.holdingName}>{artist?.name || 'Unknown'}</Text>
+                                        <Text style={styles.holdingShares}>{item.shares} shares</Text>
+                                    </View>
                                 </View>
                                 <View style={styles.holdingRight}>
                                     <Text style={styles.holdingValue}>${value.toFixed(2)}</Text>
@@ -113,39 +131,46 @@ export const PortfolioScreen = () => {
                                         </Text>
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         </Card>
                     );
                 })}
 
                 <Text style={styles.sectionTitle}>Market Positions</Text>
-                {MOCK_POSITIONS.map((item) => (
-                    <Card key={item.id} style={styles.positionCard}>
-                         <View style={styles.holdingRow}>
+                {positions.map((item) => {
+                    const pred = getPredictionById(item.predictionId);
+                    return (
+                        <Card key={item.predictionId} style={styles.positionCard}>
+                            <TouchableOpacity 
+                                style={styles.holdingRow}
+                                activeOpacity={0.7}
+                                onPress={() => (navigation as any).navigate('PredictionDetail', { predictionId: item.predictionId })}
+                            >
                                 <View style={styles.positionInfo}>
-                                    <Text style={styles.positionQ} numberOfLines={1}>{item.question}</Text>
-                                    <View style={[styles.badge, { backgroundColor: item.type === 'YES' ? COLORS.success : COLORS.error }]}>
-                                        <Text style={styles.badgeText}>{item.type}</Text>
+                                    <Text style={styles.positionQ} numberOfLines={1}>{pred?.question || 'Prediction'}</Text>
+                                    <View style={[styles.badge, { backgroundColor: item.outcomeId === 'yes' ? COLORS.success : COLORS.error }]}>
+                                        <Text style={styles.badgeText}>{item.outcomeId.toUpperCase()}</Text>
                                     </View>
                                 </View>
                                 <View style={styles.holdingRight}>
-                                     <Text style={styles.holdingValue}>${(item.amount * item.price).toFixed(2)}</Text>
+                                     <Text style={styles.holdingValue}>${item.amount.toFixed(2)}</Text>
                                 </View>
-                        </View>
-                    </Card>
-                ))}
+                            </TouchableOpacity>
+                        </Card>
+                    );
+                })}
 
                 <Text style={styles.sectionTitle}>History</Text>
-                {MOCK_HISTORY.map((item) => (
+                {history.map((item) => (
                     <View key={item.id} style={styles.historyRow}>
                         <View style={styles.historyIcon}>
                             <History size={16} color={COLORS.textSecondary} />
                         </View>
                         <View style={styles.historyInfo}>
-                            <Text style={styles.historyType}>{item.type} {item.asset}</Text>
+                            <Text style={styles.historyType}>{item.text}</Text>
                             <Text style={styles.historyDate}>{item.date}</Text>
                         </View>
-                        <Text style={styles.historyAmount}>${item.amount}</Text>
+                        <Text style={styles.historyAmount}>{item.amount}</Text>
                     </View>
                 ))}
 

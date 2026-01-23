@@ -14,7 +14,7 @@ const METHOD_TYPES = [
 ];
 
 export const AddMethodScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const handleSelect = (method: any) => {
     navigation.navigate('AddMethodForm', { methodType: method });

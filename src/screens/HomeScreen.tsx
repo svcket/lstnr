@@ -12,6 +12,9 @@ import { getPortfolio, getArtistById, getAllPredictions, getRecentActivity } fro
 import { getEntityMetrics } from '../lib/mockMetrics';
 import { EntityRow } from '../components/common/EntityRow';
 
+// Helpers
+import { getDeterministicAvatar } from '../lib/avatarResolver';
+
 // Components
 import { PortfolioCard } from '../components/home/PortfolioCard';
 import { HorizontalCard } from '../components/home/HorizontalCard';
@@ -188,7 +191,10 @@ export const HomeScreen = () => {
 
             <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                <View style={[styles.headerIconContainer, styles.avatarContainer]}>
-                 <Text style={{ fontSize: 20 }}>👻</Text>
+                 <Image 
+                    source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                    style={{ width: 40, height: 40, borderRadius: 12 }} 
+                 />
                </View>
             </TouchableOpacity>
           </View>

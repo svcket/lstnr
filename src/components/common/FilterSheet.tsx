@@ -31,39 +31,6 @@ export const FilterSheet = ({
     multiSelect = false,
     onReset 
 }: FilterSheetProps) => {
-    const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        if (visible) {
-            Animated.parallel([
-                Animated.timing(slideAnim, {
-                    toValue: 0,
-                    duration: 300,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 300,
-                    useNativeDriver: true,
-                })
-            ]).start();
-        } else {
-            Animated.parallel([
-                Animated.timing(slideAnim, {
-                    toValue: SCREEN_HEIGHT,
-                    duration: 250,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 0,
-                    duration: 250,
-                    useNativeDriver: true,
-                })
-            ]).start();
-        }
-    }, [visible]);
-
     if (!visible) return null;
 
     const isSelected = (val: string) => {
@@ -82,49 +49,53 @@ export const FilterSheet = ({
     };
 
     return (
-        <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
-            <View style={styles.overlay}>
-                {/* Backdrop Layer */}
-                <TouchableWithoutFeedback onPress={onClose}>
-                    <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
-                </TouchableWithoutFeedback>
+        <Modal 
+          transparent 
+          visible={visible} 
+          animationType="slide" 
+          onRequestClose={onClose}
+        >
+            <TouchableWithoutFeedback onPress={onClose}>
+                <View style={styles.overlay}>
+                    <TouchableWithoutFeedback>
+                        <View style={styles.sheet}>
+                            <View style={styles.handleBar} />
+                            
+                            {/* Header */}
+                            <View style={styles.header}>
+                                <Text style={styles.title}>{title}</Text>
+                                {onReset && (
+                                     <TouchableOpacity onPress={onReset}>
+                                         <Text style={styles.resetText}>Reset</Text>
+                                     </TouchableOpacity>
+                                )}
+                            </View>
 
-                {/* Sheet Content */}
-                <Animated.View style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}>
-                    
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <Text style={styles.title}>{title}</Text>
-                        {onReset && (
-                             <TouchableOpacity onPress={onReset}>
-                                 <Text style={styles.resetText}>Reset</Text>
-                             </TouchableOpacity>
-                        )}
-                    </View>
+                            {/* List */}
+                            <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+                                {options.map((opt) => {
+                                    const active = isSelected(opt.value);
+                                    return (
+                                        <TouchableOpacity 
+                                            key={opt.value} 
+                                            style={styles.row} 
+                                            onPress={() => handleSelect(opt.value)}
+                                        >
+                                            <Text style={[styles.optionLabel, active && styles.optionLabelActive]}>
+                                                {opt.label}
+                                            </Text>
+                                            {active && <Check size={20} color={COLORS.white} />}
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </ScrollView>
 
-                    {/* List */}
-                    <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
-                        {options.map((opt) => {
-                            const active = isSelected(opt.value);
-                            return (
-                                <TouchableOpacity 
-                                    key={opt.value} 
-                                    style={styles.row} 
-                                    onPress={() => handleSelect(opt.value)}
-                                >
-                                    <Text style={[styles.optionLabel, active && styles.optionLabelActive]}>
-                                        {opt.label}
-                                    </Text>
-                                    {active && <Check size={20} color={COLORS.white} />}
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </ScrollView>
-
-                    {/* Footer Safe Area */}
-                    <View style={{ height: 34 }} />
-                </Animated.View>
-            </View>
+                            {/* Footer Safe Area */}
+                            <View style={{ height: 34 }} />
+                        </View>
+                    </TouchableWithoutFeedback>
+                </View>
+            </TouchableWithoutFeedback>
         </Modal>
     );
 };
@@ -132,18 +103,27 @@ export const FilterSheet = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.7)',
         justifyContent: 'flex-end',
     },
-    backdrop: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-    },
     sheet: {
-        backgroundColor: '#181818', // Consistent surface color
+        backgroundColor: '#111',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         maxHeight: '75%',
-        paddingTop: 8,
+        paddingTop: 12,
+        paddingHorizontal: 16,
+        paddingBottom: 40,
+        borderWidth: 1,
+        borderColor: '#222',
+    },
+    handleBar: {
+        width: 40,
+        height: 4,
+        backgroundColor: '#333',
+        borderRadius: 2,
+        alignSelf: 'center',
+        marginBottom: 20,
     },
     header: {
         flexDirection: 'row',

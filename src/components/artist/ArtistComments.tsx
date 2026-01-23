@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Platform, Keyboard, LayoutAnimation, UIManager } from 'react-native';
 import { MoreVertical, Heart, CornerDownRight, ChevronDown, ChevronUp, Send, MessageSquare, Reply } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
-import { getComments, addComment, Comment } from '../../data/social';
-import { checkAccess } from '../../lib/permissions';
+import { getComments, addComment, addReply, Comment } from '../../data/social';
+import { getAccess } from '../../lib/permissions';
+import { getArtistById, getLabelById, getPredictionById } from '../../data/catalog';
+import { useToast } from '../../context/ToastContext';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -18,8 +20,29 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
   const [inputText, setInputText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = React.useRef<TextInput>(null);
+  const { showToast } = useToast();
 
-  const { canWrite, requiredWrite, isHolder } = checkAccess('me', entityId);
+  const access = getAccess('me', entityId);
+  const { canWrite, requiredWrite, isHolder, type } = access;
+
+  // Resolve dynamic symbol and label
+  let symbol = '$UNIT';
+  let requirementLabel = `${requiredWrite} shares`;
+
+  if (type === 'PREDICTION') {
+      const pred = getPredictionById(entityId);
+      if (pred?.relatedEntityId) {
+          const artist = getArtistById(pred.relatedEntityId);
+          symbol = artist?.symbol || '$UNIT';
+      } else {
+          symbol = 'Market';
+      }
+      requirementLabel = `$${requiredWrite} stake`;
+  } else {
+      const entity = getArtistById(entityId) || getLabelById(entityId);
+      symbol = entity?.symbol || '$UNIT';
+      requirementLabel = `${requiredWrite} shares`;
+  }
 
   useEffect(() => {
       setComments(getComments(entityId));
@@ -37,6 +60,7 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
     setInputText('');
     Keyboard.dismiss();
     setIsFocused(false);
+    showToast('Comment posted!', 'success');
   };
 
   const handleCancel = () => {
@@ -53,7 +77,7 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
              <TextInput 
                ref={inputRef}
                style={[styles.input, isFocused && styles.inputFocused, !canWrite && styles.inputDisabled]}
-               placeholder={canWrite ? "Comment on $BIGT" : `Hold ${requiredWrite} shares to comment`}
+               placeholder={canWrite ? `Comment on ${symbol}` : `Hold ${requirementLabel} to comment`}
                placeholderTextColor="#999"
                value={inputText}
                onChangeText={setInputText}
@@ -86,7 +110,9 @@ export const ArtistComments = ({ entityId = 'global' }: ArtistCommentsProps) => 
              <CommentItem 
                 key={comment.id} 
                 comment={comment} 
+                entityId={entityId}
                 isLast={index === comments.length - 1} 
+                onReply={() => setComments([...getComments(entityId)])}
                 onLike={() => {
                     const updated = comments.map(c => c.id === comment.id ? { ...c, liked: !c.liked, likes: c.liked ? c.likes - 1 : c.likes + 1 } : c);
                     setComments(updated);
@@ -118,21 +144,9 @@ const LikeCount = ({ likes, liked, onLike }: { likes: number; liked?: boolean; o
 const getBadgesForComment = (comment: Comment) => {
     const badges: { text: string; color: 'green' | 'red' | 'gray'; type?: 'symbol' | 'outcome' }[] = [];
 
-    // 1. Symbol Badge (Always, unless logic dictates otherwise, but prompt says "Show ONE badge: Grey $<SYMBOL>")
-    // "Grey badge: $<SYMBOL> ... If commenter isHolder === false: Either show NO badge, OR keep the same grey symbol badge"
-    // We will show symbol badge primarily.
-    
     // ARTIST / LABEL
     if (comment.contextType === 'ARTIST' || comment.contextType === 'LABEL') {
-         if (comment.isHolder) {
-             badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
-         } else {
-             // prompt: "Either show NO badge, OR keep the same grey symbol badge... BUT DO NOT show any Yes/No"
-             // Let's show it to be safe/consistent, or omit if we want to reduce noise. 
-             // Prompt says: "Artist/Label comments never display Yes/No tags."
-             // "Show ONLY ONE badge: Grey $<SYMBOL> ... If isHolder === false ... keep the same grey symbol badge" -> imply keeping it is fine.
-             badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
-         }
+         badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
          return badges;
     }
 
@@ -140,14 +154,9 @@ const getBadgesForComment = (comment: Comment) => {
     if (comment.contextType === 'PREDICTION' && comment.predictionMeta) {
         const { marketType, pickedOutcomeLabel, pickedSide } = comment.predictionMeta;
         
-        // 1. Symbol Badge
-        // "Show TWO badges ... 1) Grey badge: $<SYMBOL>"
         badges.push({ text: comment.symbol, color: 'gray', type: 'symbol' });
 
-        // 2. Outcome Badge
         if (marketType === 'binary') {
-            // "Show TWO badges... 2) Outcome badge: Yes or No"
-            // "If commenter has NOT placed a bet/position: Show ONLY the grey symbol badge"
             if (pickedSide) {
                 badges.push({ 
                     text: pickedSide === 'YES' ? 'Yes' : 'No', 
@@ -156,25 +165,12 @@ const getBadgesForComment = (comment: Comment) => {
                 });
             }
         } else if (marketType === 'multi-range') {
-             // "Show TWO badges... 1) Grey badge: specified option label... 2) Optional secondary grey badge: $<SYMBOL>"
-             // "DO NOT show Yes/No badges for multi-range markets."
-             
-             // Wait, logic says: 
-             // 1) Grey badge: pickedOutcomeLabel
-             // 2) Optional secondary: symbol.
-             
-             // Let's swap order if we want "Outcome" then "Symbol" or vice versa? 
-             // Prompt: "Show TWO badges: 1) Grey badge: the selected option label... 2) Optional secondary grey badge: $<SYMBOL>"
-             // Implementation: We added symbol first above.
-             // Let's reset badges for multi-range to match spec exactly.
-             
              if (pickedOutcomeLabel) {
                  return [
                      { text: pickedOutcomeLabel, color: 'gray', type: 'outcome' },
                      { text: comment.symbol, color: 'gray', type: 'symbol' }
                  ];
              } else {
-                 // No position? Show symbol only?
                  return [{ text: comment.symbol, color: 'gray', type: 'symbol' }];
              }
         }
@@ -183,15 +179,19 @@ const getBadgesForComment = (comment: Comment) => {
     return badges;
 };
 
-const CommentItem = ({ comment, isLast, onLike }: { comment: Comment; isLast: boolean; onLike: () => void }) => {
+const CommentItem = ({ comment, entityId, isLast, onLike, onReply }: { comment: Comment; entityId: string; isLast: boolean; onLike: () => void; onReply: () => void }) => {
   const [repliesOpen, setRepliesOpen] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
+  const { showToast } = useToast();
   
-  const handleInlineReply = () => {
-      // Mock submitting reply
-      setIsReplying(false);
-      setRepliesOpen(true);
-      // In real app we would add to data store here
+  const handleInlineReply = (text: string) => {
+      const newReply = addReply(entityId, comment.id, text);
+      if (newReply) {
+          setIsReplying(false);
+          setRepliesOpen(true);
+          onReply();
+          showToast('Reply posted!', 'success');
+      }
   };
 
   return (
@@ -228,7 +228,6 @@ const CommentItem = ({ comment, isLast, onLike }: { comment: Comment; isLast: bo
             </TouchableOpacity>
          </View>
 
-         {/* Inline Composer */}
          {isReplying && (
              <View style={{ marginTop: 12 }}>
                  <InlineComposer 
@@ -239,7 +238,6 @@ const CommentItem = ({ comment, isLast, onLike }: { comment: Comment; isLast: bo
              </View>
          )}
 
-         {/* Nested Replies Toggle */}
          {comment.repliesCount && comment.repliesCount > 0 ? (
              <View>
                  <TouchableOpacity 
@@ -490,7 +488,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const InlineComposer = ({ placeholder, onCancel, onPost }: { placeholder: string; onCancel: () => void; onPost: () => void }) => {
+const InlineComposer = ({ placeholder, onCancel, onPost }: { placeholder: string; onCancel: () => void; onPost: (t: string) => void }) => {
     const [text, setText] = useState('');
     return (
         <View>
@@ -511,7 +509,7 @@ const InlineComposer = ({ placeholder, onCancel, onPost }: { placeholder: string
                 </TouchableOpacity>
                 <TouchableOpacity 
                     onPress={() => {
-                        onPost();
+                        onPost(text.trim());
                         setText('');
                     }}
                     disabled={!text.trim()}

@@ -8,7 +8,7 @@ import { HeaderBack } from '../components/common/HeaderBack';
 import { Check, ShieldCheck } from 'lucide-react-native';
 
 export const AddMethodFormScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const route = useRoute();
     const { methodType } = route.params as { methodType: any };
 

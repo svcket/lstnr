@@ -69,7 +69,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop', 'R&B'],
         links: { spotify: 'https://spotify.com/drake', instagram: 'https://instagram.com/champagnepapi' },
-        createdBy: { name: 'Lil Wayne', avatarUrl: 'https://ui-avatars.com/api/?name=Lil+Wayne&background=random', isVerified: true }
+        createdBy: { name: 'Lil Wayne', avatarUrl: 'https://ui-avatars.com/api/?name=Lil+Wayne&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a3',
@@ -81,7 +81,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'Country'],
         links: { website: 'https://taylorswift.com', spotify: 'https://spotify.com/taylorswift' },
-        createdBy: { name: 'Scott Borchetta', avatarUrl: 'https://ui-avatars.com/api/?name=Scott+B&background=random', isVerified: false }
+        createdBy: { name: 'Scott Borchetta', avatarUrl: 'https://ui-avatars.com/api/?name=Scott+B&background=333&color=fff', isVerified: false }
     },
     {
         id: 'a4',
@@ -105,7 +105,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats', 'Reggae'],
         links: { instagram: 'https://instagram.com/burnaboygram', spotify: 'https://spotify.com/burnaboy' },
-        createdBy: { name: 'Spaceship Ent', avatarUrl: 'https://ui-avatars.com/api/?name=Spaceship&background=random', isVerified: true }
+        createdBy: { name: 'Spaceship Ent', avatarUrl: 'https://ui-avatars.com/api/?name=Spaceship&background=008000&color=fff', isVerified: true }
     },
     {
         id: 'a6',
@@ -117,7 +117,7 @@ export const ARTISTS: Artist[] = [
         region: 'South America',
         genres: ['Latin', 'Reggaeton'],
         links: { instagram: 'https://instagram.com/badbunnypr', spotify: 'https://spotify.com/badbunny' },
-        createdBy: { name: 'Rimas Ent', avatarUrl: 'https://ui-avatars.com/api/?name=Rimas&background=random', isVerified: true }
+        createdBy: { name: 'Rimas Ent', avatarUrl: 'https://ui-avatars.com/api/?name=Rimas&background=FF4500&color=fff', isVerified: true }
     },
     {
         id: 'a7',
@@ -129,7 +129,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop', 'Pop'],
         links: { website: 'https://ibighit.com/bts', youtube: 'https://youtube.com/bts' },
-        createdBy: { name: 'Big Hit', avatarUrl: 'https://ui-avatars.com/api/?name=Big+Hit&background=random', isVerified: true }
+        createdBy: { name: 'Big Hit', avatarUrl: 'https://ui-avatars.com/api/?name=Big+Hit&background=9370DB&color=fff', isVerified: true }
     },
     {
         id: 'a8',
@@ -141,7 +141,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats', 'R&B'],
         links: { instagram: 'https://instagram.com/temsbaby', spotify: 'https://spotify.com/tems' },
-        createdBy: { name: 'Leading Vibe', avatarUrl: 'https://ui-avatars.com/api/?name=Vibe&background=random', isVerified: false }
+        createdBy: { name: 'Leading Vibe', avatarUrl: 'https://ui-avatars.com/api/?name=Vibe&background=FFA500&color=fff', isVerified: false }
     },
     {
         id: 'a9',
@@ -153,7 +153,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Latin', 'Pop'],
         links: { website: 'https://rosalia.com', spotify: 'https://spotify.com/rosalia' },
-        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=random', isVerified: true }
+        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a10',
@@ -165,7 +165,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Hip-Hop', 'Drill'],
         links: { instagram: 'https://instagram.com/centralcee', spotify: 'https://spotify.com/centralcee' },
-        createdBy: { name: 'Live Yours', avatarUrl: 'https://ui-avatars.com/api/?name=Live+Yours&background=random', isVerified: true }
+        createdBy: { name: 'Live Yours', avatarUrl: 'https://ui-avatars.com/api/?name=Live+Yours&background=0000FF&color=fff', isVerified: true }
     },
     {
         id: 'a11',
@@ -177,7 +177,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop'],
         links: { website: 'https://newjeans.kr', spotify: 'https://spotify.com/newjeans' },
-        createdBy: { name: 'Min Hee-jin', avatarUrl: 'https://ui-avatars.com/api/?name=MHJ&background=random', isVerified: true }
+        createdBy: { name: 'Min Hee-jin', avatarUrl: 'https://ui-avatars.com/api/?name=MHJ&background=87CEEB&color=fff', isVerified: true }
     },
     {
         id: 'a12',
@@ -189,7 +189,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats'],
         links: { instagram: 'https://instagram.com/heisrema', spotify: 'https://spotify.com/rema' },
-        createdBy: { name: 'Mavin Records', avatarUrl: 'https://ui-avatars.com/api/?name=Mavin&background=random', isVerified: true }
+        createdBy: { name: 'Mavin Records', avatarUrl: 'https://ui-avatars.com/api/?name=Mavin&background=800080&color=fff', isVerified: true }
     },
     {
         id: 'a13',
@@ -201,7 +201,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop'],
         links: { spotify: 'https://spotify.com/travisscott' },
-        createdBy: { name: 'Cactus Jack', avatarUrl: 'https://ui-avatars.com/api/?name=Cactus&background=random', isVerified: true }
+        createdBy: { name: 'Cactus Jack', avatarUrl: 'https://ui-avatars.com/api/?name=Cactus&background=4B3621&color=fff', isVerified: true }
     },
     {
         id: 'a14',
@@ -213,7 +213,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'R&B'],
         links: { website: 'https://arianagrande.com' },
-        createdBy: { name: 'Republic', avatarUrl: 'https://ui-avatars.com/api/?name=Republic&background=random', isVerified: true }
+        createdBy: { name: 'Republic', avatarUrl: 'https://ui-avatars.com/api/?name=Republic&background=FFB6C1&color=fff', isVerified: true }
     },
     {
         id: 'a15',
@@ -225,7 +225,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop'],
         links: { website: 'https://oklama.com' },
-        createdBy: { name: 'pgLang', avatarUrl: 'https://ui-avatars.com/api/?name=pgLang&background=random', isVerified: true }
+        createdBy: { name: 'pgLang', avatarUrl: 'https://ui-avatars.com/api/?name=pgLang&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a16',
@@ -237,7 +237,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'Alternative'],
         links: { website: 'https://billieeilish.com' },
-        createdBy: { name: 'Interscope', avatarUrl: 'https://ui-avatars.com/api/?name=Interscope&background=random', isVerified: true }
+        createdBy: { name: 'Interscope', avatarUrl: 'https://ui-avatars.com/api/?name=Interscope&background=32CD32&color=000', isVerified: true }
     },
     {
         id: 'a17',
@@ -249,7 +249,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Pop', 'Rock'],
         links: { website: 'https://hstyles.co.uk' },
-        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=random', isVerified: true }
+        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=ADD8E6&color=000', isVerified: true }
     },
     {
         id: 'a18',
@@ -261,7 +261,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop', 'Pop'],
         links: { website: 'https://blackpinkofficial.com' },
-        createdBy: { name: 'YG Ent', avatarUrl: 'https://ui-avatars.com/api/?name=YG&background=random', isVerified: true }
+        createdBy: { name: 'YG Ent', avatarUrl: 'https://ui-avatars.com/api/?name=YG&background=FF69B4&color=000', isVerified: true }
     },
     {
         id: 'a19',
@@ -273,7 +273,7 @@ export const ARTISTS: Artist[] = [
         region: 'South America',
         genres: ['Latin', 'Reggaeton'],
         links: { website: 'https://karolgmusic.com' },
-        createdBy: { name: 'Universal Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Universal&background=random', isVerified: true }
+        createdBy: { name: 'Universal Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Universal&background=FF1493&color=fff', isVerified: true }
     },
     {
         id: 'a20',
@@ -285,7 +285,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Electronic', 'House'],
         links: { website: 'https://fredagain.com' },
-        createdBy: { name: 'Atlantic', avatarUrl: 'https://ui-avatars.com/api/?name=Atlantic&background=random', isVerified: true }
+        createdBy: { name: 'Atlantic', avatarUrl: 'https://ui-avatars.com/api/?name=Atlantic&background=ccc&color=000', isVerified: true }
     },
     {
         id: 'a21',
@@ -297,7 +297,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats'],
         links: { x: 'https://x.com/wizkidayo' },
-        createdBy: { name: 'Starboy', avatarUrl: 'https://ui-avatars.com/api/?name=Starboy&background=random', isVerified: true }
+        createdBy: { name: 'Starboy', avatarUrl: 'https://ui-avatars.com/api/?name=Starboy&background=FF4500&color=fff', isVerified: true }
     },
     {
         id: 'a22',
@@ -309,7 +309,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['R&B'],
         links: { website: 'https://szasos.com' },
-        createdBy: { name: 'TDE', avatarUrl: 'https://ui-avatars.com/api/?name=TDE&background=random', isVerified: true }
+        createdBy: { name: 'TDE', avatarUrl: 'https://ui-avatars.com/api/?name=TDE&background=000080&color=fff', isVerified: true }
     },
     {
         id: 'a23',
@@ -321,7 +321,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America', // Geographically Mexico
         genres: ['Latin', 'Regional Mexican'],
         links: { instagram: 'https://instagram.com/pesopluma' },
-        createdBy: { name: 'Double P', avatarUrl: 'https://ui-avatars.com/api/?name=PP&background=random', isVerified: true }
+        createdBy: { name: 'Double P', avatarUrl: 'https://ui-avatars.com/api/?name=PP&background=8B4513&color=fff', isVerified: true }
     },
     {
         id: 'a24',
@@ -333,7 +333,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Pop', 'Disco'],
         links: { website: 'https://dualipa.com' },
-        createdBy: { name: 'Warner', avatarUrl: 'https://ui-avatars.com/api/?name=Warner&background=random', isVerified: true }
+        createdBy: { name: 'Warner', avatarUrl: 'https://ui-avatars.com/api/?name=Warner&background=800000&color=fff', isVerified: true }
     },
     {
         id: 'a25',
@@ -345,7 +345,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop', 'Hip-Hop'],
         links: { website: 'https://straykids.jype.com' },
-        createdBy: { name: 'JYP', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=random', isVerified: true }
+        createdBy: { name: 'JYP', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=000&color=f00', isVerified: true }
     },
     {
         id: 'a26',
@@ -357,7 +357,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop', 'Trap'],
         links: { website: 'https://playboicarti.com' },
-        createdBy: { name: 'Opium', avatarUrl: 'https://ui-avatars.com/api/?name=Opium&background=random', isVerified: true }
+        createdBy: { name: 'Opium', avatarUrl: 'https://ui-avatars.com/api/?name=Opium&background=000&color=f00', isVerified: true }
     },
     {
         id: 'a27',
@@ -369,7 +369,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'Rock'],
         links: { website: 'https://oliviarodrigo.com' },
-        createdBy: { name: 'Geffen', avatarUrl: 'https://ui-avatars.com/api/?name=Geffen&background=random', isVerified: true }
+        createdBy: { name: 'Geffen', avatarUrl: 'https://ui-avatars.com/api/?name=Geffen&background=800080&color=fff', isVerified: true }
     },
     {
         id: 'a28',
@@ -381,7 +381,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop'],
         links: { website: 'https://golfwang.com' },
-        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=random', isVerified: true }
+        createdBy: { name: 'Columbia', avatarUrl: 'https://ui-avatars.com/api/?name=Columbia&background=FFA500&color=000', isVerified: true }
     },
     {
         id: 'a29',
@@ -393,7 +393,7 @@ export const ARTISTS: Artist[] = [
         region: 'South America',
         genres: ['Latin', 'Pop'],
         links: { website: 'https://shakira.com' },
-        createdBy: { name: 'Sony Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=random', isVerified: true }
+        createdBy: { name: 'Sony Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=DAA520&color=000', isVerified: true }
     },
     {
         id: 'a30',
@@ -405,7 +405,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats', 'R&B'],
         links: { instagram: 'https://instagram.com/ayrastarr' },
-        createdBy: { name: 'Mavin', avatarUrl: 'https://ui-avatars.com/api/?name=Mavin&background=random', isVerified: true }
+        createdBy: { name: 'Mavin', avatarUrl: 'https://ui-avatars.com/api/?name=Mavin&background=FFD700&color=000', isVerified: true }
     },
     {
         id: 'a31',
@@ -417,7 +417,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Rock', 'Indie'],
         links: { website: 'https://arcticmonkeys.com' },
-        createdBy: { name: 'Domino', avatarUrl: 'https://ui-avatars.com/api/?name=Domino&background=random', isVerified: true }
+        createdBy: { name: 'Domino', avatarUrl: 'https://ui-avatars.com/api/?name=Domino&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a32',
@@ -429,7 +429,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats'],
         links: { website: 'https://iamdavido.com' },
-        createdBy: { name: 'DMW', avatarUrl: 'https://ui-avatars.com/api/?name=DMW&background=random', isVerified: true }
+        createdBy: { name: 'DMW', avatarUrl: 'https://ui-avatars.com/api/?name=DMW&background=1E90FF&color=fff', isVerified: true }
     },
     {
         id: 'a33',
@@ -441,7 +441,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop'],
         links: { website: 'https://dreamville.com' },
-        createdBy: { name: 'Dreamville', avatarUrl: 'https://ui-avatars.com/api/?name=Dreamville&background=random', isVerified: true }
+        createdBy: { name: 'Dreamville', avatarUrl: 'https://ui-avatars.com/api/?name=Dreamville&background=333&color=fff', isVerified: true }
     },
     {
         id: 'a34',
@@ -453,7 +453,7 @@ export const ARTISTS: Artist[] = [
         region: 'South America',
         genres: ['Latin', 'Reggaeton'],
         links: { instagram: 'https://instagram.com/rauwalejandro' },
-        createdBy: { name: 'Sony Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=random', isVerified: true }
+        createdBy: { name: 'Sony Latin', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=C0C0C0&color=000', isVerified: true }
     },
     {
         id: 'a35',
@@ -465,7 +465,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop'],
         links: { website: 'https://www.seventeen-17.com' },
-        createdBy: { name: 'Pledis', avatarUrl: 'https://ui-avatars.com/api/?name=Pledis&background=random', isVerified: true }
+        createdBy: { name: 'Pledis', avatarUrl: 'https://ui-avatars.com/api/?name=Pledis&background=F7CAC9&color=fff', isVerified: true }
     },
     {
         id: 'a36',
@@ -477,7 +477,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'Hip-Hop'],
         links: { website: 'https://dojacat.com' },
-        createdBy: { name: 'Kemosabe', avatarUrl: 'https://ui-avatars.com/api/?name=Kemosabe&background=random', isVerified: true }
+        createdBy: { name: 'Kemosabe', avatarUrl: 'https://ui-avatars.com/api/?name=Kemosabe&background=FF69B4&color=fff', isVerified: true }
     },
     {
         id: 'a37',
@@ -489,7 +489,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Pop', 'Hip-Hop'],
         links: { website: 'https://postmalone.com' },
-        createdBy: { name: 'Republic', avatarUrl: 'https://ui-avatars.com/api/?name=Republic&background=random', isVerified: true }
+        createdBy: { name: 'Republic', avatarUrl: 'https://ui-avatars.com/api/?name=Republic&background=FFFFE0&color=000', isVerified: true }
     },
     {
         id: 'a38',
@@ -501,7 +501,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Electronic', 'Pop'],
         links: { website: 'https://calvinharris.com' },
-        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=random', isVerified: true }
+        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=0000CD&color=fff', isVerified: true }
     },
     {
         id: 'a39',
@@ -513,7 +513,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia', // Technically Australia, mapped to global/Asia often or need 'Oceania'
         genres: ['Rock', 'Alternative'],
         links: { website: 'https://tameimpala.com' },
-        createdBy: { name: 'Interscope', avatarUrl: 'https://ui-avatars.com/api/?name=Interscope&background=random', isVerified: true }
+        createdBy: { name: 'Interscope', avatarUrl: 'https://ui-avatars.com/api/?name=Interscope&background=8000FF&color=fff', isVerified: true }
     },
     {
         id: 'a40',
@@ -525,7 +525,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Hip-Hop', 'Grime'],
         links: { website: 'https://stormzy.com' },
-        createdBy: { name: '0207 Def Jam', avatarUrl: 'https://ui-avatars.com/api/?name=DefJam&background=random', isVerified: true }
+        createdBy: { name: '0207 Def Jam', avatarUrl: 'https://ui-avatars.com/api/?name=DefJam&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a41',
@@ -537,7 +537,7 @@ export const ARTISTS: Artist[] = [
         region: 'Africa',
         genres: ['Afrobeats'],
         links: { instagram: 'https://instagram.com/asakemusic' },
-        createdBy: { name: 'YBNL', avatarUrl: 'https://ui-avatars.com/api/?name=YBNL&background=random', isVerified: true }
+        createdBy: { name: 'YBNL', avatarUrl: 'https://ui-avatars.com/api/?name=YBNL&background=FFD700&color=000', isVerified: true }
     },
     {
         id: 'a42',
@@ -549,7 +549,7 @@ export const ARTISTS: Artist[] = [
         region: 'South America',
         genres: ['Reggaeton'],
         links: { website: 'https://ferxxop.com' },
-        createdBy: { name: 'Universal', avatarUrl: 'https://ui-avatars.com/api/?name=Univ&background=random', isVerified: true }
+        createdBy: { name: 'Universal', avatarUrl: 'https://ui-avatars.com/api/?name=Univ&background=00FF00&color=000', isVerified: true }
     },
     {
         id: 'a43',
@@ -561,7 +561,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop', 'Trap'],
         links: { website: 'https://futurefreebandz.com' },
-        createdBy: { name: 'Epic', avatarUrl: 'https://ui-avatars.com/api/?name=Epic&background=random', isVerified: true }
+        createdBy: { name: 'Epic', avatarUrl: 'https://ui-avatars.com/api/?name=Epic&background=00008B&color=fff', isVerified: true }
     },
     {
         id: 'a44',
@@ -573,7 +573,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Alternative', 'Pop'],
         links: { website: 'https://lanadelrey.com' },
-        createdBy: { name: 'Polydor', avatarUrl: 'https://ui-avatars.com/api/?name=Polydor&background=random', isVerified: true }
+        createdBy: { name: 'Polydor', avatarUrl: 'https://ui-avatars.com/api/?name=Polydor&background=FFF0F5&color=000', isVerified: true }
     },
     {
         id: 'a45',
@@ -585,7 +585,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Hip-Hop'],
         links: { website: 'https://santandave.com' },
-        createdBy: { name: 'Neighbourhood', avatarUrl: 'https://ui-avatars.com/api/?name=N&background=random', isVerified: true }
+        createdBy: { name: 'Neighbourhood', avatarUrl: 'https://ui-avatars.com/api/?name=N&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a46',
@@ -597,7 +597,7 @@ export const ARTISTS: Artist[] = [
         region: 'Asia',
         genres: ['K-Pop'],
         links: { website: 'https://twice.jype.com' },
-        createdBy: { name: 'JYP', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=random', isVerified: true }
+        createdBy: { name: 'JYP', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=FF69B4&color=fff', isVerified: true }
     },
     {
         id: 'a47',
@@ -609,7 +609,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop', 'Trap'],
         links: { website: 'https://gunna.com' },
-        createdBy: { name: 'YSL', avatarUrl: 'https://ui-avatars.com/api/?name=YSL&background=random', isVerified: true }
+        createdBy: { name: 'YSL', avatarUrl: 'https://ui-avatars.com/api/?name=YSL&background=90EE90&color=000', isVerified: true }
     },
     {
         id: 'a48',
@@ -621,7 +621,7 @@ export const ARTISTS: Artist[] = [
         region: 'North America',
         genres: ['Hip-Hop', 'Trap'],
         links: { website: 'https://lilbaby.com' },
-        createdBy: { name: 'QC', avatarUrl: 'https://ui-avatars.com/api/?name=QC&background=random', isVerified: true }
+        createdBy: { name: 'QC', avatarUrl: 'https://ui-avatars.com/api/?name=QC&background=A9A9A9&color=fff', isVerified: true }
     },
     {
         id: 'a49',
@@ -633,7 +633,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe', // Berlin based
         genres: ['Electronic', 'House'],
         links: { instagram: 'https://instagram.com/peggygou_' },
-        createdBy: { name: 'Gudu', avatarUrl: 'https://ui-avatars.com/api/?name=Gudu&background=random', isVerified: true }
+        createdBy: { name: 'Gudu', avatarUrl: 'https://ui-avatars.com/api/?name=Gudu&background=FF4500&color=fff', isVerified: true }
     },
     {
         id: 'a50',
@@ -645,7 +645,7 @@ export const ARTISTS: Artist[] = [
         region: 'Europe',
         genres: ['Grime', 'Hip-Hop'],
         links: { instagram: 'https://instagram.com/skeptagram' },
-        createdBy: { name: 'Boy Better Know', avatarUrl: 'https://ui-avatars.com/api/?name=BBK&background=random', isVerified: true }
+        createdBy: { name: 'Boy Better Know', avatarUrl: 'https://ui-avatars.com/api/?name=BBK&background=000&color=fff', isVerified: true }
     }
 ];
 
@@ -659,7 +659,7 @@ export const LABELS: Label[] = [
         labelBio: 'The most dangerous record label in history. West Coast hip-hop legends.',
         signedArtists: ['a1'],
         links: { website: 'https://deathrow.com', instagram: 'https://instagram.com/deathrowrecords' },
-        createdBy: { name: 'Snoop Dogg', avatarUrl: 'https://ui-avatars.com/api/?name=Snoop+Dogg&background=random', isVerified: true, tokenSymbol: '$DOGG' }
+        createdBy: { name: 'Snoop Dogg', avatarUrl: 'https://ui-avatars.com/api/?name=Snoop+Dogg&background=000&color=fff', isVerified: true, tokenSymbol: '$DOGG' }
     },
     {
         id: 'l2',
@@ -670,7 +670,7 @@ export const LABELS: Label[] = [
         labelBio: 'Premier independent distribution and label services company.',
         signedArtists: ['a3', 'a2'],
         links: { instagram: 'https://instagram.com/empire', website: 'https://empire.com' },
-        createdBy: { name: 'Ghazi', avatarUrl: 'https://ui-avatars.com/api/?name=Ghazi&background=random', isVerified: true }
+        createdBy: { name: 'Ghazi', avatarUrl: 'https://ui-avatars.com/api/?name=Ghazi&background=0033cc&color=fff', isVerified: true }
     },
     {
         id: 'l3',
@@ -692,7 +692,7 @@ export const LABELS: Label[] = [
         labelBio: 'Entertainment company founded by Jay-Z.',
         signedArtists: ['a1'],
         links: { website: 'https://rocnation.com', x: 'https://x.com/rocnation' },
-        createdBy: { name: 'Jay-Z', avatarUrl: 'https://ui-avatars.com/api/?name=Jay+Z&background=random', isVerified: true, tokenSymbol: '$HOV' }
+        createdBy: { name: 'Jay-Z', avatarUrl: 'https://ui-avatars.com/api/?name=Jay+Z&background=111&color=fff', isVerified: true, tokenSymbol: '$HOV' }
     },
     {
         id: 'l5',
@@ -703,7 +703,7 @@ export const LABELS: Label[] = [
         labelBio: 'Based in Atlanta. Innovators of the trap sound.',
         signedArtists: ['a48'],
         links: { instagram: 'https://instagram.com/qualitycontrolmusic', website: 'https://qualitycontrolmusic.com' },
-        createdBy: { name: 'Coach K', avatarUrl: 'https://ui-avatars.com/api/?name=Coach+K&background=random', isVerified: true }
+        createdBy: { name: 'Coach K', avatarUrl: 'https://ui-avatars.com/api/?name=Coach+K&background=FF0000&color=fff', isVerified: true }
     },
     {
         id: 'l6',
@@ -714,7 +714,7 @@ export const LABELS: Label[] = [
         labelBio: 'A major American record label owned by Universal Music Group.',
         signedArtists: ['a16', 'a39'],
         links: { website: 'https://interscope.com' },
-        createdBy: { name: 'Jimmy Iovine', avatarUrl: 'https://ui-avatars.com/api/?name=Jimmy&background=random', isVerified: true }
+        createdBy: { name: 'Jimmy Iovine', avatarUrl: 'https://ui-avatars.com/api/?name=Jimmy&background=000&color=fff', isVerified: true }
     },
     {
         id: 'l7',
@@ -725,7 +725,7 @@ export const LABELS: Label[] = [
         labelBio: 'Founded by J. Cole. A close-knit roster of lyrical talent.',
         signedArtists: ['a33'],
         links: { instagram: 'https://instagram.com/dreamville' },
-        createdBy: { name: 'J. Cole', avatarUrl: 'https://ui-avatars.com/api/?name=J+Cole&background=random', isVerified: true, tokenSymbol: '$COLE' }
+        createdBy: { name: 'J. Cole', avatarUrl: 'https://ui-avatars.com/api/?name=J+Cole&background=333&color=fff', isVerified: true, tokenSymbol: '$COLE' }
     },
     {
         id: 'l8',
@@ -736,7 +736,7 @@ export const LABELS: Label[] = [
         labelBio: 'Bridging East and West through music and media.',
         signedArtists: [],
         links: { instagram: 'https://instagram.com/88rising', youtube: 'https://youtube.com/88rising' },
-        createdBy: { name: 'Sean Miyashiro', avatarUrl: 'https://ui-avatars.com/api/?name=Sean&background=random', isVerified: true }
+        createdBy: { name: 'Sean Miyashiro', avatarUrl: 'https://ui-avatars.com/api/?name=Sean&background=EE1C25&color=fff', isVerified: true }
     },
     {
         id: 'l9',
@@ -747,7 +747,7 @@ export const LABELS: Label[] = [
         labelBio: 'Top Dawg Entertainment. West Coast powerhouse.',
         signedArtists: ['a22'],
         links: { website: 'https://tde-onlineshop.com' },
-        createdBy: { name: 'Top Dawg', avatarUrl: 'https://ui-avatars.com/api/?name=Top&background=random', isVerified: true }
+        createdBy: { name: 'Top Dawg', avatarUrl: 'https://ui-avatars.com/api/?name=Top&background=800000&color=fff', isVerified: true }
     },
     {
         id: 'l10',
@@ -758,7 +758,7 @@ export const LABELS: Label[] = [
         labelBio: 'Record label founded by American rapper Travis Scott.',
         signedArtists: ['a13'],
         links: { website: 'https://travisscott.com' },
-        createdBy: { name: 'Travis Scott', avatarUrl: 'https://ui-avatars.com/api/?name=Travis+Scott&background=random', isVerified: true }
+        createdBy: { name: 'Travis Scott', avatarUrl: 'https://ui-avatars.com/api/?name=Travis+Scott&background=556B2F&color=fff', isVerified: true }
     },
     {
         id: 'l11',
@@ -769,7 +769,7 @@ export const LABELS: Label[] = [
         labelBio: 'Young Stoner Life Records. Founded by Young Thug.',
         signedArtists: ['a47'],
         links: { instagram: 'https://instagram.com/yslrecords' },
-        createdBy: { name: 'Young Thug', avatarUrl: 'https://ui-avatars.com/api/?name=Thug&background=random', isVerified: true }
+        createdBy: { name: 'Young Thug', avatarUrl: 'https://ui-avatars.com/api/?name=Thug&background=006400&color=fff', isVerified: true }
     },
     {
         id: 'l12',
@@ -780,7 +780,7 @@ export const LABELS: Label[] = [
         labelBio: 'Founded by Playboi Carti. Known for its dark aesthetic and rage sound.',
         signedArtists: ['a26'],
         links: { website: 'https://opium.com' },
-        createdBy: { name: 'Playboi Carti', avatarUrl: 'https://ui-avatars.com/api/?name=Carti&background=random', isVerified: true }
+        createdBy: { name: 'Playboi Carti', avatarUrl: 'https://ui-avatars.com/api/?name=Carti&background=000&color=f00', isVerified: true }
     },
     {
         id: 'l13',
@@ -791,7 +791,7 @@ export const LABELS: Label[] = [
         labelBio: 'A division of Universal Music Group. Home to many top pop artists.',
         signedArtists: ['a14', 'a37'],
         links: { website: 'https://republicrecords.com' },
-        createdBy: { name: 'Monte Lipman', avatarUrl: 'https://ui-avatars.com/api/?name=Monte&background=random', isVerified: true }
+        createdBy: { name: 'Monte Lipman', avatarUrl: 'https://ui-avatars.com/api/?name=Monte&background=ADD8E6&color=000', isVerified: true }
     },
     {
         id: 'l14',
@@ -802,7 +802,7 @@ export const LABELS: Label[] = [
         labelBio: 'The oldest surviving brand name in the recorded sound business.',
         signedArtists: ['a9', 'a17', 'a28'],
         links: { website: 'https://columbiarecords.com' },
-        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=random', isVerified: true }
+        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=000&color=fff', isVerified: true }
     },
     {
         id: 'l15',
@@ -813,7 +813,7 @@ export const LABELS: Label[] = [
         labelBio: 'American record label founded in October 1947.',
         signedArtists: ['a20'],
         links: { website: 'https://atlanticrecords.com' },
-        createdBy: { name: 'WMG', avatarUrl: 'https://ui-avatars.com/api/?name=WMG&background=random', isVerified: true }
+        createdBy: { name: 'WMG', avatarUrl: 'https://ui-avatars.com/api/?name=WMG&background=FFD700&color=000', isVerified: true }
     },
     {
         id: 'l16',
@@ -824,7 +824,7 @@ export const LABELS: Label[] = [
         labelBio: 'Focused predominantly on hip hop, pop, and urban music.',
         signedArtists: ['a40'],
         links: { website: 'https://defjam.com' },
-        createdBy: { name: 'Rick Rubin', avatarUrl: 'https://ui-avatars.com/api/?name=Rick&background=random', isVerified: true }
+        createdBy: { name: 'Rick Rubin', avatarUrl: 'https://ui-avatars.com/api/?name=Rick&background=800000&color=fff', isVerified: true }
     },
     {
         id: 'l17',
@@ -835,7 +835,7 @@ export const LABELS: Label[] = [
         labelBio: 'Africa\'s leading entertainment company. Founded by Don Jazzy.',
         signedArtists: ['a12', 'a30'],
         links: { website: 'https://mavinrecords.com' },
-        createdBy: { name: 'Don Jazzy', avatarUrl: 'https://ui-avatars.com/api/?name=Don+Jazzy&background=random', isVerified: true }
+        createdBy: { name: 'Don Jazzy', avatarUrl: 'https://ui-avatars.com/api/?name=Don+Jazzy&background=000&color=FFD700', isVerified: true }
     },
     {
         id: 'l18',
@@ -846,7 +846,7 @@ export const LABELS: Label[] = [
         labelBio: 'South Korean entertainment lifestyle platform company.',
         signedArtists: ['a7', 'a11'],
         links: { website: 'https://hybecorp.com' },
-        createdBy: { name: 'Bang Si-hyuk', avatarUrl: 'https://ui-avatars.com/api/?name=Bang&background=random', isVerified: true }
+        createdBy: { name: 'Bang Si-hyuk', avatarUrl: 'https://ui-avatars.com/api/?name=Bang&background=FFFF00&color=000', isVerified: true }
     },
     {
         id: 'l19',
@@ -857,7 +857,7 @@ export const LABELS: Label[] = [
         labelBio: 'JYP Entertainment Corporation is a South Korean multinational entertainment.',
         signedArtists: ['a25', 'a46'],
         links: { website: 'https://jype.com' },
-        createdBy: { name: 'J.Y. Park', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=random', isVerified: true }
+        createdBy: { name: 'J.Y. Park', avatarUrl: 'https://ui-avatars.com/api/?name=JYP&background=0000FF&color=fff', isVerified: true }
     },
     {
         id: 'l20',
@@ -868,7 +868,7 @@ export const LABELS: Label[] = [
         labelBio: 'South Korean entertainment company established in 1996.',
         signedArtists: ['a18'],
         links: { website: 'https://ygfamily.com' },
-        createdBy: { name: 'Yang Hyun-suk', avatarUrl: 'https://ui-avatars.com/api/?name=Yang&background=random', isVerified: true }
+        createdBy: { name: 'Yang Hyun-suk', avatarUrl: 'https://ui-avatars.com/api/?name=Yang&background=000&color=ccc', isVerified: true }
     },
     {
         id: 'l21',
@@ -879,7 +879,7 @@ export const LABELS: Label[] = [
         labelBio: 'Leading Latin music label.',
         signedArtists: ['a29', 'a34'],
         links: { website: 'https://sonymusiclatin.com' },
-        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=random', isVerified: true }
+        createdBy: { name: 'Sony', avatarUrl: 'https://ui-avatars.com/api/?name=Sony&background=FFA07A&color=000', isVerified: true }
     },
     {
         id: 'l22',
@@ -890,7 +890,7 @@ export const LABELS: Label[] = [
         labelBio: 'One of the "big three" recording companies.',
         signedArtists: ['a24'],
         links: { website: 'https://wmg.com' },
-        createdBy: { name: 'WMG', avatarUrl: 'https://ui-avatars.com/api/?name=WMG&background=random', isVerified: true }
+        createdBy: { name: 'WMG', avatarUrl: 'https://ui-avatars.com/api/?name=WMG&background=000&color=fff', isVerified: true }
     },
     {
         id: 'l23',
@@ -901,7 +901,7 @@ export const LABELS: Label[] = [
         labelBio: 'Taking Over for the 99 & 2000.',
         signedArtists: [],
         links: { website: 'https://cashmoney-records.com' },
-        createdBy: { name: 'Birdman', avatarUrl: 'https://ui-avatars.com/api/?name=Birdman&background=random', isVerified: true }
+        createdBy: { name: 'Birdman', avatarUrl: 'https://ui-avatars.com/api/?name=Birdman&background=008000&color=fff', isVerified: true }
     },
      {
         id: 'l24',
@@ -912,7 +912,7 @@ export const LABELS: Label[] = [
         labelBio: 'We ain\'t going nowhere.',
         signedArtists: [],
         links: { website: 'https://badboy.com' },
-        createdBy: { name: 'Diddy', avatarUrl: 'https://ui-avatars.com/api/?name=Diddy&background=random', isVerified: true }
+        createdBy: { name: 'Diddy', avatarUrl: 'https://ui-avatars.com/api/?name=Diddy&background=000&color=fff', isVerified: true }
     },
     {
         id: 'l25',
@@ -923,7 +923,7 @@ export const LABELS: Label[] = [
         labelBio: 'Multilingual company.',
         signedArtists: ['a15'],
         links: { website: 'https://pg-lang.com' },
-        createdBy: { name: 'Dave Free', avatarUrl: 'https://ui-avatars.com/api/?name=Dave&background=random', isVerified: true }
+        createdBy: { name: 'Dave Free', avatarUrl: 'https://ui-avatars.com/api/?name=Dave&background=333&color=fff', isVerified: true }
     }
 ];
 

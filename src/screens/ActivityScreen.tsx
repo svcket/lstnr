@@ -7,8 +7,11 @@ import { ICONS } from '../constants/assets';
 import { getInboxThreads, InboxThread } from '../data/inbox';
 import { Pin, Bell } from 'lucide-react-native';
 import { BottomNav } from '../components/home/BottomNav';
+import { getDeterministicAvatar } from '../lib/avatarResolver';
+import { useAuth } from '../context/AuthContext';
 
 export const ActivityScreen = () => {
+  const { user } = useAuth();
   const navigation = useNavigation<any>();
   const threads = getInboxThreads();
 
@@ -78,7 +81,10 @@ export const ActivityScreen = () => {
 
                   <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                       <View style={[styles.headerIconContainer, styles.avatarContainerHeader]}>
-                        <Text style={{ fontSize: 20 }}>👻</Text>
+                        <Image 
+                           source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                           style={{ width: 40, height: 40, borderRadius: 12 }} 
+                        />
                       </View>
                   </TouchableOpacity>
               </View>

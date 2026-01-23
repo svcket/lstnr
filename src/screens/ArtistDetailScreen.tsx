@@ -18,6 +18,7 @@ import { ArtistHolders } from '../components/artist/ArtistHolders';
 import { ArtistActivity } from '../components/artist/ArtistActivity';
 import { ArtistPredictions } from '../components/artist/ArtistPredictions';
 import { ShareSheet } from '../components/artist/ShareSheet';
+import { useToast } from '../context/ToastContext';
 
 const { width } = Dimensions.get('window');
 const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
@@ -25,6 +26,7 @@ const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
 export const ArtistDetailScreen = ({ route, navigation }: any) => {
   const { artistId, initialTab, openChat } = route.params || { artistId: 'a1' };
   const insets = useSafeAreaInsets();
+  const { showToast } = useToast();
   
   const [artist, setArtist] = useState<Artist | null>(null);
   const [metrics, setMetrics] = useState<any>(null);
@@ -296,7 +298,11 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
          mcs={metrics.marketConfidenceScore.value}
          avatarUrl={artist.avatarUrl}
          onClose={() => setTradeSheetMode(null)}
-         onConfirm={(val: any) => { console.log('Trade', val); setTradeSheetMode(null); }}
+         onConfirm={(val: any) => { 
+           console.log('Trade', val); 
+           setTradeSheetMode(null); 
+           showToast(`${tradeSheetMode === 'BUY' ? 'Purchase' : 'Sale'} successful!`, 'success');
+         }}
        />
        
        <InfoModal 

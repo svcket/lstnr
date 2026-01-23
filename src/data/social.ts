@@ -78,13 +78,13 @@ const predictionsStore: Record<string, EntityPrediction[]> = {};
 // --- SEEDERS ---
 
 const MOCK_USERS: User[] = [
-    { id: 'u1', name: 'CryptoKing', avatar: 'https://i.pravatar.cc/150?u=1' },
-    { id: 'u2', name: 'Sarah J', avatar: 'https://i.pravatar.cc/150?u=2' },
-    { id: 'u3', name: 'WhaleWatcher', avatar: 'https://i.pravatar.cc/150?u=3' },
-    { id: 'u4', name: 'MusicFan99', avatar: 'https://i.pravatar.cc/150?u=4' },
-    { id: 'u5', name: 'TraderX', avatar: 'https://i.pravatar.cc/150?u=5' },
-    { id: 'u6', name: 'HODLer', avatar: 'https://i.pravatar.cc/150?u=6' },
-    { id: 'u7', name: 'BigBag', avatar: 'https://i.pravatar.cc/150?u=7' },
+    { id: 'u1', name: 'CryptoKing', avatar: 'https://ui-avatars.com/api/?name=CryptoKing&background=000&color=fff' },
+    { id: 'u2', name: 'Sarah J', avatar: 'https://ui-avatars.com/api/?name=Sarah+J&background=333&color=fff' },
+    { id: 'u3', name: 'WhaleWatcher', avatar: 'https://ui-avatars.com/api/?name=WhaleWatcher&background=004d40&color=fff' },
+    { id: 'u4', name: 'MusicFan99', avatar: 'https://ui-avatars.com/api/?name=MusicFan99&background=1a237e&color=fff' },
+    { id: 'u5', name: 'TraderX', avatar: 'https://ui-avatars.com/api/?name=TraderX&background=311b92&color=fff' },
+    { id: 'u6', name: 'HODLer', avatar: 'https://ui-avatars.com/api/?name=HODLer&background=880e4f&color=fff' },
+    { id: 'u7', name: 'BigBag', avatar: 'https://ui-avatars.com/api/?name=BigBag&background=b71c1c&color=fff' },
 ];
 
 export const getComments = (entityId: string): Comment[] => {
@@ -130,19 +130,44 @@ export const getComments = (entityId: string): Comment[] => {
 
 export const addComment = (entityId: string, text: string, isHolder: boolean = false) => {
     const list = getComments(entityId);
-    const newComment: Comment = {
+        const newComment: Comment = {
         id: Date.now().toString(),
-        user: { id: 'me', name: 'You', avatar: 'https://i.pravatar.cc/150?u=me' },
+        user: { id: 'me', name: 'You', avatar: 'https://ui-avatars.com/api/?name=You&background=000&color=fff' },
         text,
         createdAt: 'Just now',
         likes: 0,
         liked: false,
         isHolder,
         contextType: entityId.startsWith('p') ? 'PREDICTION' : 'ARTIST',
-        symbol: '$BIGT'
+        symbol: '$BIGT',
+        replies: [],
+        repliesCount: 0
     };
     commentsStore[entityId] = [newComment, ...list];
     return newComment;
+};
+
+export const addReply = (entityId: string, commentId: string, text: string) => {
+    const list = getComments(entityId);
+    const comment = list.find(c => c.id === commentId);
+    if (!comment) return null;
+
+    const newReply: Comment = {
+        id: `r_${Date.now()}`,
+        user: { id: 'me', name: 'You', avatar: 'https://ui-avatars.com/api/?name=You&background=000&color=fff' },
+        text,
+        createdAt: 'Just now',
+        likes: 0,
+        liked: false,
+        contextType: comment.contextType,
+        symbol: comment.symbol
+    };
+
+    if (!comment.replies) comment.replies = [];
+    comment.replies = [newReply, ...comment.replies];
+    comment.repliesCount = (comment.repliesCount || 0) + 1;
+    
+    return newReply;
 };
 
 const CHAT_PHRASES = [
@@ -201,7 +226,7 @@ export const addChatMessage = (entityId: string, text: string) => {
     if (!chatStore[entityId]) getHoldersChat(entityId); // Ensure init
     const msg: ChatMessage = {
         id: Date.now().toString(),
-        user: { id: 'me', name: 'You', avatar: 'https://i.pravatar.cc/150?u=me' },
+        user: { id: 'me', name: 'You', avatar: 'https://ui-avatars.com/api/?name=You&background=000&color=fff' },
         text,
         createdAt: new Date().toISOString(),
         isMe: true

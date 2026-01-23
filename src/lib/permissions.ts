@@ -38,3 +38,23 @@ export const checkPredictionAccess = (userId: string, predictionId: string) => {
         requiredAmount: 1 // $1 min
     };
 };
+
+export const getAccess = (userId: string, entityId: string) => {
+    if (entityId.startsWith('p')) {
+        const access = checkPredictionAccess(userId, entityId);
+        return {
+            canRead: access.canRead,
+            canWrite: access.canWrite,
+            shares: access.amount,
+            requiredWrite: access.requiredAmount,
+            isHolder: access.canRead,
+            type: 'PREDICTION' as const
+        };
+    }
+
+    const access = checkAccess(userId, entityId);
+    return {
+        ...access,
+        type: 'ARTIST' as const
+    };
+};

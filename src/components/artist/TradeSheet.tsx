@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, ScrollView
 import { COLORS, FONT_FAMILY, BUTTON_HEIGHT } from '../../constants/theme';
 import { ChevronLeft, Settings2, ChevronDown, X, Check, DollarSign, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { DepositSheet, PaymentMethod } from '../common/DepositSheet';
 
 // --- Session Persistence (Simple In-Memory) ---
 const SESSION_SETTINGS = {
@@ -33,15 +34,7 @@ const PCT_AMOUNTS = [
     { label: 'Max', val: 1.0 },
 ];
 
-type PaymentMethodId = 'apple' | 'paypal' | 'venmo' | 'revolut' | 'card' | 'phantom' | 'manual' | 'usdc';
-
-interface PaymentMethod {
-    id: PaymentMethodId;
-    name: string;
-    section: 'fiat' | 'crypto';
-    iconType: string;
-    badge?: string;
-}
+// PaymentMethod interface removed (Using import from DepositSheet.tsx)
 
 const PAYMENT_METHODS: PaymentMethod[] = [
     { id: 'apple', name: 'Apple Pay', section: 'fiat', iconType: 'apple', badge: 'Instant' },
@@ -213,52 +206,17 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
                </View>
            </Modal>
 
-           {/* PAYMENT SHEET OVERLAY */}
-           <Modal 
-             animationType="slide" 
-             transparent={true} 
+           {/* Standardized DepositSheet (Phase 6) */}
+           <DepositSheet
              visible={showPaymentSheet}
-             onRequestClose={() => setShowPaymentSheet(false)}
-           >
-               <View style={styles.sheetOverlay}>
-                   <View style={styles.paymentSheetContainer}>
-                        <View style={styles.sheetHeader}>
-                            <Text style={styles.sheetTitle}>Deposit Methods</Text>
-                            <TouchableOpacity onPress={() => setShowPaymentSheet(false)}>
-                                <X size={24} color="#666" />
-                            </TouchableOpacity>
-                        </View>
-
-                        <ScrollView contentContainerStyle={styles.paymentList}>
-                            <Text style={styles.sectionTitle}>Buy with fiat</Text>
-                            {PAYMENT_METHODS.filter(m => m.section === 'fiat').map(m => (
-                                <PaymentRow 
-                                    key={m.id} 
-                                    item={m} 
-                                    selected={paymentMethod.id === m.id}
-                                    onSelect={(item) => {
-                                        setPaymentMethod(item);
-                                        setShowPaymentSheet(false);
-                                    }} 
-                                />
-                            ))}
-                            
-                            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Crypto transfer</Text>
-                            {PAYMENT_METHODS.filter(m => m.section === 'crypto').map(m => (
-                                <PaymentRow 
-                                    key={m.id} 
-                                    item={m} 
-                                    selected={paymentMethod.id === m.id}
-                                    onSelect={(item) => {
-                                        setPaymentMethod(item);
-                                        setShowPaymentSheet(false);
-                                    }} 
-                                />
-                            ))}
-                        </ScrollView>
-                   </View>
-               </View>
-           </Modal>
+             onClose={() => setShowPaymentSheet(false)}
+             methods={PAYMENT_METHODS}
+             selectedId={paymentMethod.id}
+             onSelect={(item) => {
+                 setPaymentMethod(item);
+                 setShowPaymentSheet(false);
+             }}
+           />
 
            {/* REVIEW & CONFIRM OVERLAY */}
            <Modal
@@ -496,26 +454,7 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
   );
 };
 
-const PaymentRow = ({ item, selected, onSelect }: { item: PaymentMethod, selected: boolean, onSelect: (i: PaymentMethod) => void }) => (
-    <TouchableOpacity style={styles.paymentOption} onPress={() => onSelect(item)}>
-        <View style={styles.paymentInfo}>
-             <View style={styles.paymentIconBase}>
-                 {/* Placeholder for icons */}
-                 <Text style={{fontSize: 10, color: '#FFF'}}>{item.name[0]}</Text>
-             </View>
-             <Text style={styles.paymentName}>{item.name}</Text>
-        </View>
-        
-        {item.badge && (
-            <View style={[styles.badge, item.badge === 'Instant' ? styles.badgeInstant : styles.badgeNormal]}>
-                {item.badge === 'Instant' && <Text style={{color:'#4ADE80', fontSize:10, marginRight:2}}>⚡</Text>}
-                <Text style={[styles.badgeText, item.badge === 'Instant' ? {color:'#4ADE80'} : {color: COLORS.textSecondary}]}>
-                    {item.badge}
-                </Text>
-            </View>
-        )}
-    </TouchableOpacity>
-);
+// Redundant PaymentRow removed (Moved to DepositSheet.tsx)
 
 const DetailRow = ({ label, value }: { label: string, value: string }) => (
     <View style={styles.detailRow}>
@@ -581,24 +520,12 @@ const styles = StyleSheet.create({
   gradientBtn: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
   confirmText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
 
-  // BOTTOM SHEETS
+  // ... BOTTOM SHEETS
   sheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  paymentSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '75%', paddingBottom: 40 },
   settingsSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 60 },
   reviewSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 40 },
   sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#222' },
   sheetTitle: { fontSize: 18, color: '#FFF', fontWeight: '700', fontFamily: FONT_FAMILY.header },
-  
-  paymentList: { padding: 16 },
-  sectionTitle: { color: COLORS.textSecondary, fontSize: 13, marginBottom: 12, fontWeight: '600', textTransform: 'uppercase' },
-  paymentOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A1A1A', padding: 16, borderRadius: 16, marginBottom: 12 },
-  paymentInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  paymentIconBase: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' },
-  paymentName: { color: '#FFF', fontSize: 16, fontWeight: '600' },
-  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
-  badgeInstant: { backgroundColor: 'rgba(74, 222, 128, 0.1)', borderColor: 'transaprent' },
-  badgeNormal: { backgroundColor: '#222', borderColor: '#333' },
-  badgeText: { fontSize: 12, fontWeight: '600' },
 
   // SETTINGS
   settingRow: { marginTop: 24 },

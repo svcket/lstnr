@@ -17,6 +17,7 @@ import { ShareSheet } from '../components/artist/ShareSheet';
 import { InfoSheet } from '../components/common/InfoSheet';
 import { TradeSheet } from '../components/artist/TradeSheet';
 import { getUserSharesInfo, MIN_SHARES_FOR_CHAT, getPredictionHolders } from '../data/social';
+import { useToast } from '../context/ToastContext';
 
 const { width } = Dimensions.get('window');
 const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
@@ -29,6 +30,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
     const { predictionId, initialTab } = route.params || { predictionId: 'p1' };
     const navigation = useNavigation<any>();
     const insets = useSafeAreaInsets();
+    const { showToast } = useToast();
 
     const [detail, setDetail] = useState<PredictionDetail | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('Details');
@@ -343,7 +345,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                             setProhibitionsOpen(!prohibitionsOpen);
                                         }}
                                     >
-                                        <Text style={styles.sectionTitle}>Trading Prohibitions</Text>
+                                        <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>Trading Prohibitions</Text>
                                         {prohibitionsOpen ? <ChevronUp size={20} color="#FFF" /> : <ChevronDown size={20} color="#FFF" />}
                                     </TouchableOpacity>
                                     {prohibitionsOpen && (
@@ -355,37 +357,37 @@ export const PredictionDetailScreen = ({ route }: any) => {
                                     )}
                                 </View>
                                 
-                                <View style={{ height: 24 }} />
-                                
                                 {/* Similar Predictions */}
-                                <Text style={styles.sectionTitle}>Similar Predictions</Text>
-                                <View style={styles.similarList}>
-                                    {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
-                                        const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
-                                        const chanceStr = simPred.marketType === 'binary' 
-                                            ? (simPred.chance + '%') 
-                                            : ((simPred as any).outcomes[0]?.chance + '%'); // Top outcome chance
-                                        
-                                        return (
-                                            <TouchableOpacity 
-                                                key={simPred.id}
-                                                style={[styles.simRow, index === arr.length - 1 && { borderBottomWidth: 0 }]}
-                                                onPress={() => navigation.push('PredictionDetail', { predictionId: simPred.id })}
-                                            >
-                                                <Image 
-                                                    source={{ uri: relatedArtist?.avatarUrl || 'https://i.pravatar.cc/150' }} 
-                                                    style={styles.simAvatar} 
-                                                />
-                                                <View style={{ flex: 1, gap: 4 }}>
-                                                    <Text style={styles.simQuestion} numberOfLines={2}>{simPred.question}</Text>
-                                                    <Text style={styles.simMeta}>{formatCompact(simPred.volume)} Vol • {chanceStr} Chance</Text>
-                                                </View>
-                                                <View style={styles.chevron}>
-                                                     <Share size={16} color="#444" style={{ transform: [{ rotate: '-90deg' }] }}  />
-                                                </View>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
+                                <View>
+                                    <Text style={styles.sectionTitle}>Similar Predictions</Text>
+                                    <View style={styles.similarList}>
+                                        {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
+                                            const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
+                                            const chanceStr = simPred.marketType === 'binary' 
+                                                ? (simPred.chance + '%') 
+                                                : ((simPred as any).outcomes[0]?.chance + '%'); // Top outcome chance
+                                            
+                                            return (
+                                                <TouchableOpacity 
+                                                    key={simPred.id}
+                                                    style={[styles.simRow, index === arr.length - 1 && { borderBottomWidth: 0 }]}
+                                                    onPress={() => navigation.push('PredictionDetail', { predictionId: simPred.id })}
+                                                >
+                                                    <Image 
+                                                        source={{ uri: relatedArtist?.avatarUrl || 'https://i.pravatar.cc/150' }} 
+                                                        style={styles.simAvatar} 
+                                                    />
+                                                    <View style={{ flex: 1, gap: 4 }}>
+                                                        <Text style={styles.simQuestion} numberOfLines={2}>{simPred.question}</Text>
+                                                        <Text style={styles.simMeta}>{formatCompact(simPred.volume)} Vol • {chanceStr} Chance</Text>
+                                                    </View>
+                                                    <View style={styles.chevron}>
+                                                         <Share size={16} color="#444" style={{ transform: [{ rotate: '-90deg' }] }}  />
+                                                    </View>
+                                                </TouchableOpacity>
+                                            );
+                                        })}
+                                    </View>
                                 </View>
                                 <View style={{ height: 40 }} />
                             </View>
@@ -417,6 +419,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                     onConfirm={(amt, isShares) => {
                         console.log('Trade confirmed:', amt, isShares);
                         setTradeSheetOpen(false);
+                        showToast(`Order placed successfully!`, 'success');
                     }}
                 />
             )}
@@ -467,7 +470,7 @@ const TimelineItem = ({ label, value, isFirst, isLast }: any) => (
             <View style={[styles.timelineDot, isFirst && { backgroundColor: COLORS.primary }]} />
             {!isLast && <View style={[styles.timelineLine, isFirst && { backgroundColor: COLORS.primary }]} />}
         </View>
-        <View style={styles.timelineContent}>
+        <View style={[styles.timelineContent, isLast && { paddingBottom: 0 }]}>
             <Text style={styles.timelineLabel}>{label}</Text>
             <Text style={styles.timelineValue}>{value}</Text>
         </View>
@@ -745,7 +748,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     accordionContent: {
-        marginTop: 16, 
+        marginTop: 8, 
     },
 
     // PROMO CARD

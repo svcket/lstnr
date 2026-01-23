@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getArtistById } from '../data/catalog';
 import { getEntityMetrics } from '../lib/mockMetrics';
 import { TradeSheet } from '../components/artist/TradeSheet';
+import { getDeterministicAvatar } from '../lib/avatarResolver';
 
 export const HoldersChatScreen = () => {
   const route = useRoute<any>();
@@ -129,7 +130,7 @@ export const HoldersChatScreen = () => {
                 
                 <TouchableOpacity onPress={handleHeaderPress} activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                     <Image 
-                        source={{ uri: entity?.avatarUrl || 'https://i.pravatar.cc/150' }} 
+                        source={{ uri: entity?.avatarUrl || getDeterministicAvatar(entity?.name || 'Stock', entityId) }} 
                         style={styles.headerAvatar} 
                     />
                     <View>
