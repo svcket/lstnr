@@ -6,7 +6,7 @@ import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
 import { getRecentActivity, ActivityItem } from '../data/catalog';
 import { ICONS } from '../constants/assets';
-import { Search } from 'lucide-react-native';
+import { Search, ArrowDownLeft, ArrowUpRight } from 'lucide-react-native';
 import { FilterPill } from '../components/common/FilterPill';
 
 export const HistoryScreen = () => {
@@ -61,18 +61,22 @@ export const HistoryScreen = () => {
         return result;
     }, [activity, search, typeFilter, sortOrder]);
 
-    const renderItem = ({ item, index }: { item: ActivityItem, index: number }) => (
+    const renderItem = ({ item, index }: { item: ActivityItem, index: number }) => {
+        const isMoneyOut = item.isMoneyOut; // mapped from mock
+        const color = isMoneyOut ? COLORS.error : COLORS.success;
+        const Icon = isMoneyOut ? ArrowUpRight : ArrowDownLeft;
+        const bg = isMoneyOut ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)';
+        
+        return (
         <TouchableOpacity 
             style={styles.row} 
             activeOpacity={0.7}
             onPress={() => navigation.navigate('TransactionDetail', { activity: item })}
         >
             <View style={styles.left}>
-                <Image 
-                    source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
-                    style={styles.icon} 
-                    resizeMode="contain" 
-                />
+                <View style={[styles.iconContainer, { backgroundColor: bg }]}>
+                    <Icon size={16} color={color} />
+                </View>
                 <View>
                     <Text style={styles.title}>{item.text}</Text>
                     <Text style={styles.time}>{item.time}</Text>
@@ -82,7 +86,8 @@ export const HistoryScreen = () => {
             
             <View style={styles.divider} />
         </TouchableOpacity>
-    );
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -191,9 +196,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
     },
-    icon: {
+    iconContainer: {
         width: 40,
         height: 40,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
         fontFamily: FONT_FAMILY.medium,

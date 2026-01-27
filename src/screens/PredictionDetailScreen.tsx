@@ -393,13 +393,7 @@ export const PredictionDetailScreen = ({ route }: any) => {
                             </View>
                         )}
                 {activeTab === 'Comments' && <ArtistComments entityId={predictionId} />}
-                {activeTab === 'Holders' && (
-                    <PredictionHolders 
-                        entityId={predictionId} 
-                        onBuyYes={() => { setViewSide('yes'); setSelectedOutcome(detail.outcomes[0]); setTradeSheetOpen(true); }}
-                        onBuyNo={() => { setViewSide('no'); setSelectedOutcome(detail.outcomes[1]); setTradeSheetOpen(true); }}
-                    />
-                )}
+                {activeTab === 'Holders' && <ArtistHolders entityId={predictionId} type="PREDICTION" />}
                 {activeTab === 'Activity' && <ArtistActivity artist={{ id: predictionId } as any} />}
             </ScreenContainer>
         </View>

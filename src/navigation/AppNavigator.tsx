@@ -28,6 +28,8 @@ import { TransactionDetailScreen } from '../screens/TransactionDetailScreen';
 import { WithdrawScreen } from '../screens/WithdrawScreen';
 import { AddMethodScreen } from '../screens/AddMethodScreen';
 import { AddMethodFormScreen } from '../screens/AddMethodFormScreen';
+import { HoldersScreen } from '../screens/HoldersScreen';
+import { HoldingDetailsSheet } from '../components/HoldingDetailsSheet';
 
 // ... imports
 
@@ -83,12 +85,15 @@ export default function AppNavigator() {
       <Stack.Screen name="PredictionDetail" component={PredictionDetailScreen} />
       <Stack.Screen name="EndingSoon" component={EndingSoonScreen} />
       <Stack.Screen name="HoldersChat" component={HoldersChatScreen} />
-      <Stack.Screen name="History" component={HistoryScreen} />
+      <Stack.Screen name="Holders" component={HoldersScreen} />
+      {/* Sheets as Modals */}
+      <Stack.Screen name="HoldingDetails" component={HoldingDetailsSheet} options={{ presentation: 'transparentModal', animation: 'fade' }} />
       <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} />
       <Stack.Screen name="Updates" component={UpdatesScreen} />
       <Stack.Screen name="Withdraw" component={WithdrawScreen} />
       <Stack.Screen name="AddMethod" component={AddMethodScreen} />
       <Stack.Screen name="AddMethodForm" component={AddMethodFormScreen} />
+      <Stack.Screen name="History" component={HistoryScreen} />
     </Stack.Navigator>
   );
 }

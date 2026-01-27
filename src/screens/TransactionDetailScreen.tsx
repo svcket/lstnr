@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, StatusBar, Image, ScrollView } from 'react-native';
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
@@ -13,6 +14,11 @@ export const TransactionDetailScreen = () => {
 
     if (!activity) return null;
 
+    const isMoneyOut = activity.isMoneyOut;
+    const color = isMoneyOut ? COLORS.error : COLORS.success;
+    const bgColor = isMoneyOut ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)';
+    const Icon = isMoneyOut ? ArrowUpRight : ArrowDownLeft;
+
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" />
@@ -24,13 +30,13 @@ export const TransactionDetailScreen = () => {
 
                 <ScrollView contentContainerStyle={styles.content}>
                     <View style={styles.hero}>
-                        <Image 
-                            source={activity.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
-                            style={styles.heroIcon} 
-                            resizeMode="contain" 
-                        />
+                        <View style={[styles.heroIconContainer, { backgroundColor: bgColor }]}>
+                            <Icon size={32} color={color} />
+                        </View>
                         <Text style={styles.amount}>{activity.amount}</Text>
-                        <Text style={styles.status}>{activity.status}</Text>
+                        <Text style={[styles.status, { color: color, backgroundColor: bgColor }]}>
+                            {activity.status}
+                        </Text>
                     </View>
 
                     <View style={styles.card}>
@@ -78,9 +84,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 32,
     },
-    heroIcon: {
+    heroIconContainer: {
         width: 64,
         height: 64,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 16,
     },
     amount: {

@@ -4,31 +4,50 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { 
     getHolders, 
+    getPredictionHolders,
     Holder, 
     MIN_SHARES_FOR_CHAT 
 } from '../../data/social';
+import { getHoldingPosition } from '../../utils/holdingResolvers';
 import { checkAccess } from '../../lib/permissions';
 import { Lock, MessageCircle } from 'lucide-react-native';
+import { getEntityMetrics } from '../../lib/mockMetrics';
 
 const GAP = 8;
 
 interface ArtistHoldersProps {
   entityId?: string;
+  type?: 'ARTIST' | 'LABEL' | 'PREDICTION';
   initialViewMode?: any; 
+  onJoinPress?: () => void;
 }
 
-export const ArtistHolders = ({ entityId = 'a1' }: ArtistHoldersProps) => {
+export const ArtistHolders = ({ entityId = 'a1', type = 'ARTIST', onJoinPress }: ArtistHoldersProps) => {
   const navigation = useNavigation<any>();
   const [holders, setHolders] = useState<Holder[]>([]);
   const [userShares, setUserShares] = useState(0);
   const [hasAccess, setHasAccess] = useState(false);
+  const [joinCost, setJoinCost] = useState(0);
+
+  const [predictionHolders, setPredictionHolders] = useState<{yes: Holder[], no: Holder[]}>({yes: [], no: []});
 
   useEffect(() => {
-      setHolders(getHolders(entityId));
-      const accessInfo = checkAccess('me', entityId);
-      setUserShares(accessInfo.shares);
-      setHasAccess(accessInfo.canRead);
-  }, [entityId]);
+    if (type === 'PREDICTION') {
+        setPredictionHolders(getPredictionHolders(entityId));
+    } else {
+        setHolders(getHolders(entityId));
+    }
+    const accessInfo = checkAccess('me', entityId);
+    setUserShares(accessInfo.shares);
+    setHasAccess(accessInfo.canRead);
+
+    // Calculate Entry Cost
+    const metrics = getEntityMetrics(entityId);
+    if (metrics) {
+        const cost = metrics.price * MIN_SHARES_FOR_CHAT;
+        setJoinCost(cost);
+    }
+  }, [entityId, type]);
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
@@ -62,36 +81,114 @@ export const ArtistHolders = ({ entityId = 'a1' }: ArtistHoldersProps) => {
                  <Text style={styles.promoHelper}>
                      {hasAccess 
                        ? 'You have access to this group.' 
-                       : `Hold at least ${MIN_SHARES_FOR_CHAT} shares to join.`}
+                       : `You need ${MIN_SHARES_FOR_CHAT} shares to access chat.`}
                  </Text>
                  <TouchableOpacity 
-                    style={[styles.promoBtn, !hasAccess && styles.promoBtnLocked]}
+                    style={[
+                        styles.promoBtn, 
+                        hasAccess && styles.promoBtnSecondary,
+                        !hasAccess && styles.promoBtnPrimary
+                    ]}
                     onPress={() => {
                         if (hasAccess) {
                             navigation.navigate('HoldersChat', { entityId });
                         } else {
-                            console.log('Open Trade Sheet');
+                            if (onJoinPress) onJoinPress();
                         }
                     }}
                  >
-                     <Text style={[styles.promoBtnText, !hasAccess && styles.promoBtnTextLocked]}>
-                         {hasAccess ? 'Join Chat' : 'Buy to Join'}
+                     <Text style={[
+                         styles.promoBtnText, 
+                         hasAccess ? styles.promoBtnTextSecondary : styles.promoBtnTextPrimary
+                     ]}>
+                         {hasAccess ? 'Open Chat' : 'Join Chat'}
                      </Text>
                      {!hasAccess && <Lock size={14} color="#000" style={{marginLeft: 6}} />}
                  </TouchableOpacity>
             </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Top Holders</Text>
+        <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Top Holders</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Holders', { entityId, type })}>
+                <Text style={styles.seeAll}>See All</Text>
+            </TouchableOpacity>
+        </View>
     </View>
   );
+
+  if (type === 'PREDICTION') {
+      return (
+        <View style={styles.container}>
+            <View style={styles.splitHeader}>
+                <View style={{flex: 1}}>
+                    <Text style={styles.splitTitle}>Yes holders</Text>
+                </View>
+                <View style={{flex: 1, paddingLeft: 16}}>
+                    <Text style={styles.splitTitle}>No holders</Text>
+                </View>
+            </View>
+            
+            <View style={{ flexDirection: 'row' }}>
+                {/* YES Column */}
+                <View style={{ flex: 1, borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.05)', paddingRight: 8 }}>
+                    {predictionHolders.yes.slice(0, 10).map((h, i) => (
+                        <HolderItem 
+                            key={h.id} 
+                            holder={h} 
+                            rank={0} 
+                            compact 
+                            side="YES"
+                            onPress={() => {
+                                const position = getHoldingPosition(h, { type, entityId, name: 'Prediction', side: 'YES' });
+                                navigation.navigate('HoldingDetails', { position });
+                            }}
+                        />
+                    ))}
+                </View>
+                {/* NO Column */}
+                <View style={{ flex: 1, paddingLeft: 16 }}>
+                    {predictionHolders.no.slice(0, 10).map((h, i) => (
+                        <HolderItem 
+                            key={h.id} 
+                            holder={h} 
+                            rank={0} 
+                            compact 
+                            side="NO"
+                            onPress={() => {
+                                const position = getHoldingPosition(h, { type, entityId, name: 'Prediction', side: 'NO' });
+                                navigation.navigate('HoldingDetails', { position });
+                            }}
+                        />
+                    ))}
+                </View>
+            </View>
+
+            <TouchableOpacity 
+                style={styles.seeAllBtn} 
+                onPress={() => navigation.navigate('Holders', { entityId, type })}
+            >
+                <Text style={styles.seeAll}>See All Holders</Text>
+            </TouchableOpacity>
+        </View>
+      );
+  }
 
   return (
     <View style={styles.container}>
       <FlatList
         data={holders}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => <HolderItem holder={item} rank={index + 1} />}
+        renderItem={({ item, index }) => (
+            <HolderItem 
+                holder={item} 
+                rank={index + 1} 
+                onPress={() => {
+                   const position = getHoldingPosition(item, { type, entityId, name: 'Loading...' }); // name might be fetched async or missing in this scope, but it's acceptable for now as resolver handles it.
+                   navigation.navigate('HoldingDetails', { position });
+                }}
+            />
+        )}
         ListHeaderComponent={renderHeader}
         contentContainerStyle={styles.listContent}
         scrollEnabled={false} 
@@ -107,21 +204,35 @@ const MetricCard = ({ label, value }: { label: string, value: string }) => (
   </View>
 );
 
-const HolderItem = ({ holder, rank }: { holder: Holder; rank: number }) => (
-    <View style={styles.holderRow}>
-        <Text style={styles.rank}>#{rank}</Text>
+const HolderItem = ({ holder, rank, compact, onPress, side }: { holder: Holder; rank: number; compact?: boolean; onPress?: () => void; side?: 'YES' | 'NO' }) => (
+    <TouchableOpacity 
+        style={[styles.holderRow, compact && styles.holderRowCompact]}
+        activeOpacity={0.7}
+        onPress={onPress}
+        disabled={!onPress}
+    >
+        {rank > 0 && <Text style={styles.rank}>#{rank}</Text>}
         <Image source={{ uri: holder.avatar }} style={styles.avatar} />
         
         <View style={styles.holderInfo}>
-            <Text style={styles.holderName}>{holder.name}</Text>
-            <Text style={styles.sharesText}>{holder.shares.toLocaleString()} shares</Text>
+            <Text style={[styles.holderName, compact && {fontSize: 13}]}>{holder.name}</Text>
+            <Text style={[
+                styles.sharesText, 
+                compact && {fontSize: 11},
+                side === 'YES' && { color: COLORS.success }, // Green for YES
+                side === 'NO' && { color: COLORS.error }      // Red for NO
+            ]}>
+                {(holder as any)._side ? `${(holder as any)._side} ` : ''}{holder.shares.toLocaleString()} shares
+            </Text>
         </View>
         
-        <View style={styles.holderStats}>
-            <Text style={styles.valueText}>${holder.value?.toLocaleString()}</Text>
-            {holder.percent && <Text style={styles.percentText}>{holder.percent.toFixed(2)}%</Text>}
-        </View>
-    </View>
+        {!compact && (
+            <View style={styles.holderStats}>
+                <Text style={styles.valueText}>${holder.value?.toLocaleString()}</Text>
+                {holder.percent && <Text style={styles.percentText}>{holder.percent.toFixed(2)}%</Text>}
+            </View>
+        )}
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
@@ -210,32 +321,50 @@ const styles = StyleSheet.create({
       marginRight: 12,
   },
   promoBtn: {
-      backgroundColor: '#FFF',
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 20,
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'center',
   },
-  promoBtnLocked: {
-      backgroundColor: COLORS.primary, // or brand color
+  promoBtnPrimary: {
+      backgroundColor: '#FFF',
+  },
+  promoBtnSecondary: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: '#FFF',
   },
   promoBtnText: {
-      color: '#000',
       fontSize: 13,
       fontWeight: '600',
+      fontFamily: FONT_FAMILY.header,
   },
-  promoBtnTextLocked: {
+  promoBtnTextPrimary: {
       color: '#000',
+  },
+  promoBtnTextSecondary: {
+      color: '#FFF',
   },
 
   sectionTitle: {
       fontSize: 14,
       fontWeight: '600',
       color: '#666',
-      marginBottom: 12,
-      textTransform: 'uppercase',
       letterSpacing: 1,
+  },
+  sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+  },
+  seeAll: {
+      fontSize: 12,
+      fontFamily: FONT_FAMILY.header,
+      color: COLORS.primary,
+      fontWeight: '600',
   },
 
   // Holder Row
@@ -286,4 +415,25 @@ const styles = StyleSheet.create({
       fontSize: 12,
       color: COLORS.success, 
   },
+  splitHeader: {
+      flexDirection: 'row',
+      marginBottom: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#222',
+      paddingBottom: 8,
+  },
+  splitTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: '#FFF',
+  },
+  holderRowCompact: {
+      paddingVertical: 8,
+      borderBottomWidth: 0,
+  },
+  seeAllBtn: {
+      alignItems: 'center',
+      paddingVertical: 16,
+      marginTop: 8,
+  }
 });

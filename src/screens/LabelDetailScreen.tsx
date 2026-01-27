@@ -293,7 +293,10 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
                  )}
                  {activeTab === 'Holders' && (
                      <View style={styles.tabContent}>
-                        <ArtistHolders entityId={label.id} /> 
+                        <ArtistHolders 
+                            entityId={label.id} 
+                            onJoinPress={() => setTradeSheetMode('BUY')}
+                        /> 
                      </View>
                  )}
                  {activeTab === 'Activity' && (

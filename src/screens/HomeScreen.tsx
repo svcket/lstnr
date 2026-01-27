@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Mic2, Disc, Sparkles, Download } from 'lucide-react-native';
+import { Bell, Mic2, Disc, Sparkles, Download, ArrowDownLeft, ArrowUpRight } from 'lucide-react-native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { BottomNav } from '../components/home/BottomNav';
 import { useAuth } from '../context/AuthContext';
@@ -355,11 +355,13 @@ export const HomeScreen = () => {
                            >
                                <RowItem 
                                   leftIcon={
-                                    <Image 
-                                      source={item.isMoneyOut ? ICONS.activityOut : ICONS.activityIn} 
-                                      style={styles.feedIcon} 
-                                      resizeMode="contain" 
-                                    />
+                                    <View style={[styles.feedIconContainer, { backgroundColor: item.isMoneyOut ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }]}>
+                                      {item.isMoneyOut ? (
+                                        <ArrowUpRight size={16} color={COLORS.error} />
+                                      ) : (
+                                        <ArrowDownLeft size={16} color={COLORS.success} />
+                                      )}
+                                    </View>
                                   } 
                                   title={item.text}
                                   subtitle={item.time}
@@ -580,9 +582,12 @@ const styles = StyleSheet.create({
     borderRadius: 8, 
   },
   // Feed Icons
-  feedIcon: {
+  feedIconContainer: {
     width: 40,
     height: 40,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textStack: {
     flex: 1,

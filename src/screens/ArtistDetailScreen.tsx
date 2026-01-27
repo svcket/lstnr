@@ -193,6 +193,7 @@ export const ArtistDetailScreen = ({ route, navigation }: any) => {
                 <ArtistHolders 
                    entityId={artist.id}
                    initialViewMode={openChat ? 'Chat' : 'Holders'}
+                   onJoinPress={() => setTradeSheetMode('BUY')}
                 /> 
              </View>
         ) : activeTab === 'Activity' ? (

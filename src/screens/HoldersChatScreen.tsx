@@ -60,6 +60,10 @@ export const HoldersChatScreen = () => {
         setMetrics(getEntityMetrics(entityId));
     }
     setMessages(getHoldersChat(entityId));
+    
+    // Check Access
+    const access = require('../lib/permissions').checkAccess('me', entityId);
+    setHasAccess(access.canRead);
   }, [entityId, type]);
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
