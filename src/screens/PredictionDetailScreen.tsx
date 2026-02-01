@@ -528,11 +528,11 @@ const PredictionHolders = ({ entityId, onBuyYes, onBuyNo }: { entityId: string, 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.background,
     },
     loading: {
         flex: 1,
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.background,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent', // Default transparent
     },
     tfPillActive: {
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface, // Updated from #181818
     },
     tfText: {
         fontFamily: FONT_FAMILY.header,
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     // TAB CONTENT
     tabContent: {
         paddingTop: 8,
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.background,
     },
     detailsStack: {
         gap: 24,
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     rulePill: {
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface, // Updated from #181818
         paddingHorizontal: 16,
         paddingVertical: 10, 
         borderRadius: 20,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
 
     // PROMO CARD
     promoCard: {
-      backgroundColor: '#111',
+      backgroundColor: COLORS.surface, // Updated from #111
       borderRadius: 16,
       padding: 16,
       borderWidth: 1,

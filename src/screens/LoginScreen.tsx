@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#111',
+    backgroundColor: COLORS.surface, // Updated from #111
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: SPACING.l,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     height: 56,
     paddingLeft: 20,
     paddingRight: 10,
-    backgroundColor: '#111',
+    backgroundColor: COLORS.background, // Updated from #111
     borderWidth: 1,
     borderColor: '#333',
     borderRightWidth: 0,

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   card: {
     width: 140,
     height: 140,
-    backgroundColor: '#111111', // Updated to match Home Screen cards
+    backgroundColor: COLORS.surface, // Updated to match Home Screen cards
     borderRadius: 16,
     padding: SPACING.m,
     marginRight: SPACING.m,

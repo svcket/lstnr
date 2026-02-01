@@ -372,9 +372,9 @@ const StatCard = ({ label, value }: { label: string, value: string }) => (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: COLORS.background,
     },
-    loading: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+    loading: { flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
     
     // Header
     header: {
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     tfPillActive: {
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface,
     },
     tfText: {
         color: '#666',
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     statCard: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 12,
         padding: 16,
         width: (width - 32 - 8) / 2, // width - padding*2 - gap / 2
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
 
     // Bio
     bioCard: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         padding: 16,
         marginBottom: 32,
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
 
     // Signed Artists
     signedArtistsCard: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         paddingHorizontal: 16,
         marginBottom: 40,
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     socialPill: {
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface, // Updated from #181818
         paddingHorizontal: 14,
         paddingVertical: 8,
         borderRadius: 20,
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
         fontFamily: FONT_FAMILY.header, 
     },
     similarCard: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         paddingHorizontal: 16,
         marginBottom: 40,

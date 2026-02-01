@@ -2,14 +2,17 @@ export const COLORS = {
   primary: '#F53636', // Red (Gradient End)
   primaryGradient: ['#C99315', '#F53636'] as const, // Gold -> Red Gradient
   secondary: '#00FFFF', // Cyan
-  background: '#000000', // Deep Black
-  surface: '#181818', // Updated Surface
+  background: '#0B0B0D', // Deep Black -> Charcoal
+  surface: '#141417', // Updated Surface -> Charcoal Card
   surfaceLight: '#2A2A2A',
   text: '#FFFFFF', // Primary text
   textSecondary: '#9A9A9A', // Secondary text
   success: '#00FF9D',
   error: '#FF0055',
   border: '#333333',
+  stroke: {
+    settings: '#242428', // Settings-only border
+  },
   white: '#FFFFFF',
   black: '#000000',
 };

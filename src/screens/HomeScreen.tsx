@@ -15,6 +15,8 @@ import { EntityRow } from '../components/common/EntityRow';
 // Helpers
 import { getDeterministicAvatar } from '../lib/avatarResolver';
 
+const USER_AVATAR = require('../../assets/user_avatar.png');
+
 // Components
 import { PortfolioCard } from '../components/home/PortfolioCard';
 import { HorizontalCard } from '../components/home/HorizontalCard';
@@ -192,7 +194,7 @@ export const HomeScreen = () => {
             <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                <View style={[styles.headerIconContainer, styles.avatarContainer]}>
                  <Image 
-                    source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                    source={USER_AVATAR} 
                     style={{ width: 40, height: 40, borderRadius: 12 }} 
                  />
                </View>
@@ -421,7 +423,7 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
   headerIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
     borderColor: '#2A2A2A',
   },
   avatarContainer: {
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderColor: '#333',
   },
   unreadDot: {
@@ -469,6 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: COLORS.error, 
   },
+
   scrollContent: {
     paddingBottom: 120, // BottomNav space
   },
@@ -482,7 +485,7 @@ const styles = StyleSheet.create({
   quickActionDark: {
     flex: 1, // Fill available width
     aspectRatio: 1, // Keep square
-    backgroundColor: '#151515', 
+    backgroundColor: COLORS.surface, // Updated from #151515
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -541,7 +544,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   card: {
-    backgroundColor: '#111111',
+    backgroundColor: COLORS.surface, // Updated from #111111
     borderRadius: 16,
     marginHorizontal: PAGE_X, 
     padding: 16, 
@@ -635,7 +638,7 @@ const styles = StyleSheet.create({
   emptyStateCard: {
     margin: PAGE_X,
     padding: 32,
-    backgroundColor: '#111111',
+    backgroundColor: COLORS.surface, // Updated from #111111
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -656,7 +659,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   exploreButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.surface,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 24,

@@ -1,67 +1,130 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
+import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS, FONT_FAMILY } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, ChevronRight, Bell, Shield, CircleHelp as HelpCircle, Wallet } from 'lucide-react-native'; 
+import { Settings, Share2, Pencil } from 'lucide-react-native'; 
+import { getUserProfile, HolderProfile, HoldingPosition } from '../utils/holdingResolvers';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { HolderRow } from '../components/common/HolderRow';
 
-export const ProfileScreen = () => {
-    const { user, logout } = useAuth();
+const USER_AVATAR = require('../../assets/user_avatar.png');
 
-    const menuItems = [
-        { icon: Wallet, label: 'Payment Methods' },
-        { icon: Bell, label: 'Notifications', hasSwitch: true },
-        { icon: Shield, label: 'Privacy & Security' },
-        { icon: HelpCircle, label: 'Help & Support' },
-    ];
+const { width } = Dimensions.get('window');
+
+// --- Components ---
+
+const StatItem = ({ label, value }: { label: string, value: string }) => (
+    <View style={styles.statItem}>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
+    </View>
+);
+
+// --- Screen ---
+
+export const ProfileScreen = ({ navigation }: any) => {
+    const { user } = useAuth();
+    const [profile, setProfile] = useState<HolderProfile | null>(null);
+
+    useEffect(() => {
+        if (user) {
+            const data = getUserProfile(user.id, user.name, user.avatar);
+            setProfile(data);
+        }
+    }, [user]);
+
+    // Derived from profile or user object
+    const followers = user?.followers?.toLocaleString() || '0';
+    const following = user?.following?.toLocaleString() || '0';
+    const portfolioValue = profile ? `$${Math.floor(profile.stats.totalValue).toLocaleString()}` : '-';
+
+    if (!user || !profile) return null;
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-            <View style={styles.header}>
-                <HeaderBack />
-                <Text style={styles.title}>Profile</Text>
-            </View>
+            
+            {/* Top Bar */}
+            <View style={styles.topBar}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <HeaderBack /> 
+                    <Text style={styles.headerTitle}>Profile</Text>
+                </View>
+                <TouchableOpacity style={styles.settingsBtn} onPress={() => navigation.navigate('SettingsHome')}>
+                    <Settings size={24} color={COLORS.white} />
+                </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
-                <View style={styles.profileCard}>
-                    <Image source={{ uri: user?.avatar }} style={styles.avatar} />
-                    <Text style={styles.name}>{user?.name}</Text>
-                    <Text style={styles.handle}>@{user?.handle}</Text>
-                    <TouchableOpacity style={styles.editBtn}>
-                        <Text style={styles.editBtnText}>Edit Profile</Text>
-                    </TouchableOpacity>
-                </View>
+                
+                {/* Profile Header */}
+                <View style={styles.profileHeader}>
+                    <Image source={USER_AVATAR} style={styles.avatar} />
+                    <Text style={styles.name}>{user.name}</Text>
+                    <Text style={styles.handle}>{user.handle}</Text>
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Settings</Text>
-                    {menuItems.map((item, index) => (
-                        <TouchableOpacity key={index} style={styles.menuItem}>
-                            <View style={styles.menuLeft}>
-                                <item.icon size={20} color={COLORS.text} />
-                                <Text style={styles.menuLabel}>{item.label}</Text>
-                            </View>
-                            {item.hasSwitch ? (
-                                <Switch 
-                                    value={true} 
-                                    trackColor={{ false: COLORS.surface, true: COLORS.primary }}
-                                    thumbColor={COLORS.text}
-                                />
-                            ) : (
-                                <ChevronRight size={20} color={COLORS.textSecondary} />
-                            )}
+                    {/* Stats Row */}
+                    <View style={styles.statsRow}>
+                        <StatItem label="Followers" value={followers} />
+                        <View style={styles.statDivider} />
+                        <StatItem label="Following" value={following} />
+                        <View style={styles.statDivider} />
+                        <StatItem label="Portfolio Value" value={portfolioValue} />
+                    </View>
+
+                    {/* Action Buttons */}
+                    <View style={styles.actionButtons}>
+                        <TouchableOpacity 
+                            style={styles.actionBtn}
+                            onPress={() => navigation.navigate('ManageProfile')}
+                        >
+                            <Pencil size={18} color={COLORS.white} style={{ marginRight: 8 }} />
+                            <Text style={styles.actionBtnText}>Edit Profile</Text>
                         </TouchableOpacity>
-                    ))}
+                        <TouchableOpacity style={styles.actionBtn}>
+                            <Share2 size={18} color={COLORS.white} style={{ marginRight: 8 }} />
+                            <Text style={styles.actionBtnText}>Share Profile</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-                    <LogOut size={20} color={COLORS.error} />
-                    <Text style={styles.logoutText}>Log Out</Text>
-                </TouchableOpacity>
+                {/* Watchlist Section */}
+                <View style={styles.watchlistContainer}>
+                    <Text style={styles.sectionTitle}>Watchlist</Text>
+                    
+                    <View style={styles.card}>
+                        {profile.positions.length > 0 ? (
+                            profile.positions.map((pos, index) => (
+                                <HolderRow 
+                                    key={pos.id} 
+                                    item={{
+                                        id: pos.entityId,
+                                        name: pos.entityTitle,
+                                        avatar: '', 
+                                        shares: pos.shares,
+                                        value: pos.value,
+                                        percent: pos.pnlPercent || 0,
+                                        _side: pos.outcomeSide 
+                                    } as any}
+                                    context={{
+                                        type: pos.entityType === 'SHARE' ? 'ARTIST' : pos.entityType,
+                                        entityId: pos.entityId,
+                                        name: pos.entityTitle,
+                                        ticker: pos.entitySymbol,
+                                        // @ts-ignore
+                                        side: pos.outcomeSide
+                                    }}
+                                    isLast={index === profile.positions.length - 1}
+                                />
+                            ))
+                        ) : (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyText}>No items in watchlist</Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
 
-                <Text style={styles.version}>Version 1.0.0 (Build 42)</Text>
             </ScrollView>
         </SafeAreaView>
     );
@@ -72,102 +135,119 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    paddingHorizontal: SPACING.l,
-    paddingVertical: SPACING.m,
-    borderBottomWidth: 1,
-    borderColor: COLORS.surface,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 16,
-    minHeight: 60,
+  topBar: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.m, // HeaderBack has internal padding
+      paddingVertical: SPACING.s,
   },
-  title: {
-      fontSize: 20, // Slightly reduced to fit better centered? Or keep 24? 20 is more standard for center.
-      fontWeight: 'bold',
-      color: COLORS.text,
+  headerTitle: {
+     fontSize: 20,
+     fontFamily: FONT_FAMILY.header,
+     fontWeight: 'bold',
+     color: COLORS.white, 
+  },
+  settingsBtn: {
+      padding: 8,
   },
   content: {
-      padding: SPACING.l,
+      paddingBottom: SPACING.xl,
+      paddingTop: 10,
   },
-  profileCard: {
+  profileHeader: {
       alignItems: 'center',
+      paddingHorizontal: SPACING.l,
       marginBottom: SPACING.xl,
   },
   avatar: {
       width: 80,
       height: 80,
-      borderRadius: BORDER_RADIUS.full,
+      borderRadius: 40,
       marginBottom: SPACING.m,
       borderWidth: 2,
-      borderColor: COLORS.surface,
+      borderColor: '#333',
   },
   name: {
       color: COLORS.text,
-      fontSize: FONT_SIZE.l,
+      fontSize: 20,
+      fontFamily: FONT_FAMILY.header,
       fontWeight: 'bold',
       marginBottom: 4,
   },
   handle: {
       color: COLORS.textSecondary,
-      fontSize: FONT_SIZE.m,
-      marginBottom: SPACING.m,
+      fontSize: 14,
+      marginBottom: SPACING.l,
   },
-  editBtn: {
-      paddingHorizontal: SPACING.l,
-      paddingVertical: SPACING.s,
-      borderRadius: BORDER_RADIUS.full,
-      borderWidth: 1,
-      borderColor: COLORS.border,
-  },
-  editBtnText: {
-      color: COLORS.text,
-      fontWeight: 'bold',
-  },
-  section: {
-      marginBottom: SPACING.xl,
-  },
-  sectionTitle: {
-      color: COLORS.textSecondary,
-      fontWeight: 'bold',
-      marginBottom: SPACING.m,
-      marginLeft: SPACING.s,
-  },
-  menuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: COLORS.surface,
-      padding: SPACING.m,
-      marginBottom: 1,
-      borderRadius: BORDER_RADIUS.m,
-  },
-  menuLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.m,
-  },
-  menuLabel: {
-      color: COLORS.text,
-      fontSize: FONT_SIZE.m,
-  },
-  logoutBtn: {
+  statsRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: SPACING.s,
-      padding: SPACING.m,
-      marginBottom: SPACING.xl,
+      marginBottom: SPACING.l,
+      width: '100%',
   },
-  logoutText: {
-      color: COLORS.error,
+  statItem: {
+      alignItems: 'center',
+      paddingHorizontal: SPACING.m,
+  },
+  statValue: {
+      color: COLORS.text,
+      fontSize: 18,
       fontWeight: 'bold',
-      fontSize: FONT_SIZE.m,
+      fontFamily: FONT_FAMILY.header,
+      marginBottom: 2,
   },
-  version: {
-      textAlign: 'center',
-      color: COLORS.textSecondary,
-      fontSize: FONT_SIZE.xs,
+  statLabel: {
+      color: '#888',
+      fontSize: 12,
   },
+  statDivider: {
+      width: 1,
+      height: 24,
+      backgroundColor: '#333',
+  },
+  actionButtons: {
+      flexDirection: 'row',
+      gap: 12,
+  },
+  actionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#222',
+      height: 56, // Updated to 56px as requested
+      paddingHorizontal: 24,
+      borderRadius: 28, // Fully rounded
+      borderWidth: 1,
+      borderColor: '#333',
+  },
+  actionBtnText: {
+      color: COLORS.text,
+      fontSize: 14,
+      fontWeight: '600',
+  },
+  watchlistContainer: {
+      paddingHorizontal: SPACING.l,
+  },
+  sectionTitle: {
+      color: COLORS.text,
+      fontSize: 18,
+      fontFamily: FONT_FAMILY.header,
+      fontWeight: 'bold',
+      marginBottom: 12,
+  },
+    card: {
+        backgroundColor: COLORS.surface,
+        borderRadius: 16,
+        padding: 16,
+        overflow: 'hidden',
+    },
+    emptyState: {
+        alignItems: 'center',
+        padding: 20,
+    },
+    emptyText: {
+        color: '#666',
+        fontStyle: 'italic',
+    },
 });

@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   actionBtn: {
       width: 100, // Fixed width for square-ish look
       height: 100,
-      backgroundColor: '#151515', // Dark background
+      backgroundColor: COLORS.surface, // Updated from #151515
       borderRadius: 24, // Soft rounded corners
       justifyContent: 'center',
       alignItems: 'center',

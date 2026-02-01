@@ -109,7 +109,7 @@ export const ActivityScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  headerIconContainer: {
+    headerIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderColor: '#2A2A2A',
   },
   avatarContainerHeader: {
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderColor: '#333',
   },
   unreadDot: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: '#222',
+      backgroundColor: COLORS.surface, // Updated from #222
       alignItems: 'center',
       justifyContent: 'center',
   },

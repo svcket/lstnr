@@ -72,7 +72,7 @@ export const UpdatesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   card: {
-    backgroundColor: '#111111',
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: CARD_PAD,
     overflow: 'hidden',

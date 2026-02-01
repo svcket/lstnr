@@ -60,7 +60,7 @@ const DetailRow = ({ label, value, copyable }: { label: string, value: string, c
 );
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000' },
+    container: { flex: 1, backgroundColor: COLORS.background },
     safeArea: { flex: 1 },
     header: {
         flexDirection: 'row',
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     card: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 24,
         padding: 24,
         gap: 20,

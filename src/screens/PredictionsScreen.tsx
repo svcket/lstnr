@@ -175,7 +175,7 @@ export const PredictionsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000' },
+    container: { flex: 1, backgroundColor: COLORS.background },
     safeArea: { flex: 1 },
     header: {
         flexDirection: 'row',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1C1C1E',
+        backgroundColor: COLORS.surface, // Updated from #1C1C1E
         height: 40,
         borderRadius: 12,
         paddingHorizontal: 12,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         height: 52,
         borderRadius: 26,
         paddingHorizontal: 16,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     filterPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         height: 36,
         paddingHorizontal: 12,
         borderRadius: 8,

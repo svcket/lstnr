@@ -472,7 +472,7 @@ const KeypadBtn = ({ label, onPress }: { label: string, onPress: () => void }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050505',
+    backgroundColor: COLORS.background, // Updated from #050505
     paddingTop: 24, 
     justifyContent: 'space-between',
   },
@@ -522,8 +522,8 @@ const styles = StyleSheet.create({
 
   // ... BOTTOM SHEETS
   sheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  settingsSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 60 },
-  reviewSheetContainer: { backgroundColor: '#111', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 40 },
+  settingsSheetContainer: { backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 60 },
+  reviewSheetContainer: { backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16, paddingBottom: 40 },
   sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#222' },
   sheetTitle: { fontSize: 18, color: '#FFF', fontWeight: '700', fontFamily: FONT_FAMILY.header },
 

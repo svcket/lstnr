@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   inputWrapper: {
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderRadius: 28,
     borderWidth: 1,
     borderColor: '#333',
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4, // Reduce vertical padding to allow input to center itself or flex
   },
   inlineInputWrapper: {
-      backgroundColor: '#181818',
+      backgroundColor: COLORS.surface, // Updated from #181818
       borderRadius: 24,
       borderWidth: 1,
       borderColor: '#333',
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   inputWrapperDisabled: {
-      backgroundColor: '#111',
+      backgroundColor: COLORS.surface, // Updated from #111
       borderColor: '#222',
       opacity: 0.7,
   },

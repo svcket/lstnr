@@ -88,7 +88,7 @@ export const MultiRangeMarketCard = ({ market, onPress }: MultiRangeMarketCardPr
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#151515',
+    backgroundColor: COLORS.surface,
     borderRadius: 20,
     padding: 16,
     // Removed border per request

@@ -16,6 +16,8 @@ import { getDeterministicAvatar } from '../lib/avatarResolver';
 import { useAuth } from '../context/AuthContext';
 import Svg, { Circle, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 
+const USER_AVATAR = require('../../assets/user_avatar.png');
+
 // --- TYPES ---
 type FilterType = 'All' | 'Artists' | 'Labels' | 'Predictions' | 'Ending soon';
 
@@ -189,7 +191,7 @@ export const ExploreScreen = () => {
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                        <View style={[styles.headerIconContainer, styles.avatarContainer]}>
                          <Image 
-                            source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                            source={USER_AVATAR} 
                             style={{ width: 40, height: 40, borderRadius: 12 }} 
                          />
                        </View>
@@ -317,7 +319,7 @@ const formatCompact = (num: number) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: COLORS.background,
     },
     safeArea: {
         flex: 1,
@@ -345,7 +347,7 @@ const styles = StyleSheet.create({
     headerIconContainer: {
         width: 40,
         height: 40,
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface, // Updated from #181818
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -353,7 +355,7 @@ const styles = StyleSheet.create({
         borderColor: '#2A2A2A',
     },
     avatarContainer: {
-        backgroundColor: '#181818',
+        backgroundColor: COLORS.surface, // Updated from #181818
         borderColor: '#333',
     },
     unreadDot: {
@@ -372,7 +374,7 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         height: 52,
         borderRadius: 26,
         paddingHorizontal: 16,
@@ -399,7 +401,7 @@ const styles = StyleSheet.create({
         borderColor: '#FFF',
     },
     chipInactive: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface, // Updated from #111
         borderColor: 'rgba(255,255,255,0.1)',
     },
     chipText: {
@@ -428,7 +430,7 @@ const styles = StyleSheet.create({
         color: '#FFF',
     },
     bigCard: {
-        backgroundColor: '#111111',
+        backgroundColor: COLORS.surface,
         marginHorizontal: PX_16,
         borderRadius: 16,
         paddingHorizontal: PX_16, 
@@ -437,7 +439,7 @@ const styles = StyleSheet.create({
 
     // Prediction Cards
     predCard: {
-        backgroundColor: '#111111',
+        backgroundColor: COLORS.surface,
         borderRadius: 16, 
         padding: 16,
         marginHorizontal: 16,

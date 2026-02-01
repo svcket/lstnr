@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { FONT_FAMILY } from '../../constants/theme';
+import { COLORS, FONT_FAMILY } from '../../constants/theme';
 import { ActivityRow } from './ActivityRow';
 import { getActivity, ActivityItem } from '../../data/social';
 
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#181818',
+    backgroundColor: COLORS.surface, // Updated from #181818
     borderWidth: 1,
     borderColor: '#222',
   },

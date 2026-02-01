@@ -223,7 +223,7 @@ export const LandingScreen = () => {
           style={StyleSheet.absoluteFill}
         />
       ) : (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000000' }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: COLORS.background }]} />
       )}
 
       <SafeAreaView style={styles.safeArea}>
@@ -289,7 +289,7 @@ export const LandingScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.background,
     paddingHorizontal: 20,
   },
   btnIcon: {
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#222',
   },
   orBadge: {
-    backgroundColor: '#111',
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,

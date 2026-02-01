@@ -90,11 +90,7 @@ export const ArtistHolders = ({ entityId = 'a1', type = 'ARTIST', onJoinPress }:
                         !hasAccess && styles.promoBtnPrimary
                     ]}
                     onPress={() => {
-                        if (hasAccess) {
-                            navigation.navigate('HoldersChat', { entityId });
-                        } else {
-                            if (onJoinPress) onJoinPress();
-                        }
+                        navigation.navigate('HoldersChat', { entityId });
                     }}
                  >
                      <Text style={[
@@ -257,7 +253,7 @@ const styles = StyleSheet.create({
   },
   metricCard: {
       flex: 1, // Adapts to parent width
-      backgroundColor: '#111',
+      backgroundColor: COLORS.surface, // Updated from #111
       borderRadius: 12,
       padding: 16,
       justifyContent: 'center',
@@ -277,7 +273,7 @@ const styles = StyleSheet.create({
 
   // Promo Card
   promoCard: {
-      backgroundColor: '#111',
+      backgroundColor: COLORS.surface, // Updated from #111
       borderRadius: 16,
       padding: 16,
       marginBottom: 24,

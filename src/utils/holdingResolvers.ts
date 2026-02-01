@@ -238,3 +238,103 @@ export const getHoldingPosition = (
         pnlPercent: pnlPercent,
     };
 };
+
+export const getUserProfile = (userId: string, userName: string, userAvatar: string): HolderProfile => {
+    // Generate a diverse portfolio for the user using MOCK_OTHER_ENTITIES
+    
+    // 1. User Positions
+    const positions: HoldingPosition[] = [];
+    let totalPortfolioValue = 0;
+
+    // Fixed mock subset for consistent user profile
+    const userEntitiesIndices = [0, 1, 3, 4, 7, 8, 11, 13]; 
+
+    userEntitiesIndices.forEach((idx, i) => {
+        if (idx >= MOCK_OTHER_ENTITIES.length) return;
+        const entity = MOCK_OTHER_ENTITIES[idx];
+        const seed = userId.charCodeAt(0) + i;
+        
+        // Random shares/values
+        const shares = 50 + (seed % 20) * 10;
+        const price = 0.5 + ((seed % 50) / 100);
+        const val = shares * price;
+        totalPortfolioValue += val;
+
+        const isProfit = i % 3 !== 0; // mostly profitable
+        const pnlPct = isProfit ? (10 + (i * 2)) : -(5 + i);
+        const pnlVal = val * (pnlPct / 100);
+        const avgBuy = price / (1 + (pnlPct / 100));
+
+        positions.push({
+            id: `my-pos-${i}`,
+            holderId: userId,
+            holderName: userName,
+            holderAvatarUrl: userAvatar,
+            entityType: entity.type as any,
+            entityId: entity.id,
+            entityTitle: entity.title,
+            entitySymbol: entity.ticker,
+            outcomeSide: entity.side as 'YES' | 'NO',
+            shares,
+            value: val,
+            avgBuyPrice: avgBuy,
+            pnlValue: pnlVal,
+            pnlPercent: pnlPct
+        });
+    });
+
+    // Sort by value
+    positions.sort((a, b) => b.value - a.value);
+
+    // 2. Closed Positions (History)
+    const closedPositions: HoldingPosition[] = [];
+    [2, 5].forEach((idx, i) => {
+         const entity = MOCK_OTHER_ENTITIES[idx];
+         closedPositions.push({
+            id: `my-closed-${i}`,
+            holderId: userId,
+            holderName: userName,
+            holderAvatarUrl: userAvatar,
+            entityType: entity.type as any,
+            entityId: entity.id,
+            entityTitle: entity.title,
+            entitySymbol: entity.ticker,
+            outcomeSide: entity.side as 'YES' | 'NO',
+            shares: 0,
+            value: 0,
+            avgBuyPrice: 0.35,
+            pnlValue: 450 * (i + 1), // Realized gains
+            pnlPercent: 25
+         });
+    });
+
+    // 3. User Activity (Mock based on positions)
+    const activity: HoldingActivityItem[] = [];
+    positions.forEach((p, i) => {
+        if (i > 3) return; // Limit activity items
+        activity.push({
+            id: `my-act-${i}`,
+            type: 'BUY',
+            timestamp: `${i + 1}d ago`,
+            sharesDelta: 50,
+            price: p.avgBuyPrice || 0.5,
+            value: 50 * (p.avgBuyPrice || 0.5),
+            subtitle: p.entityType === 'PREDICTION' ? `Predicted ${p.outcomeSide}` : undefined,
+            side: p.outcomeSide
+        });
+    });
+
+    return {
+        stats: {
+            totalValue: totalPortfolioValue + 2450.50, // + Cash Balance
+            biggestWin: 12500.00,
+            predictionsCount: 142,
+            pnlValue: 5430.20,
+            pnlPercent: 32.4, // Good trader
+            chartData: [95, 98, 96, 102, 108, 115, 120, 118, 125, 132, 138] // Upward trend
+        },
+        positions,
+        closedPositions,
+        activity
+    };
+};

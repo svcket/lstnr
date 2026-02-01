@@ -30,6 +30,7 @@ import { AddMethodScreen } from '../screens/AddMethodScreen';
 import { AddMethodFormScreen } from '../screens/AddMethodFormScreen';
 import { HoldersScreen } from '../screens/HoldersScreen';
 import { HoldingDetailsSheet } from '../components/HoldingDetailsSheet';
+import { ManageProfileScreen } from '../screens/ManageProfileScreen';
 
 // ... imports
 
@@ -66,10 +67,21 @@ function TabNavigator() {
   );
 }
 
+import { SettingsHomeScreen } from '../screens/settings/SettingsHomeScreen';
+import { SettingsAccountScreen } from '../screens/settings/SettingsAccountScreen';
+import { SettingsAppearanceScreen } from '../screens/settings/SettingsAppearanceScreen';
+import { SettingsNotificationsScreen } from '../screens/settings/SettingsNotificationsScreen';
+import { SettingsPaymentsScreen } from '../screens/settings/SettingsPaymentsScreen';
+import { SettingsTransactionsScreen } from '../screens/settings/SettingsTransactionsScreen';
+import { SettingsSecurityScreen } from '../screens/settings/SettingsSecurityScreen';
+import { SettingsHelpScreen } from '../screens/settings/SettingsHelpScreen';
+import { SettingsLegalScreen } from '../screens/settings/SettingsLegalScreen';
+
 export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} detachInactiveScreens={false}>
       <Stack.Screen name="Tabs" component={TabNavigator} />
+      {/* ... existing screens ... */}
       <Stack.Screen name="Labels" component={LabelsScreen} />
       <Stack.Screen name="ArtistDetail" component={ArtistDetailScreen} />
 
@@ -94,6 +106,18 @@ export default function AppNavigator() {
       <Stack.Screen name="AddMethod" component={AddMethodScreen} />
       <Stack.Screen name="AddMethodForm" component={AddMethodFormScreen} />
       <Stack.Screen name="History" component={HistoryScreen} />
+
+      {/* Settings Flow */}
+      <Stack.Screen name="ManageProfile" component={ManageProfileScreen} />
+      <Stack.Screen name="SettingsHome" component={SettingsHomeScreen} />
+      <Stack.Screen name="SettingsAccount" component={SettingsAccountScreen} />
+      <Stack.Screen name="SettingsAppearance" component={SettingsAppearanceScreen} />
+      <Stack.Screen name="SettingsNotifications" component={SettingsNotificationsScreen} />
+      <Stack.Screen name="SettingsPayments" component={SettingsPaymentsScreen} />
+      <Stack.Screen name="SettingsTransactions" component={SettingsTransactionsScreen} />
+      <Stack.Screen name="SettingsSecurity" component={SettingsSecurityScreen} />
+      <Stack.Screen name="SettingsHelp" component={SettingsHelpScreen} />
+      <Stack.Screen name="SettingsLegal" component={SettingsLegalScreen} />
     </Stack.Navigator>
   );
 }

@@ -131,7 +131,7 @@ export const OtpScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Full screen dark
+    backgroundColor: COLORS.background, // Full screen dark
     paddingHorizontal: SPACING.l,
     paddingTop: 60,
   },
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 70,
     borderRadius: 12,
-    backgroundColor: '#111',
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: '#333',
     color: '#FFF',

@@ -162,7 +162,7 @@ export const WithdrawScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   card: {
-    backgroundColor: '#111',
+    backgroundColor: COLORS.surface, // Updated from #111
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#222',
+    backgroundColor: COLORS.surface, // Updated from #222
     alignItems: 'center',
     justifyContent: 'center',
   },

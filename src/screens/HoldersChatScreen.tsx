@@ -234,7 +234,7 @@ export const HoldersChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050505', // Very dark bg
+    backgroundColor: COLORS.background, // Very dark bg
   },
   safeArea: {
       flex: 1,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   actionPill: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#111', // Dark pill
+      backgroundColor: COLORS.surface, // Dark pill
       borderRadius: 12, // Rounded corners
       paddingVertical: 10,
       paddingHorizontal: 12,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   // Footer
   footer: {
       padding: 16,
-      backgroundColor: '#050505',
+      backgroundColor: COLORS.background,
   },
   buyButtonWrapper: {
       marginBottom: 16,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
       height: 50,
-      backgroundColor: '#111',
+      backgroundColor: COLORS.surface,
       borderRadius: 25, // Pill shape
       paddingHorizontal: 20,
       flexDirection: 'row',
