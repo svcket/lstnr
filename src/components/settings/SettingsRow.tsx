@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     separator: {
         position: 'absolute',
         bottom: 0,
-        left: 52, // Align with text start usually
+        left: 0, // Span end-to-end
         right: 0,
         height: 1,
         backgroundColor: COLORS.stroke.settings,

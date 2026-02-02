@@ -10,5 +10,5 @@ export const LAYOUT = {
   screenPadding: PX_16,
   sectionSpacing: PX_24,
   cardRadius: 24,
-  chipRadius: 18,
+  chipRadius: 8,
 };

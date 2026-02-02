@@ -1,20 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONT_FAMILY, SPACING } from '../../constants/theme';
 import { SettingsGroup } from '../../components/settings/SettingsGroup';
 import { SettingsRow } from '../../components/settings/SettingsRow';
 import { HeaderBack } from '../../components/common/HeaderBack';
 import { useSettings } from '../../context/SettingsContext';
+import { GradientSwitch } from '../../components/common/GradientSwitch';
 
 export const SettingsNotificationsScreen = () => {
     const { notifications, toggleNotification } = useSettings();
 
     const renderSwitch = (val: boolean, key: keyof typeof notifications) => (
-        <Switch 
+        <GradientSwitch 
             value={val} 
             onValueChange={() => toggleNotification(key)} 
-            trackColor={{ false: '#333', true: COLORS.primary }}
         />
     );
 
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: SPACING.m,
+        paddingHorizontal: SPACING.m, // 16px
         paddingVertical: SPACING.m,
         marginBottom: SPACING.m,
     },
@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     content: {
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
     }
 });

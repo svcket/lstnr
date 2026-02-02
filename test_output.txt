@@ -4,27 +4,32 @@
 
 FAIL src/__tests__/PredictionDetail.test.tsx
   PredictionDetailScreen Layout
-    ✕ renders the chat card with strict styling (197 ms)
-    ✕ renders the split holders view when Holders tab is active (3 ms)
-    ✕ renders the chat tab with composer (5 ms)
+    ✕ renders the chat card with strict styling (170 ms)
+    ✕ renders the split holders view when Holders tab is active (4 ms)
+    ✕ renders the chat tab with composer (4 ms)
 
   ● PredictionDetailScreen Layout › renders the chat card with strict styling
 
-    TypeError: (0 , _catalog.getAllPredictions) is not a function
+    Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
 
-      366 |                                 <Text style={styles.sectionTitle}>Similar Predictions</Text>
-      367 |                                 <View style={styles.similarList}>
-    > 368 |                                     {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
-          |                                                       ^
-      369 |                                         const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
-      370 |                                         const chanceStr = simPred.marketType === 'binary' 
-      371 |                                             ? (simPred.chance + '%') 
+    Check the render method of `PredictionDetailScreen`.
 
-      at PredictionDetailScreen (src/screens/PredictionDetailScreen.tsx:368:55)
-      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13976:20)
-      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2866:22)
-      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6006:19)
-      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7474:18)
+      90 | describe('PredictionDetailScreen Layout', () => {
+      91 |     it('renders the chat card with strict styling', () => {
+    > 92 |         const { getByText } = render(<MockNavigation />);
+         |                                     ^
+      93 |         
+      94 |         // Check for simplified title
+      95 |         expect(getByText('Start a conversation!')).toBeTruthy();
+
+      at createFiberFromTypeAndProps (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12185:28)
+      at createFiberFromElement (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12199:14)
+      at createChild (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4475:26)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4805:25)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5122:30)
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5227:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5735:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7551:13)
       at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:1574:13)
       at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10972:22)
       at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10816:41)
@@ -37,25 +42,30 @@ FAIL src/__tests__/PredictionDetail.test.tsx
       at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
-      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:90:37)
+      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:92:37)
 
   ● PredictionDetailScreen Layout › renders the split holders view when Holders tab is active
 
-    TypeError: (0 , _catalog.getAllPredictions) is not a function
+    Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
 
-      366 |                                 <Text style={styles.sectionTitle}>Similar Predictions</Text>
-      367 |                                 <View style={styles.similarList}>
-    > 368 |                                     {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
-          |                                                       ^
-      369 |                                         const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
-      370 |                                         const chanceStr = simPred.marketType === 'binary' 
-      371 |                                             ? (simPred.chance + '%') 
+    Check the render method of `PredictionDetailScreen`.
 
-      at PredictionDetailScreen (src/screens/PredictionDetailScreen.tsx:368:55)
-      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13976:20)
-      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2866:22)
-      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6006:19)
-      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7474:18)
+      109 |
+      110 |     it('renders the split holders view when Holders tab is active', () => {
+    > 111 |         const { getByText, getAllByText } = render(<MockNavigation />);
+          |                                                   ^
+      112 |         
+      113 |         // Find Holders tab
+      114 |         const holdersTab = getByText('Holders');
+
+      at createFiberFromTypeAndProps (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12185:28)
+      at createFiberFromElement (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12199:14)
+      at createChild (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4475:26)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4805:25)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5122:30)
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5227:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5735:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7551:13)
       at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:1574:13)
       at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10972:22)
       at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10816:41)
@@ -68,25 +78,30 @@ FAIL src/__tests__/PredictionDetail.test.tsx
       at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
-      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:109:51)
+      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:111:51)
 
   ● PredictionDetailScreen Layout › renders the chat tab with composer
 
-    TypeError: (0 , _catalog.getAllPredictions) is not a function
+    Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
 
-      366 |                                 <Text style={styles.sectionTitle}>Similar Predictions</Text>
-      367 |                                 <View style={styles.similarList}>
-    > 368 |                                     {getAllPredictions().filter(p => p.id !== predictionId).slice(0, 3).map((simPred, index, arr) => {
-          |                                                       ^
-      369 |                                         const relatedArtist = simPred.relatedEntityId ? getArtistById(simPred.relatedEntityId) : null;
-      370 |                                         const chanceStr = simPred.marketType === 'binary' 
-      371 |                                             ? (simPred.chance + '%') 
+    Check the render method of `PredictionDetailScreen`.
 
-      at PredictionDetailScreen (src/screens/PredictionDetailScreen.tsx:368:55)
-      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13976:20)
-      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2866:22)
-      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6006:19)
-      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7474:18)
+      126 |
+      127 |     it('renders the chat tab with composer', () => {
+    > 128 |         const { getByText, getByPlaceholderText } = render(<MockNavigation />);
+          |                                                           ^
+      129 |         
+      130 |         // Switch to comments
+      131 |         fireEvent.press(getByText('Comments'));
+
+      at createFiberFromTypeAndProps (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12185:28)
+      at createFiberFromElement (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12199:14)
+      at createChild (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4475:26)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4805:25)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5122:30)
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5227:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5735:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7551:13)
       at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:1574:13)
       at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10972:22)
       at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:10816:41)
@@ -99,10 +114,10 @@ FAIL src/__tests__/PredictionDetail.test.tsx
       at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
       at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
-      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:126:59)
+      at Object.<anonymous> (src/__tests__/PredictionDetail.test.tsx:128:59)
 
 Test Suites: 1 failed, 1 total
 Tests:       3 failed, 3 total
 Snapshots:   0 total
-Time:        0.9 s, estimated 1 s
+Time:        0.879 s, estimated 1 s
 Ran all test suites matching /src\/__tests__\/PredictionDetail.test.tsx/i.

@@ -111,11 +111,11 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         maxHeight: '75%',
-        paddingTop: 12,
-        paddingHorizontal: 16,
+        paddingTop: 8,
         paddingBottom: 40,
         borderWidth: 1,
         borderColor: '#222',
+        overflow: 'hidden',
     },
     handleBar: {
         width: 40,
@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
         borderRadius: 2,
         alignSelf: 'center',
-        marginBottom: 20,
+        marginVertical: 12, // Reduced from marginBottom 20 and paddingTop
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16, // Reduced from 20
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255,255,255,0.05)',
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     listContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16, // Reduced from 20
         paddingVertical: 8,
     },
     row: {

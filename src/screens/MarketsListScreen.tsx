@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    padding: SPACING.l,
+    padding: SPACING.m, // 16px
     borderBottomWidth: 1,
     borderColor: COLORS.surface,
   },

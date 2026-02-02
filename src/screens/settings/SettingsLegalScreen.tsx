@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     content: {
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
     },
     version: {
         color: '#444',

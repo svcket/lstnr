@@ -31,6 +31,14 @@ import { AddMethodFormScreen } from '../screens/AddMethodFormScreen';
 import { HoldersScreen } from '../screens/HoldersScreen';
 import { HoldingDetailsSheet } from '../components/HoldingDetailsSheet';
 import { ManageProfileScreen } from '../screens/ManageProfileScreen';
+import { EditUsernameScreen } from '../screens/EditUsernameScreen';
+import { EditBioScreen } from '../screens/EditBioScreen';
+import { UserNetworkScreen } from '../screens/UserNetworkScreen';
+import { CardsListScreen } from '../screens/settings/payments/CardsListScreen';
+import { WalletsListScreen } from '../screens/settings/payments/WalletsListScreen';
+import { AddCardSheet } from '../components/payments/AddCardSheet';
+import { ConnectWalletSheet } from '../components/payments/ConnectWalletSheet';
+import { DefaultMethodPicker } from '../components/payments/DefaultMethodPicker';
 
 // ... imports
 
@@ -109,11 +117,23 @@ export default function AppNavigator() {
 
       {/* Settings Flow */}
       <Stack.Screen name="ManageProfile" component={ManageProfileScreen} />
+      <Stack.Screen name="EditUsername" component={EditUsernameScreen} />
+      <Stack.Screen name="EditBio" component={EditBioScreen} />
+      <Stack.Screen name="UserNetwork" component={UserNetworkScreen} />
       <Stack.Screen name="SettingsHome" component={SettingsHomeScreen} />
+      
+      {/* Payments Flow */}
+      <Stack.Screen name="SettingsPayments" component={SettingsPaymentsScreen} />
+      <Stack.Screen name="CardsList" component={CardsListScreen} />
+      <Stack.Screen name="WalletsList" component={WalletsListScreen} />
+      <Stack.Screen name="AddCardSheet" component={AddCardSheet} options={{ presentation: 'transparentModal', animation: 'fade' }} />
+      <Stack.Screen name="ConnectWalletSheet" component={ConnectWalletSheet} options={{ presentation: 'transparentModal', animation: 'fade' }} />
+      <Stack.Screen name="DefaultMethodPicker" component={DefaultMethodPicker} options={{ presentation: 'transparentModal', animation: 'fade' }} />
+
       <Stack.Screen name="SettingsAccount" component={SettingsAccountScreen} />
       <Stack.Screen name="SettingsAppearance" component={SettingsAppearanceScreen} />
       <Stack.Screen name="SettingsNotifications" component={SettingsNotificationsScreen} />
-      <Stack.Screen name="SettingsPayments" component={SettingsPaymentsScreen} />
+      {/* <Stack.Screen name="SettingsPayments" component={SettingsPaymentsScreen} /> REMOVED DUPLICATE - MOVED UP */}
       <Stack.Screen name="SettingsTransactions" component={SettingsTransactionsScreen} />
       <Stack.Screen name="SettingsSecurity" component={SettingsSecurityScreen} />
       <Stack.Screen name="SettingsHelp" component={SettingsHelpScreen} />

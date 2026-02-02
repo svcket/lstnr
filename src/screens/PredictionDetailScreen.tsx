@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 import { HeaderBack } from '../components/common/HeaderBack';
-import { Share, MessageCircle, Lock, Monitor, ShieldCheck, Info, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { Share, MessageCircle, Lock, Monitor, ShieldCheck, Info, ChevronDown, ChevronUp, Eye } from 'lucide-react-native';
+import { GradientEye } from '../components/common/GradientEye';
 import { ArtistTabs, TabType } from '../components/artist/ArtistTabs';
 import { ArtistComments } from '../components/artist/ArtistComments';
 import { ArtistHolders } from '../components/artist/ArtistHolders';
@@ -40,6 +41,13 @@ export const PredictionDetailScreen = ({ route }: any) => {
             setActiveTab(initialTab);
         }
     }, [initialTab]);
+
+    const [isWatchlisted, setIsWatchlisted] = useState(false);
+    const toggleWatchlist = () => {
+        const newState = !isWatchlisted;
+        setIsWatchlisted(newState);
+        if (newState) showToast('Prediction added to watchlist', 'success');
+    };
 
     const [tradeSheetOpen, setTradeSheetOpen] = useState(false);
     const [shareSheetVisible, setShareSheetVisible] = useState(false);
@@ -108,12 +116,17 @@ export const PredictionDetailScreen = ({ route }: any) => {
             <View style={[styles.header, { paddingTop: insets.top }]}>
                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
                     <HeaderBack />
-                    <Text style={styles.headerTitle}>Predictions</Text>
-                 </View>
-                 <TouchableOpacity onPress={() => setShareSheetVisible(true)}>
-                     <Share size={24} color={COLORS.white} />
-                 </TouchableOpacity>
-            </View>
+                     <Text style={styles.headerTitle}>Predictions</Text>
+                  </View>
+                  <View style={{flexDirection: 'row', gap: 20}}>
+                     <TouchableOpacity onPress={toggleWatchlist} activeOpacity={0.7}>
+                        {isWatchlisted ? <GradientEye size={24} /> : <Eye size={24} color="#FFF" />}
+                     </TouchableOpacity>
+                     <TouchableOpacity onPress={() => setShareSheetVisible(true)}>
+                         <Share size={24} color={COLORS.white} />
+                     </TouchableOpacity>
+                  </View>
+             </View>
 
             <ScrollView stickyHeaderIndices={[1]} showsVerticalScrollIndicator={false}>
                 <View style={styles.heroSection}>

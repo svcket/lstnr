@@ -7,6 +7,7 @@ import { Settings, Share2, Pencil } from 'lucide-react-native';
 import { getUserProfile, HolderProfile, HoldingPosition } from '../utils/holdingResolvers';
 import { HeaderBack } from '../components/common/HeaderBack';
 import { HolderRow } from '../components/common/HolderRow';
+import { ShareSheet } from '../components/artist/ShareSheet';
 
 const USER_AVATAR = require('../../assets/user_avatar.png');
 
@@ -26,6 +27,7 @@ const StatItem = ({ label, value }: { label: string, value: string }) => (
 export const ProfileScreen = ({ navigation }: any) => {
     const { user } = useAuth();
     const [profile, setProfile] = useState<HolderProfile | null>(null);
+    const [showShare, setShowShare] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -81,7 +83,10 @@ export const ProfileScreen = ({ navigation }: any) => {
                             <Pencil size={18} color={COLORS.white} style={{ marginRight: 8 }} />
                             <Text style={styles.actionBtnText}>Edit Profile</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.actionBtn}>
+                        <TouchableOpacity 
+                            style={styles.actionBtn}
+                            onPress={() => setShowShare(true)}
+                        >
                             <Share2 size={18} color={COLORS.white} style={{ marginRight: 8 }} />
                             <Text style={styles.actionBtnText}>Share Profile</Text>
                         </TouchableOpacity>
@@ -126,6 +131,12 @@ export const ProfileScreen = ({ navigation }: any) => {
                 </View>
 
             </ScrollView>
+
+            <ShareSheet
+                visible={showShare}
+                onClose={() => setShowShare(false)}
+                artistName={user.name} 
+            />
         </SafeAreaView>
     );
 };
@@ -157,7 +168,7 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
       alignItems: 'center',
-      paddingHorizontal: SPACING.l,
+      paddingHorizontal: SPACING.m, // 16px
       marginBottom: SPACING.xl,
   },
   avatar: {
@@ -227,19 +238,20 @@ const styles = StyleSheet.create({
       fontWeight: '600',
   },
   watchlistContainer: {
-      paddingHorizontal: SPACING.l,
+      paddingHorizontal: SPACING.m, // 16px
   },
   sectionTitle: {
       color: COLORS.text,
       fontSize: 18,
       fontFamily: FONT_FAMILY.header,
       fontWeight: 'bold',
-      marginBottom: 12,
+      marginBottom: 16, // 16px spacing
   },
     card: {
         backgroundColor: COLORS.surface,
         borderRadius: 16,
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 4, // 4px + 12px (HolderRow) = 16px total visual padding
         overflow: 'hidden',
     },
     emptyState: {

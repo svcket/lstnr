@@ -60,16 +60,16 @@ export const ARTISTS: Artist[] = [
         createdBy: { name: 'Roc Nation', avatarUrl: 'https://ui-avatars.com/api/?name=Roc+Nation&background=111&color=fff', isVerified: true }
     },
     {
-        id: 'a2',
+        id: 'a15',
         type: 'artist',
-        name: 'Drake',
-        symbol: '$6GOD',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Drake&background=F5A623&color=000&size=256',
-        bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music.',
+        name: 'Kendrick Lamar',
+        symbol: '$KDOT',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Kendrick+Lamar&background=000&color=fff',
+        bio: 'Pulitzer Prize-winning rapper known for his complex lyricism.',
         region: 'North America',
-        genres: ['Hip-Hop', 'R&B'],
-        links: { spotify: 'https://spotify.com/drake', instagram: 'https://instagram.com/champagnepapi' },
-        createdBy: { name: 'Lil Wayne', avatarUrl: 'https://ui-avatars.com/api/?name=Lil+Wayne&background=000&color=fff', isVerified: true }
+        genres: ['Hip-Hop'],
+        links: { website: 'https://oklama.com' },
+        createdBy: { name: 'pgLang', avatarUrl: 'https://ui-avatars.com/api/?name=pgLang&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a3',
@@ -216,16 +216,16 @@ export const ARTISTS: Artist[] = [
         createdBy: { name: 'Republic', avatarUrl: 'https://ui-avatars.com/api/?name=Republic&background=FFB6C1&color=fff', isVerified: true }
     },
     {
-        id: 'a15',
+        id: 'a2',
         type: 'artist',
-        name: 'Kendrick Lamar',
-        symbol: '$KDOT',
-        avatarUrl: 'https://ui-avatars.com/api/?name=Kendrick+Lamar&background=000&color=fff',
-        bio: 'Pulitzer Prize-winning rapper known for his complex lyricism.',
+        name: 'Drake',
+        symbol: '$6GOD',
+        avatarUrl: 'https://ui-avatars.com/api/?name=Drake&background=F5A623&color=000&size=256',
+        bio: 'Canadian rapper, singer, and songwriter. A dominant figure in contemporary popular music.',
         region: 'North America',
-        genres: ['Hip-Hop'],
-        links: { website: 'https://oklama.com' },
-        createdBy: { name: 'pgLang', avatarUrl: 'https://ui-avatars.com/api/?name=pgLang&background=000&color=fff', isVerified: true }
+        genres: ['Hip-Hop', 'R&B'],
+        links: { spotify: 'https://spotify.com/drake', instagram: 'https://instagram.com/champagnepapi' },
+        createdBy: { name: 'Lil Wayne', avatarUrl: 'https://ui-avatars.com/api/?name=Lil+Wayne&background=000&color=fff', isVerified: true }
     },
     {
         id: 'a16',

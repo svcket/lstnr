@@ -7,8 +7,9 @@ import { ICONS } from '../constants/assets';
 import { getInboxThreads, InboxThread } from '../data/inbox';
 import { Pin, Bell } from 'lucide-react-native';
 import { BottomNav } from '../components/home/BottomNav';
-import { getDeterministicAvatar } from '../lib/avatarResolver';
 import { useAuth } from '../context/AuthContext';
+
+const USER_AVATAR = require('../../assets/user_avatar.png');
 
 export const ActivityScreen = () => {
   const { user } = useAuth();
@@ -82,7 +83,7 @@ export const ActivityScreen = () => {
                   <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
                       <View style={[styles.headerIconContainer, styles.avatarContainerHeader]}>
                         <Image 
-                           source={{ uri: getDeterministicAvatar(user?.name || 'User', user?.id || 'u1') }} 
+                           source={USER_AVATAR} 
                            style={{ width: 40, height: 40, borderRadius: 12 }} 
                         />
                       </View>

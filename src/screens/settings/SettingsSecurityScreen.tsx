@@ -6,6 +6,7 @@ import { SettingsGroup } from '../../components/settings/SettingsGroup';
 import { SettingsRow } from '../../components/settings/SettingsRow';
 import { HeaderBack } from '../../components/common/HeaderBack';
 import { useSettings } from '../../context/SettingsContext';
+import { GradientSwitch } from '../../components/common/GradientSwitch';
 
 export const SettingsSecurityScreen = () => {
     const { security, toggleSecurity, setProfileVisibility } = useSettings();
@@ -40,10 +41,9 @@ export const SettingsSecurityScreen = () => {
                     <SettingsRow 
                         title="Biometric Lock" 
                         rightElement={
-                            <Switch 
+                            <GradientSwitch 
                                 value={security.biometricLock} 
                                 onValueChange={() => toggleSecurity('biometricLock')}
-                                trackColor={{ false: '#333', true: COLORS.primary }}
                             />
                         }
                     />
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     content: {
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
     },
     sectionLabel: {
         color: '#666',

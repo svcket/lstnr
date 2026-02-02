@@ -49,12 +49,23 @@ jest.mock('lucide-react-native', () => ({
   Send: () => 'Send',
   ChevronDown: () => 'ChevronDown',
   ChevronUp: () => 'ChevronUp',
+  Eye: () => 'Eye',
 }));
 
 jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation', () => ({
   ...jest.requireActual('react-native/Libraries/LayoutAnimation/LayoutAnimation'),
   configureNext: jest.fn(),
   Presets: { easeInEaseOut: {} },
+}));
+
+jest.mock('react-native-svg', () => ({
+  __esModule: true,
+  default: 'Svg',
+  Path: 'Path',
+  Defs: 'Defs',
+  LinearGradient: 'LinearGradient',
+  Stop: 'Stop',
+  Circle: 'Circle',
 }));
 
 jest.mock('../data/social', () => ({
@@ -66,6 +77,69 @@ jest.mock('../data/social', () => ({
   }),
   getComments: () => [],
   addComment: () => ({ id: 'c1', text: 'Test Comment', user: { name: 'Me' } })
+}));
+
+jest.mock('../components/common/GradientEye', () => ({
+  GradientEye: () => 'GradientEye'
+}));
+
+jest.mock('../components/charts/UnifiedMarketChart', () => ({
+  UnifiedMarketChart: () => 'UnifiedMarketChart'
+}));
+
+jest.mock('../components/artist/ArtistTabs', () => ({
+  ArtistTabs: ({ onTabPress }) => {
+     const { View, Button } = require('react-native');
+     return (
+         <View>
+             <Button title="Holders" onPress={() => onTabPress('Holders')} />
+             <Button title="Comments" onPress={() => onTabPress('Comments')} />
+         </View>
+     );
+  }
+}));
+
+jest.mock('../components/artist/ArtistComments', () => ({
+  ArtistComments: () => {
+    const { TextInput } = require('react-native');
+    return <TextInput placeholder="Hold $1 stake to comment" />;
+  }
+}));
+
+jest.mock('../components/artist/ArtistHolders', () => ({
+  ArtistHolders: () => {
+     const { View, Text } = require('react-native');
+     return (
+        <View>
+            <Text>Yes holders</Text>
+            <Text>No holders</Text>
+            <Text>UserY0</Text>
+             {/* Render enough items to satisfy "length > 0" */}
+            <Text>100 shares</Text>
+            <Text>UserN0</Text>
+        </View>
+     );
+  }
+}));
+
+jest.mock('../components/artist/ArtistActivity', () => ({
+  ArtistActivity: () => 'ArtistActivity'
+}));
+jest.mock('../components/common/FilterSheet', () => ({
+  FilterSheet: () => 'FilterSheet'
+}));
+jest.mock('../components/artist/ShareSheet', () => ({
+  ShareSheet: () => 'ShareSheet'
+}));
+jest.mock('../components/common/InfoSheet', () => ({
+  InfoSheet: () => 'InfoSheet'
+}));
+jest.mock('../components/artist/TradeSheet', () => ({
+  TradeSheet: () => 'TradeSheet'
+}));
+// ScreenContainer is simple, but let's mock it to be safe
+jest.mock('../components/common/ScreenContainer', () => ({
+  ScreenContainer: ({ children }: any) => <>{children}</>
 }));
 
 // Mock Navigation

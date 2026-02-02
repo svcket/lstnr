@@ -26,7 +26,7 @@ export const SettingsHomeScreen = () => {
                     title: user?.handle || '@user',
                     subtitle: 'Manage Profile',
                     icon: <User size={20} color={COLORS.primary} />,
-                    onPress: () => navigation.navigate('Profile') // Existing profile
+                    onPress: () => navigation.navigate('ManageProfile')
                 },
                 {
                     id: 'manage_account',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
         paddingVertical: SPACING.s,
     },
     headerTitle: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#18181b',
-        marginHorizontal: SPACING.l,
+        marginHorizontal: SPACING.m, // 16px
         paddingHorizontal: 12,
         height: 44,
         borderRadius: 12,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     content: {
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
         paddingBottom: SPACING.xl,
     },
     emptyState: {

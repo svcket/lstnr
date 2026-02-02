@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_FAMILY, BORDER_RADIUS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
@@ -34,15 +34,34 @@ const MenuItem = ({ label, value, icon, isLast, onPress }: MenuItemProps) => (
 export const ManageProfileScreen = ({ navigation }: any) => {
     const { user } = useAuth();
 
+    const handleEditAvatar = () => {
+        Alert.alert(
+            "Change Profile Photo",
+            "Choose an option",
+            [
+                { 
+                    text: "Take Photo", 
+                    onPress: () => Alert.alert("Camera", "Camera functionality would open here.") 
+                },
+                { 
+                    text: "Choose from Library", 
+                    onPress: () => Alert.alert("Gallery", "Gallery picker would open here.") 
+                },
+                { text: "Cancel", style: "cancel" }
+            ]
+        );
+    };
+
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.safeArea} edges={['top']}>
                 
                 {/* Header */}
                 <View style={styles.header}>
-                    <HeaderBack />
-                    <Text style={styles.headerTitle}>Manage Profile</Text>
-                    <View style={{ width: 40 }} /> 
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <HeaderBack />
+                        <Text style={styles.headerTitle}>Manage Profile</Text>
+                    </View>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.content}>
@@ -51,7 +70,7 @@ export const ManageProfileScreen = ({ navigation }: any) => {
                     <View style={styles.avatarSection}>
                         <View style={styles.avatarContainer}>
                             <Image source={USER_AVATAR} style={styles.avatar} />
-                            <TouchableOpacity style={styles.editBadge}>
+                            <TouchableOpacity style={styles.editBadge} onPress={handleEditAvatar}>
                                 <Pencil size={14} color="#FFF" />
                             </TouchableOpacity>
                         </View>
@@ -63,12 +82,12 @@ export const ManageProfileScreen = ({ navigation }: any) => {
                         <MenuItem 
                             label="Username" 
                             value={user?.handle || '@svcket'} 
-                            onPress={() => {}} 
+                            onPress={() => navigation.navigate('EditUsername')} 
                         />
                         <MenuItem 
                             label="Bio" 
                             isLast 
-                            onPress={() => {}} 
+                            onPress={() => navigation.navigate('EditBio')} 
                         />
                     </View>
 
@@ -78,7 +97,12 @@ export const ManageProfileScreen = ({ navigation }: any) => {
                         <MenuItem 
                             label="Followers" 
                             value={(user?.followers || 0).toString()} 
-                            onPress={() => {}} 
+                            onPress={() => navigation.navigate('UserNetwork', { type: 'followers' })} 
+                        />
+                        <MenuItem 
+                            label="Following" 
+                            value={(user?.following || 0).toString()} 
+                            onPress={() => navigation.navigate('UserNetwork', { type: 'following' })} 
                         />
                         <MenuItem 
                             label="Auth Factors" 
@@ -123,7 +147,7 @@ const styles = StyleSheet.create({
     },
     content: {
         paddingTop: 20,
-        paddingHorizontal: SPACING.l,
+        paddingHorizontal: SPACING.m, // 16px
     },
     avatarSection: {
         alignItems: 'center',
@@ -138,7 +162,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: '#222',
         borderWidth: 2,
-        borderColor: '#222', // As closest to screenshot dark ring
+        borderColor: '#222',
     },
     editBadge: {
         position: 'absolute',

@@ -18,6 +18,8 @@ import { ArtistHolders } from '../components/artist/ArtistHolders';
 import { ArtistActivity } from '../components/artist/ArtistActivity';
 import { ArtistPredictions } from '../components/artist/ArtistPredictions';
 import { ShareSheet } from '../components/artist/ShareSheet';
+import { useToast } from '../context/ToastContext';
+import { GradientEye } from '../components/common/GradientEye';
 
 const { width } = Dimensions.get('window');
 const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
@@ -25,6 +27,7 @@ const TIMEFRAMES = ['1m', '5m', '10m', '15m', '30m', 'All'];
 export const LabelDetailScreen = ({ route, navigation }: any) => {
     const { labelId } = route.params || { labelId: 'l1' };
     const insets = useSafeAreaInsets();
+    const { showToast } = useToast();
     
     // START: IDENTICAL STATE LOGIC TO ARTIST DETAIL
     const [label, setLabel] = useState<Label | null>(null);
@@ -44,7 +47,11 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
     };
 
     const toggleWatchlist = () => {
-        setIsWatchlisted(!isWatchlisted);
+        const newState = !isWatchlisted;
+        setIsWatchlisted(newState);
+        if (newState) {
+             showToast('Label added to watchlist', 'success');
+        }
     };
 
     // FETCH DATA
@@ -108,8 +115,12 @@ export const LabelDetailScreen = ({ route, navigation }: any) => {
                     </View>
                 </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity onPress={toggleWatchlist}>
-                         <Eye size={24} color={isWatchlisted ? COLORS.primary : "#FFF"} fill={isWatchlisted ? COLORS.primary : "transparent"} />
+                    <TouchableOpacity onPress={toggleWatchlist} activeOpacity={0.7}>
+                         {isWatchlisted ? (
+                             <GradientEye size={24} />
+                         ) : (
+                             <Eye size={24} color="#FFF" />
+                         )}
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setShareSheetVisible(true)}>
                          <Share size={24} color="#FFF" />
