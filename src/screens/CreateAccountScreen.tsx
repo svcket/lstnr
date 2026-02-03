@@ -8,6 +8,7 @@ import { FONT_FAMILY, SPACING, COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { GradientButton } from '../components/common/GradientButton';
 
 export const CreateAccountScreen = () => {
   const navigation = useNavigation<any>();
@@ -145,15 +146,13 @@ export const CreateAccountScreen = () => {
         </View>
         
         {/* Create Button */}
-        <TouchableOpacity 
-          style={[styles.mainButton, !isFormValid && styles.disabled]}
+        {/* Create Button */}
+        <GradientButton 
+          title={loading ? 'Creating account...' : 'Create account'} 
           onPress={handleCreate}
           disabled={!isFormValid || loading}
-        >
-           <Text style={styles.btnText}>
-             {loading ? 'Creating account...' : 'Create account'}
-           </Text>
-        </TouchableOpacity>
+          style={styles.mainButton}
+        />
 
       </ScrollView>
     </View>
@@ -261,11 +260,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   mainButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 20,
   },
   disabled: {
     backgroundColor: '#333',

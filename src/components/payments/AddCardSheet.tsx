@@ -161,10 +161,10 @@ export const AddCardSheet = () => {
 const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
-        backgroundColor: COLORS.surface, // Modal surface
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingTop: 8,
+        backgroundColor: COLORS.background,
+        borderTopLeftRadius: 32, 
+        borderTopRightRadius: 32,
+        paddingTop: 0,
     },
     header: {
         flexDirection: 'row',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#222',
-        marginTop: 20,
+        // marginTop removed
     },
     title: {
         fontSize: 18,
@@ -198,10 +198,10 @@ const styles = StyleSheet.create({
         fontFamily: FONT_FAMILY.body,
     },
     input: {
-        backgroundColor: '#111',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
+        backgroundColor: COLORS.surface, // Slightly lighter than bg
+        borderRadius: 28, // Pill shape like Auth
+        paddingHorizontal: 20,
+        height: 56, // Fixed height like Auth
         color: '#FFF',
         fontSize: 16,
         fontFamily: FONT_FAMILY.body,
@@ -217,8 +217,10 @@ const styles = StyleSheet.create({
         gap: 8,
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
         padding: 12,
-        borderRadius: 8,
-        marginTop: 8,
+        borderRadius: 12,
+        marginTop: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.2)',
     },
     secureText: {
         color: '#059669',

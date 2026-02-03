@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { requestPasswordReset } from '../services/authApi';
+import { GradientButton } from '../components/common/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,8 +49,11 @@ export const ForgotPasswordScreen = () => {
   };
 
   const handleClose = () => {
-    // Navigate to Get Started page (auth slide)
-    navigation.navigate('Landing', { slide: 2 });
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+       navigation.navigate('Landing', { slide: 2 });
+    }
   };
 
   const handleGoToReset = () => {
@@ -114,20 +118,17 @@ export const ForgotPasswordScreen = () => {
           </View>
 
           {/* Send Recovery Button */}
-          <TouchableOpacity 
-            style={[styles.sendButton, !isFormValid && styles.disabledButton]}
+          <GradientButton 
+            title={isLoading ? 'Sending...' : 'Email me a recovery link'}
             onPress={handleSendRecovery}
             disabled={!isFormValid || isLoading}
-          >
-            <Text style={styles.sendText}>
-              {isLoading ? 'Sending...' : 'Email me a recovery link'}
-            </Text>
-          </TouchableOpacity>
+            style={styles.sendButton}
+          />
 
           {/* Go back link */}
           <TouchableOpacity 
             style={styles.fallbackButton}
-            onPress={() => navigation.navigate('Login', { identifier: email })}
+            onPress={() => navigation.replace('Login', { identifier: email })}
           >
             <Text style={styles.fallbackText}>
               Oh I remember my password now! <Text style={styles.fallbackLink}>Go back to Login</Text>
@@ -150,12 +151,11 @@ export const ForgotPasswordScreen = () => {
             <Text style={styles.successSubtitle}>
               A recovery mail has been sent to enable you reset your password
             </Text>
-            <TouchableOpacity 
-              style={styles.successButton}
+            <GradientButton 
+              title="Enter recovery code"
               onPress={handleGoToReset}
-            >
-              <Text style={styles.sendText}>Enter recovery code</Text>
-            </TouchableOpacity>
+              style={styles.successButton}
+            />
           </View>
         </View>
       </Modal>
@@ -253,31 +253,22 @@ const styles = StyleSheet.create({
     right: 20,
   },
   sendButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 20,
+    marginTop: 10,
   },
-  disabledButton: {
-    opacity: 0.3,
-  },
-  sendText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
-  },
+
   fallbackButton: {
     alignSelf: 'center',
   },
   fallbackText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.bodyBold,
+    color: '#888',
+    fontFamily: FONT_FAMILY.body,
     fontSize: 14,
   },
   fallbackLink: {
-    color: COLORS.primary,
+    color: '#FFF',
+    fontFamily: FONT_FAMILY.header,
+    fontWeight: 'bold',
   },
   // Success Modal
   successOverlay: {
@@ -310,11 +301,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   successButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
     width: '100%',
   },
 });

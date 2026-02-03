@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { GENRES } from '../constants/genres';
+import { GradientButton } from '../components/common/GradientButton';
 
 // 2) Metrics defined here
 const { width } = Dimensions.get('window');
@@ -94,7 +95,7 @@ export const GenreSelectionScreen = () => {
     <SafeAreaView style={styles.root}>
       {/* 1) Header Zone (Static) */}
       <View style={styles.header}>
-        <Text style={styles.title}>Personalize your genres of interest</Text>
+        <Text style={styles.title}>Personalize your genres{'\n'}of interest</Text>
         <Text style={styles.subtitle}>Invest in their story, earn in their success.</Text>
       </View>
 
@@ -113,20 +114,13 @@ export const GenreSelectionScreen = () => {
 
       {/* 3) Footer Zone (Static) */}
       <View style={styles.footer}>
-        <TouchableOpacity 
-          style={[styles.continueButtonWrapper, { opacity: hasSelection ? 1 : 0.45 }]}
+        <GradientButton 
+          title="Continue"
           onPress={handleContinue}
           disabled={!hasSelection}
-        >
-          <LinearGradient
-            colors={['#8B6914', '#CD0000']} 
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.continueButton}
-          >
-            <Text style={styles.continueText}>Continue</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          style={styles.continueButtonWrapper}
+          textStyle={{ fontFamily: FONT_FAMILY.medium }}
+        />
 
         <TouchableOpacity onPress={handleContinue} style={styles.skipButton}>
           <Text style={styles.skipText}>Do this later</Text>
@@ -143,13 +137,15 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.l,
-    paddingTop: 10,
+    paddingHorizontal: SPACING.l,
+    paddingTop: 0, // Reduced from 10
     paddingBottom: 24,
     backgroundColor: '#000', // Ensure opacity doesn't bleed
     zIndex: 10,
   },
   title: {
-    fontFamily: FONT_FAMILY.header,
+    fontFamily: FONT_FAMILY.medium,
+    fontWeight: '600', // Semi-bold
     fontSize: 32,
     color: '#FFF',
     lineHeight: 38,
@@ -157,8 +153,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.body,
-    fontSize: 14,
-    color: '#888',
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.8)',
   },
   listContainer: {
     flex: 1, // Only scrollable region
@@ -181,9 +177,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
     borderRadius: 16,
-    // marginBottom is handled in inline style or gap if vertical gap supported
-    // But FlatList doesn't support vertical 'gap' easily in all versions for columns
-    // We added marginBottom: GAP in renderItem
   },
   genreItemActive: {
     backgroundColor: '#333',
@@ -191,8 +184,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   genreText: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 18, 
+    fontFamily: FONT_FAMILY.medium,
+    fontSize: 16, // Reduced from 18 
     color: '#888',
     textAlign: 'center',
   },
@@ -211,25 +204,16 @@ const styles = StyleSheet.create({
   },
   continueButtonWrapper: {
     marginBottom: 20,
-  },
-  continueButton: {
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  continueText: {
-    fontFamily: FONT_FAMILY.header,
-    color: '#FFF',
-    fontSize: 16,
+    width: '100%',
   },
   skipButton: {
     alignItems: 'center',
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 24, // Increased to 24px
   },
   skipText: {
-    fontFamily: FONT_FAMILY.bodyBold,
+    fontFamily: FONT_FAMILY.medium,
+    fontWeight: '600', // Match main CTA weight
     color: '#FFF',
     fontSize: 14,
   },

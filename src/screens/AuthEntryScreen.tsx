@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { checkIdentifierExists, requestOtp } from '../services/authApi';
 import { COUNTRIES } from '../constants/countries';
 import { FlatList } from 'react-native';
+import { GradientButton } from '../components/common/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,7 +66,7 @@ export const AuthEntryScreen = () => {
       const exists = await checkIdentifierExists(fullIdentifier);
       
       if (exists) {
-        navigation.navigate('Login', { identifier: fullIdentifier });
+        navigation.replace('Login', { identifier: fullIdentifier });
       } else {
         const otpResult = await requestOtp(fullIdentifier);
         if (otpResult.success) {
@@ -84,7 +85,7 @@ export const AuthEntryScreen = () => {
     // Navigate to Login regardless of existence check
     // Prefill with current input
     const fullIdentifier = authMethod === 'whatsapp' ? `${selectedCountry.code}${inputValue}` : inputValue;
-    navigation.navigate('Login', { identifier: fullIdentifier });
+    navigation.replace('Login', { identifier: fullIdentifier });
   };
 
   const renderCountryPicker = () => {
@@ -112,8 +113,12 @@ export const AuthEntryScreen = () => {
   };
 
   const handleClose = () => {
-    // Navigate to Get Started page (auth slide)
-    navigation.navigate('Landing', { slide: 2 });
+    // Close the modal to reveal the Get Started slide underneath
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+       navigation.navigate('Landing', { slide: 2 });
+    }
   };
 
   return (
@@ -216,13 +221,12 @@ export const AuthEntryScreen = () => {
           </View>
 
           {/* Continue Button */}
-          <TouchableOpacity 
-            style={[styles.continueButton, !inputValue && styles.disabledButton]}
+          <GradientButton 
+            title="Continue"
             onPress={handleContinue}
             disabled={!inputValue}
-          >
-            <Text style={styles.continueText}>Continue</Text>
-          </TouchableOpacity>
+            style={styles.continueButton}
+          />
 
           {/* Fallback Login Link */}
           <TouchableOpacity 
@@ -348,20 +352,10 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
   },
   continueButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
-  disabledButton: {
-    opacity: 0.3,
-  },
-  continueText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
-  },
+
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -435,5 +429,6 @@ const styles = StyleSheet.create({
   fallbackLink: {
     color: '#FFF',
     fontFamily: FONT_FAMILY.header,
+    fontWeight: 'bold',
   },
 });

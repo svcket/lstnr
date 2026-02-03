@@ -35,6 +35,7 @@ const SLIDES = [
     id: 3,
     titleMain: 'Get Started',
     subtitle: 'Where belief meets reward.',
+    buttonLabel: 'Get started',
     isAuth: true,
   }
 ];
@@ -174,6 +175,19 @@ export const LandingScreen = () => {
        <View style={{ flex: 1 }} />
 
        <View style={styles.authContent}>
+         {/* Background with Fade Top */}
+         <View style={[StyleSheet.absoluteFill, { backgroundColor: COLORS.background }]} />
+         <LinearGradient
+           colors={['transparent', COLORS.background]}
+           style={{
+             position: 'absolute',
+             top: -100,
+             left: 0,
+             right: 0,
+             height: 100,
+           }}
+         />
+
          <Text style={styles.authTitle}>Get Started</Text>
          <Text style={styles.authSubtitle}>Where belief meets reward.</Text>
 
@@ -215,7 +229,7 @@ export const LandingScreen = () => {
   return (
     <View style={styles.container}>
       
-      {!slide.isAuth ? (
+      {slide.gradient ? (
         <LinearGradient
           colors={slide.gradient as [string, string, ...string[]]}
           start={slide.start}
@@ -236,11 +250,7 @@ export const LandingScreen = () => {
                 {SLIDES.filter(s => !s.isAuth).map((_, index) => renderProgressBar(index))}
               </View>
 
-              <View style={styles.tagContainer}>
-                <View style={styles.tag}>
-                   <Text style={styles.tagText}>Curious Fan</Text>
-                </View>
-              </View>
+              <View style={styles.tagContainer} />
 
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{slide.titleMain}</Text>
@@ -339,9 +349,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.l,
   },
   title: {
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 56,
-    lineHeight: 60,
+    fontFamily: FONT_FAMILY.medium, // Semibold
+    fontWeight: '600',
+    fontSize: 52,
+    lineHeight: 56,
     color: '#FFFFFF',
     marginBottom: SPACING.m,
   },
@@ -369,8 +380,9 @@ const styles = StyleSheet.create({
   },
   mainButtonText: {
     fontFamily: FONT_FAMILY.header,
+    fontWeight: '600',
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16, // Standard app size
   },
   solidButton: {
     backgroundColor: '#FFFFFF',
@@ -386,8 +398,9 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontFamily: FONT_FAMILY.header,
+    fontWeight: '600',
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 14,
+    fontSize: 16,
   },
   // Auth Slide
   // Auth Slide Styles
@@ -409,6 +422,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.l,
     marginBottom: 40,
     zIndex: 10,
+    paddingTop: 20, // Add some breathing room since we added a background
   },
   authTitle: {
     fontFamily: FONT_FAMILY.header,
@@ -445,6 +459,7 @@ const styles = StyleSheet.create({
   },
   outlineButtonText: {
     fontFamily: FONT_FAMILY.header, // Back to Oswald
+    fontWeight: '600',
     color: '#FFFFFF',
     fontSize: 16,
   },

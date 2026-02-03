@@ -48,20 +48,28 @@ export default function RootNavigator() {
         <Stack.Screen 
           name="AuthEntry" 
           component={AuthEntryScreen} 
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
         <Stack.Screen name="Otp" component={OtpScreen} />
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
-        <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+        <Stack.Screen 
+          name="CreateAccount" 
+          component={CreateAccountScreen} 
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
+        />
         <Stack.Screen 
           name="ForgotPassword" 
           component={ForgotPasswordScreen} 
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
         <Stack.Screen 
           name="ResetPassword" 
           component={ResetPasswordScreen} 
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
 
         {/* Onboarding Flow */}

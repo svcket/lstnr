@@ -386,7 +386,11 @@ export const HomeScreen = () => {
              </Text>
              <View style={styles.card}>
                  {MOCK_LEARN.map((item, index) => (
-                    <TouchableOpacity key={item.id}>
+                    <TouchableOpacity 
+                      key={item.id}
+                      onPress={() => navigation.navigate('LearnDetail', { id: item.id })}
+                      activeOpacity={0.7}
+                    >
                         <RowItem 
                           leftIcon={
                             <Image 

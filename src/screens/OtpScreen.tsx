@@ -8,6 +8,7 @@ import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderBack } from '../components/common/HeaderBack';
+import { GradientButton } from '../components/common/GradientButton';
 
 export const OtpScreen = () => {
   const navigation = useNavigation<any>();
@@ -101,12 +102,13 @@ export const OtpScreen = () => {
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <TouchableOpacity 
-        style={styles.verifyButton}
+      {/* Verify Button */}
+      <GradientButton 
+        title={loading ? 'Verifying...' : 'Verify'} 
         onPress={handleVerify}
-      >
-        <Text style={styles.verifyText}>{loading ? 'Verifying...' : 'Verify'}</Text>
-      </TouchableOpacity>
+        disabled={loading}
+        style={styles.verifyButton}
+      />
 
       <TouchableOpacity onPress={requestOtp} style={styles.resendBtn}>
          <Text style={styles.resendText}>Didn’t receive any code? <Text style={styles.resendLink}>Resend Code</Text></Text>
@@ -182,12 +184,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   verifyButton: {
-    height: 56,
-    backgroundColor: '#FF3B30',
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 30, // Just keep margin, GradientButton handles height/bg
   },
   verifyText: {
     color: '#FFF',
@@ -208,7 +205,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
   },
   resendLink: {
-    color: '#FF3B30',
+    color: '#FFF',
     fontFamily: FONT_FAMILY.bodyBold,
   },
   footerLinks: {

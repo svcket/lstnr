@@ -77,7 +77,7 @@ export const DefaultMethodPicker = () => {
                             title={method.label}
                             subtitle={method.type === 'System' ? undefined : method.type}
                             onPress={() => handleSelect(method.id)}
-                            rightElement={selectedId === method.id ? <GradientCheck /> : undefined}
+                            rightElement={selectedId === method.id ? <GradientCheck /> : null}
                             isLast={index === methods.length - 1}
                         />
                     ))}
@@ -90,20 +90,18 @@ export const DefaultMethodPicker = () => {
 const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
-        backgroundColor: COLORS.surface,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingTop: 8,
+        backgroundColor: COLORS.background,
+        paddingTop: 0,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 12, // slightly tighter
         borderBottomWidth: 1,
         borderBottomColor: '#222',
-        marginTop: 20,
+        // marginTop removed
     },
     title: {
         fontSize: 18,

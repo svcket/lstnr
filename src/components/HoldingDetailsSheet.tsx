@@ -14,9 +14,15 @@ export const HoldingDetailsSheet = () => {
   const initialPosition: HoldingPosition = route.params?.position;
   
   // View State
-  const [activeTab, setActiveTab] = useState<'POSITIONS' | 'SHARES' | 'ACTIVITY'>('POSITIONS');
+  const [activeTab, setActiveTab] = useState<'POSITIONS' | 'SHARES' | 'ACTIVITY'>(() => {
+      if (initialPosition?.entityType === 'SHARE' || initialPosition?.entityType === 'LABEL') return 'SHARES';
+      return 'POSITIONS';
+  });
   const [subTab, setSubTab] = useState<'ACTIVE' | 'CLOSED'>('ACTIVE');
-  const [sharesSubTab, setSharesSubTab] = useState<'ARTIST' | 'LABEL'>('ARTIST');
+  const [sharesSubTab, setSharesSubTab] = useState<'ARTIST' | 'LABEL'>(() => {
+      if (initialPosition?.entityType === 'LABEL') return 'LABEL';
+      return 'ARTIST';
+  });
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'VALUE' | 'PNL'>('VALUE');

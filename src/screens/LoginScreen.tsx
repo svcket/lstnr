@@ -9,6 +9,7 @@ import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { COUNTRIES } from '../constants/countries';
+import { GradientButton } from '../components/common/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -62,11 +63,15 @@ export const LoginScreen = () => {
 
   const handleClose = () => {
     // Navigate to Get Started page (auth slide)
-    navigation.navigate('Landing', { slide: 2 });
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('Landing', { slide: 2 });
+    }
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword', { identifier });
+    navigation.replace('ForgotPassword', { identifier });
   };
 
   const renderCountryPicker = () => {
@@ -219,20 +224,17 @@ export const LoginScreen = () => {
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           {/* Login Button */}
-          <TouchableOpacity 
-            style={[styles.loginButton, !isFormValid && styles.disabledButton]}
+          <GradientButton 
+            title={isLoading ? 'Logging in...' : 'Login'}
             onPress={handleLogin}
             disabled={!isFormValid || isLoading}
-          >
-            <Text style={styles.loginText}>
-              {isLoading ? 'Logging in...' : 'Login'}
-            </Text>
-          </TouchableOpacity>
+            style={styles.loginButton}
+          />
 
           {/* Create Account Fallback */}
           <TouchableOpacity 
             style={styles.fallbackButton}
-            onPress={() => navigation.navigate('AuthEntry')}
+            onPress={() => navigation.replace('AuthEntry')}
           >
             <Text style={styles.fallbackText}>
               Don't have an account? <Text style={styles.fallbackLink}>Create account</Text>
@@ -342,9 +344,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   forgotLink: {
-    color: COLORS.primary,
+    color: '#FFF',
     fontFamily: FONT_FAMILY.header,
     fontSize: 14,
+    fontWeight: 'bold',
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -431,20 +434,10 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
   },
   loginButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
-  disabledButton: {
-    opacity: 0.3,
-  },
-  loginText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
-  },
+
   fallbackButton: {
     marginTop: 20,
     alignSelf: 'center',
@@ -457,5 +450,6 @@ const styles = StyleSheet.create({
   fallbackLink: {
     color: '#FFF',
     fontFamily: FONT_FAMILY.header,
+    fontWeight: 'bold',
   },
 });

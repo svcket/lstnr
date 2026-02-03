@@ -8,6 +8,7 @@ import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { verifyResetCode, resetPassword } from '../services/authApi';
 import { validatePassword, isPasswordStrong } from '../utils/authValidation';
+import { GradientButton } from '../components/common/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -85,7 +86,7 @@ export const ResetPasswordScreen = () => {
     try {
       await resetPassword(identifier, code, newPassword);
       // Navigate to login with success
-      navigation.navigate('Login', { identifier, passwordReset: true });
+      navigation.replace('Login', { identifier, passwordReset: true });
     } catch (e) {
       setError('Failed to reset password.');
     } finally {
@@ -166,15 +167,12 @@ export const ResetPasswordScreen = () => {
 
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-              <TouchableOpacity 
-                style={[styles.actionButton, !isOtpComplete && styles.disabledButton]}
+              <GradientButton 
+                title={isLoading ? 'Verifying...' : 'Verify Code'}
                 onPress={handleVerifyCode}
                 disabled={!isOtpComplete || isLoading}
-              >
-                <Text style={styles.actionText}>
-                  {isLoading ? 'Verifying...' : 'Verify Code'}
-                </Text>
-              </TouchableOpacity>
+                style={styles.actionButton}
+              />
             </>
           ) : (
             <>
@@ -214,15 +212,12 @@ export const ResetPasswordScreen = () => {
 
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-              <TouchableOpacity 
-                style={[styles.actionButton, !isPasswordValid && styles.disabledButton]}
+              <GradientButton 
+                title={isLoading ? 'Resetting...' : 'Reset Password'}
                 onPress={handleResetPassword}
                 disabled={!isPasswordValid || isLoading}
-              >
-                <Text style={styles.actionText}>
-                  {isLoading ? 'Resetting...' : 'Reset Password'}
-                </Text>
-              </TouchableOpacity>
+                style={styles.actionButton}
+              />
             </>
           )}
           
@@ -371,18 +366,8 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.body,
   },
   actionButton: {
-    height: 56,
-    backgroundColor: COLORS.primary,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
-  disabledButton: {
-    opacity: 0.3,
-  },
-  actionText: {
-    color: '#FFF',
-    fontFamily: FONT_FAMILY.header,
-    fontSize: 16,
-  },
+
 });

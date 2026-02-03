@@ -475,6 +475,7 @@ const styles = StyleSheet.create({
   // Tab Content
   tabContent: {
     paddingHorizontal: 16,
+    minHeight: Dimensions.get('window').height, // Ensure height persists to keep header sticky
   },
   grid: {
     flexDirection: 'row',

@@ -25,6 +25,7 @@ import { EndingSoonScreen } from '../screens/EndingSoonScreen';
 import { HoldersChatScreen } from '../screens/HoldersChatScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { TransactionDetailScreen } from '../screens/TransactionDetailScreen';
+import { LearnDetailScreen } from '../screens/LearnDetailScreen';
 import { WithdrawScreen } from '../screens/WithdrawScreen';
 import { AddMethodScreen } from '../screens/AddMethodScreen';
 import { AddMethodFormScreen } from '../screens/AddMethodFormScreen';
@@ -138,6 +139,9 @@ export default function AppNavigator() {
       <Stack.Screen name="SettingsSecurity" component={SettingsSecurityScreen} />
       <Stack.Screen name="SettingsHelp" component={SettingsHelpScreen} />
       <Stack.Screen name="SettingsLegal" component={SettingsLegalScreen} />
+      
+      {/* Learn Details */}
+      <Stack.Screen name="LearnDetail" component={LearnDetailScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

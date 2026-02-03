@@ -31,7 +31,10 @@ export const SettingsAppearanceScreen = () => {
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
-            <HeaderBack title="Appearance" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: SPACING.m, paddingVertical: SPACING.s, gap: 8 }}>
+                <HeaderBack />
+                <Text style={{ fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: COLORS.white }}>Appearance</Text>
+            </View>
             <ScrollView contentContainerStyle={styles.content}>
                 <SettingsGroup>
                     {themes.map((t, index) => (
@@ -39,7 +42,7 @@ export const SettingsAppearanceScreen = () => {
                             key={t.id}
                             title={t.label}
                             onPress={() => setTheme(t.id as any)}
-                            rightElement={theme === t.id ? <GradientCheck /> : undefined}
+                            rightElement={theme === t.id ? <GradientCheck /> : null}
                             isLast={index === themes.length - 1}
                         />
                     ))}
