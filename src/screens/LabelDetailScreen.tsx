@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         padding: 16,
-        marginBottom: 32,
+        marginBottom: 24,
     },
     bioText: {
         fontSize: 14,
@@ -568,14 +568,14 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         paddingHorizontal: 16,
-        marginBottom: 40,
+        marginBottom: 24,
     },
     // Removed local EntityRow styles as they are now in the component, except where they might be used by something else
     // Cleaning up to be safe
     
     // Creator (Copied from ArtistDetail)
     creatorSection: {
-        marginBottom: 40,
+        marginBottom: 24,
     },
     
     // Shared Section Header
@@ -615,6 +615,6 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.surface, // Updated from #111
         borderRadius: 16,
         paddingHorizontal: 16,
-        marginBottom: 40,
+        marginBottom: 24,
     },
 });

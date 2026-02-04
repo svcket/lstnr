@@ -4,6 +4,7 @@ import { COLORS, FONT_FAMILY, BUTTON_HEIGHT } from '../../constants/theme';
 import { ChevronLeft, Settings2, ChevronDown, X, Check, DollarSign, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DepositSheet, PaymentMethod } from '../common/DepositSheet';
+import { LedgerStore } from '../../lib/ledgerStore'; // Added import
 
 // --- Session Persistence (Simple In-Memory) ---
 const SESSION_SETTINGS = {
@@ -43,7 +44,9 @@ const PAYMENT_METHODS: PaymentMethod[] = [
     { id: 'revolut', name: 'Revolut Pay', section: 'fiat', iconType: 'revolut', badge: 'Instant' },
     { id: 'card', name: 'Debit Card', section: 'fiat', iconType: 'card', badge: 'Instant' },
     { id: 'phantom', name: 'Phantom', section: 'crypto', iconType: 'ghost', badge: 'detected' },
+    { id: 'phantom', name: 'Phantom', section: 'crypto', iconType: 'ghost', badge: 'detected' },
     { id: 'manual', name: 'Manual transfer', section: 'crypto', iconType: 'qr' },
+    { id: 'ledger', name: 'Available Balance', section: 'fiat', iconType: 'wallet' }, // Added Ledger
 ];
 
 // --- Custom Components ---
@@ -68,6 +71,14 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
 
   const [amount, setAmount] = useState('0');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHODS[4]); // Default Debit
+  
+  // Use Ledger if available and Buying
+  useEffect(() => {
+     if (mode === 'BUY' && LedgerStore.getAvailableBalance() > 0) {
+         setPaymentMethod(PAYMENT_METHODS.find(p => p.id === 'ledger') || PAYMENT_METHODS[4]);
+     }
+  }, [mode]);
+
   const [multiSide, setMultiSide] = useState<'Yes' | 'No'>('Yes');
 
   const [showPaymentSheet, setShowPaymentSheet] = useState(false);
@@ -377,8 +388,9 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
 
                </View>
 
-               {/* Payment Selector */}
-               <View style={styles.paymentRow}>
+               {/* Payment Selector - Hide if Selling */}
+               {mode === 'BUY' && (
+                <View style={styles.paymentRow}>
                    <TouchableOpacity 
                         style={styles.paymentSelector}
                         onPress={() => setShowPaymentSheet(true)}
@@ -386,14 +398,20 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
                        <View style={[styles.cardIcon, paymentMethod.id === 'usdc' && { backgroundColor: '#2775CA', borderColor: '#2775CA' }]}>
                            {paymentMethod.id === 'usdc' ? (
                                <DollarSign size={14} color="#FFF" />
+                           ) : paymentMethod.id === 'ledger' ? (
+                                <View style={{width: 12, height: 8, backgroundColor: COLORS.success, borderRadius: 2}} />
                            ) : (
                                <View style={{width: 12, height: 8, backgroundColor: '#FFD700', borderRadius: 2}} />
                            )}
                        </View>
                        <Text style={styles.payText}>{paymentMethod.name}</Text>
+                       {paymentMethod.id === 'ledger' && (
+                           <Text style={{color: COLORS.success, fontSize: 12, marginLeft: 4}}>${LedgerStore.getAvailableBalance().toFixed(2)}</Text>
+                       )}
                        <ChevronDown size={16} color="#FFF" />
                    </TouchableOpacity>
-               </View>
+                </View>
+               )}
 
                 {/* Pills - Always Fixed Amounts */}
                 <View style={styles.pillsRow}>

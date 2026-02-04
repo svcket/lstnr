@@ -62,7 +62,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
 
 const styles = StyleSheet.create({
     creatorSection: {
-        marginBottom: 40,
+        marginBottom: 24,
     },
     sectionHeader: {
         color: '#FFF',

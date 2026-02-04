@@ -9,6 +9,7 @@ import { TrendingUp, TrendingDown, DollarSign, History, Mic2, Disc, Sparkles, Do
 
 import { getPortfolio, getArtistById, getPredictionPortfolio, getPredictionById, getRecentActivity } from '../data/catalog';
 import { getDeterministicAvatar } from '../lib/avatarResolver';
+import { LedgerStore } from '../lib/ledgerStore';
 
 // Removed hardcoded MOCK_HOLDINGS and MOCK_POSITIONS. Using catalog data.
 
@@ -34,6 +35,12 @@ export const PortfolioScreen = () => {
     const positionsValue = positions.reduce((acc, p) => acc + p.amount, 0);
     const totalBalance = (user?.balance || 0) + portfolioValue + positionsValue;
 
+    // Force update when ledger changes
+    const [_, setTick] = React.useState(0);
+    React.useEffect(() => {
+        return LedgerStore.subscribe(() => setTick(t => t + 1));
+    }, []);
+
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
@@ -45,6 +52,13 @@ export const PortfolioScreen = () => {
                     <Text style={styles.balanceLabel}>Total Balance</Text>
                     <Text style={styles.balanceValue}>${totalBalance.toFixed(2)}</Text>
                     <Text style={{ color: COLORS.success, fontWeight: 'bold' }}>+$612.40 (+4.8%) <Text style={{ color: '#888', fontWeight: 'normal' }}>today</Text></Text>
+                    
+                    {/* Withdraw Balance (Option A) */}
+                    <View style={styles.withdrawDivider} />
+                    <View style={styles.withdrawRow}>
+                       <Text style={styles.withdrawLabel}>Available to withdraw</Text>
+                       <Text style={styles.withdrawValue}>${LedgerStore.getAvailableBalance().toFixed(2)}</Text>
+                    </View>
                 </View>
 
                 {/* Quick Actions */}
@@ -311,9 +325,33 @@ const styles = StyleSheet.create({
       borderColor: 'rgba(255,255,255,0.08)',
   },
   iconCircle: {
-      marginBottom: 8,
+      marginBottom: 48,
   },
-  actionLabel: {
+  withdrawDivider: {
+    height: 1,
+    backgroundColor: '#333',
+    width: '100%',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  withdrawRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 8, // slight padding for alignment
+  },
+  withdrawLabel: {
+    color: '#888',
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.body,
+  },
+  withdrawValue: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.medium,
+    fontWeight: '600',
+  },
+  sectionTitle: {
       color: '#FFF',
       fontFamily: 'ClashDisplay-Medium',
       fontSize: 14,

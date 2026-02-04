@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface, // Updated from #111
     borderRadius: 16,
     padding: 16,
-    marginBottom: 32,
+    marginBottom: 24, // Reduced to 24px
   },
   bioText: {
     fontSize: 14,
@@ -548,8 +548,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   socialPill: {
-    backgroundColor: COLORS.surface, // Updated from #181818 if needed, but #181818 is close to surface. Kept as is or surface? Let's use surface or explicitly #181818.
-    // Actually, let's keep it consistent. #181818 is approx surface.
     backgroundColor: '#181818', 
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -568,7 +566,7 @@ const styles = StyleSheet.create({
 
   // Creator
   creatorSection: {
-    marginBottom: 40,
+    marginBottom: 24,
   },
   sectionHeader: {
     color: '#FFF',
@@ -580,6 +578,6 @@ const styles = StyleSheet.create({
       backgroundColor: COLORS.surface, // Updated from #111
       borderRadius: 16,
       paddingHorizontal: 16,
-      marginBottom: 40,
+      marginBottom: 24,
   },
 });

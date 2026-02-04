@@ -26,6 +26,10 @@ import { HoldersChatScreen } from '../screens/HoldersChatScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { TransactionDetailScreen } from '../screens/TransactionDetailScreen';
 import { LearnDetailScreen } from '../screens/LearnDetailScreen';
+import { SellToWithdrawScreen } from '../screens/withdraw/SellToWithdrawScreen';
+import { WithdrawAmountScreen } from '../screens/withdraw/WithdrawAmountScreen';
+import { WithdrawMethodScreen } from '../screens/withdraw/WithdrawMethodScreen';
+import { WithdrawConfirmScreen } from '../screens/withdraw/WithdrawConfirmScreen';
 import { WithdrawScreen } from '../screens/WithdrawScreen';
 import { AddMethodScreen } from '../screens/AddMethodScreen';
 import { AddMethodFormScreen } from '../screens/AddMethodFormScreen';
@@ -142,6 +146,13 @@ export default function AppNavigator() {
       
       {/* Learn Details */}
       <Stack.Screen name="LearnDetail" component={LearnDetailScreen} options={{ headerShown: false }} />
+      
+      {/* Withdraw Flow */}
+      <Stack.Screen name="SellToWithdraw" component={SellToWithdrawScreen} />
+      <Stack.Screen name="WithdrawAmount" component={WithdrawAmountScreen} />
+      <Stack.Screen name="WithdrawMethod" component={WithdrawMethodScreen} />
+      <Stack.Screen name="WithdrawConfirm" component={WithdrawConfirmScreen} />
+
     </Stack.Navigator>
   );
 }
