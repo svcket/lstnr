@@ -137,7 +137,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.l,
-    paddingHorizontal: SPACING.l,
     paddingTop: 0, // Reduced from 10
     paddingBottom: 24,
     backgroundColor: '#000', // Ensure opacity doesn't bleed

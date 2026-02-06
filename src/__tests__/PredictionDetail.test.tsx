@@ -88,7 +88,7 @@ jest.mock('../components/charts/UnifiedMarketChart', () => ({
 }));
 
 jest.mock('../components/artist/ArtistTabs', () => ({
-  ArtistTabs: ({ onTabPress }) => {
+  ArtistTabs: ({ onTabPress }: any) => {
      const { View, Button } = require('react-native');
      return (
          <View>

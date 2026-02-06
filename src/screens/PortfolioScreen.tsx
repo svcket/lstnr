@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS } from '../constants/theme';
+import { COLORS, SPACING, FONT_SIZE, BORDER_RADIUS, FONT_FAMILY } from '../constants/theme';
+
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { Card } from '../components/Card';
@@ -38,7 +39,8 @@ export const PortfolioScreen = () => {
     // Force update when ledger changes
     const [_, setTick] = React.useState(0);
     React.useEffect(() => {
-        return LedgerStore.subscribe(() => setTick(t => t + 1));
+        const unsub = LedgerStore.subscribe(() => setTick(t => t + 1));
+        return () => { unsub(); };
     }, []);
 
     return (
@@ -244,13 +246,7 @@ const styles = StyleSheet.create({
       color: COLORS.text,
       fontWeight: 'bold',
   },
-  sectionTitle: {
-      color: COLORS.text,
-      fontSize: FONT_SIZE.l,
-      fontWeight: 'bold',
-      marginBottom: SPACING.m,
-      marginTop: SPACING.m,
-  },
+
   holdingCard: {
       padding: SPACING.m,
   },
@@ -350,6 +346,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: FONT_FAMILY.medium,
     fontWeight: '600',
+  },
+  actionLabel: {
+      marginTop: 8,
+      fontSize: 12,
+      color: COLORS.textSecondary,
+      fontFamily: FONT_FAMILY.medium,
   },
   sectionTitle: {
       color: '#FFF',

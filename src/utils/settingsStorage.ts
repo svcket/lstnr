@@ -59,19 +59,19 @@ interface SettingsState extends UserSettings {
 
 export const useSettings = create<SettingsState>()(
     persist(
-        (set) => ({
+        (set: any) => ({
             ...DEFAULT_SETTINGS,
             
-            setTheme: (theme) => set({ theme }),
+            setTheme: (theme: UserSettings['theme']) => set({ theme }),
             
-            toggleNotification: (key) => set((state) => ({
+            toggleNotification: (key: keyof UserSettings['notifications']) => set((state: SettingsState) => ({
                 notifications: {
                     ...state.notifications,
                     [key]: !state.notifications[key]
                 }
             })),
             
-            toggleSecurity: (key) => set((state) => {
+            toggleSecurity: (key: keyof UserSettings['security']) => set((state: SettingsState) => {
                 if (key === 'autoLockMins' || key === 'profileVisibility') return state; // handled separately
                 return {
                     security: {
@@ -81,11 +81,11 @@ export const useSettings = create<SettingsState>()(
                 };
             }),
 
-            setAutoLock: (mins) => set((state) => ({
+            setAutoLock: (mins: number) => set((state: SettingsState) => ({
                 security: { ...state.security, autoLockMins: mins }
             })),
 
-            setProfileVisibility: (vis) => set((state) => ({
+            setProfileVisibility: (vis: 'public' | 'private') => set((state: SettingsState) => ({
                 security: { ...state.security, profileVisibility: vis }
             })),
         }),
