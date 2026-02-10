@@ -17,91 +17,91 @@ export const ActivityScreen = () => {
   const threads = getInboxThreads();
 
   const renderItem = ({ item, index }: { item: InboxThread, index: number }) => (
-    <TouchableOpacity 
-        style={styles.itemContainer}
-        activeOpacity={0.7}
-        onPress={() => navigation.navigate(item.context.screen, item.context.params)}
+    <TouchableOpacity
+      style={styles.itemContainer}
+      activeOpacity={0.7}
+      onPress={() => navigation.navigate(item.context.screen, item.context.params)}
     >
-       <View style={styles.left}>
-         {/* Avatar Logic */}
-         <View style={styles.avatarContainer}>
-             {item.avatar ? (
-                 <Image source={{ uri: item.avatar }} style={styles.avatar} />
-             ) : (
-                 <Image 
-                    source={item.type === 'PREDICTION' ? ICONS.learnPredictions : ICONS.activityIn} 
-                    style={styles.placeholderIcon} 
-                 />
-             )}
-         </View>
-         
-         <View style={styles.textContainer}>
-            <View style={styles.titleRow}>
-                <Text style={styles.title}>{item.title}</Text>
-                {item.isPinned && <Pin size={12} color="#888" style={{ marginLeft: 4 }} />}
-            </View>
-            <Text style={[styles.subtitle, item.unreadCount > 0 && styles.subtitleBold]} numberOfLines={1}>
-                {item.subtitle}
-            </Text>
-         </View>
-       </View>
+      <View style={styles.left}>
+        {/* Avatar Logic */}
+        <View style={styles.avatarContainer}>
+          {item.avatar ? (
+            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+          ) : (
+            <Image
+              source={item.type === 'PREDICTION' ? ICONS.learnPredictions : ICONS.activityIn}
+              style={styles.placeholderIcon}
+            />
+          )}
+        </View>
 
-       <View style={styles.right}>
-           <Text style={styles.date}>{item.timestamp}</Text>
-           {item.unreadCount > 0 && (
-               <View style={styles.unreadBadge}>
-                   <Text style={styles.unreadText}>{item.unreadCount}</Text>
-               </View>
-           )}
-       </View>
-       
-       {index < threads.length - 1 && <View style={styles.separator} />}
+        <View style={styles.textContainer}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{item.title}</Text>
+            {item.isPinned && <Pin size={12} color="#888" style={{ marginLeft: 4 }} />}
+          </View>
+          <Text style={[styles.subtitle, item.unreadCount > 0 && styles.subtitleBold]} numberOfLines={1}>
+            {item.subtitle}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.right}>
+        <Text style={styles.date}>{item.timestamp}</Text>
+        {item.unreadCount > 0 && (
+          <View style={styles.unreadBadge}>
+            <Text style={styles.unreadText}>{item.unreadCount}</Text>
+          </View>
+        )}
+      </View>
+
+      {index < threads.length - 1 && <View style={styles.separator} />}
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={styles.safeArea}>
-          {/* Main Tab Header */}
-          <View style={styles.header}>
-              <Text style={styles.greeting}>Inbox</Text>
-              <View style={styles.headerRight}>
-                  <TouchableOpacity 
-                    onPress={() => navigation.navigate('Updates')}
-                    activeOpacity={0.7}
-                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                  >
-                    <View>
-                      <Bell size={24} color="#FFF" />
-                      {true && ( 
-                        <View style={styles.unreadDot} />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
-                      <View style={[styles.headerIconContainer, styles.avatarContainerHeader]}>
-                        <Image 
-                           source={USER_AVATAR} 
-                           style={{ width: 40, height: 40, borderRadius: 12 }} 
-                        />
-                      </View>
-                  </TouchableOpacity>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        {/* Main Tab Header */}
+        <View style={styles.header}>
+          <Text style={styles.greeting}>Inbox</Text>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Updates')}
+              activeOpacity={0.7}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <View>
+                <Bell size={24} color="#FFF" />
+                {true && (
+                  <View style={styles.unreadDot} />
+                )}
               </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
+              <View style={[styles.headerIconContainer, styles.avatarContainerHeader]}>
+                <Image
+                  source={USER_AVATAR}
+                  style={{ width: 40, height: 40, borderRadius: 12 }}
+                />
+              </View>
+            </TouchableOpacity>
           </View>
+        </View>
 
-           <View style={{ flex: 1 }}>
-              <FlatList 
-                data={threads}
-                keyExtractor={item => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-              />
-           </View>
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={threads}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
 
-           <BottomNav activeTab="Inbox" />
+        <BottomNav activeTab="Inbox" />
       </SafeAreaView>
     </View>
   );
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-    headerIconContainer: {
+  headerIconContainer: {
     width: 40,
     height: 40,
     backgroundColor: COLORS.surface, // Updated from #181818
@@ -155,9 +155,9 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.error, 
+    backgroundColor: COLORS.error,
   },
-  
+
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 120, // Space for BottomNav
@@ -178,32 +178,32 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatarContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: COLORS.surface, // Updated from #222
-      alignItems: 'center',
-      justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.surface, // Updated from #222
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   placeholderIcon: {
-      width: 24,
-      height: 24,
-      tintColor: '#666',
+    width: 24,
+    height: 24,
+    tintColor: '#666',
   },
   textContainer: {
-      flex: 1,
-      justifyContent: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   titleRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      marginBottom: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
   },
   title: {
     fontFamily: FONT_FAMILY.medium, // Explicit Medium
@@ -216,19 +216,19 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   subtitleBold: {
-      color: '#FFF',
-      fontWeight: '600',
+    color: '#FFF',
+    fontWeight: '600',
   },
   pinIcon: {
-      width: 12,
-      height: 12,
-      tintColor: '#888',
+    width: 12,
+    height: 12,
+    tintColor: '#888',
   },
-  
+
   // Right
   right: {
-      alignItems: 'flex-end',
-      gap: 6,
+    alignItems: 'flex-end',
+    gap: 6,
   },
   date: {
     fontFamily: FONT_FAMILY.body,
@@ -236,19 +236,19 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   unreadBadge: {
-      backgroundColor: '#FFFFFF',
-      borderRadius: 10,
-      minWidth: 20,
-      height: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
   },
   unreadText: {
-      fontFamily: FONT_FAMILY.medium,
-      fontSize: 10,
-      color: '#000',
-      fontWeight: '700',
+    fontFamily: FONT_FAMILY.medium,
+    fontSize: 10,
+    color: '#000',
+    fontWeight: '700',
   },
   separator: {
     position: 'absolute',

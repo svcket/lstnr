@@ -56,15 +56,15 @@ const MOCK_LEARN = [
 
 // 1. Section Header (Title + Chevron)
 const SectionHeader = ({ title, onPress }: { title: string; onPress?: () => void }) => (
-  <TouchableOpacity 
-    style={styles.sectionHeader} 
-    onPress={onPress} 
+  <TouchableOpacity
+    style={styles.sectionHeader}
+    onPress={onPress}
     activeOpacity={0.7}
   >
     <Text style={styles.sectionTitle}>{title}</Text>
-    <Image 
-      source={ICONS.chevronRight} 
-      style={{ width: 16, height: 16, tintColor: COLORS.text }} 
+    <Image
+      source={ICONS.chevronRight}
+      style={{ width: 16, height: 16, tintColor: COLORS.text }}
       resizeMode="contain"
     />
   </TouchableOpacity>
@@ -82,15 +82,15 @@ interface RowItemProps {
   hasDivider?: boolean;
 }
 
-const RowItem = ({ 
-  leftIcon, 
-  title, 
-  subtitle, 
-  rightTop, 
-  rightBottom, 
-  isPositive, 
-  showChevron, 
-  hasDivider 
+const RowItem = ({
+  leftIcon,
+  title,
+  subtitle,
+  rightTop,
+  rightBottom,
+  isPositive,
+  showChevron,
+  hasDivider
 }: RowItemProps) => (
   <View style={styles.rowWrapper}>
     <View style={styles.rowContent}>
@@ -114,15 +114,15 @@ const RowItem = ({
           </Text>
         )}
         {showChevron && (
-          <Image 
-            source={ICONS.chevronRight} 
-            style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }} 
+          <Image
+            source={ICONS.chevronRight}
+            style={{ width: 6, height: 12, tintColor: COLORS.textSecondary }}
             resizeMode="contain"
           />
         )}
       </View>
     </View>
-    
+
     {/* Divider never renders for last item */}
     {hasDivider && <View style={styles.divider} />}
   </View>
@@ -130,79 +130,79 @@ const RowItem = ({
 
 export const HomeScreen = () => {
   const { user } = useAuth();
-  const navigation = useNavigation<any>(); 
+  const navigation = useNavigation<any>();
   const [hasPositions, setHasPositions] = useState(true);
 
   // Dynamic Portfolio
-  const portfolio = getPortfolio(); 
+  const portfolio = getPortfolio();
 
   const renderQuickAction = (
-    iconSource: ImageSourcePropType, 
-    label: string, 
-    bgColor: string, 
-    iconColor: string, 
-    hasBorder: boolean = false, 
+    iconSource: ImageSourcePropType,
+    label: string,
+    bgColor: string,
+    iconColor: string,
+    hasBorder: boolean = false,
     onPress?: () => void
   ) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.quickAction, 
-        { 
+        styles.quickAction,
+        {
           backgroundColor: bgColor,
           borderWidth: hasBorder ? 1 : 0,
           borderColor: hasBorder ? '#1F1F1F' : 'transparent'
         }
-      ]} 
-      onPress={onPress} 
+      ]}
+      onPress={onPress}
       activeOpacity={0.7}
     >
-        <Image 
-          source={iconSource} 
-          style={[styles.actionImage, { tintColor: iconColor }]} 
-          resizeMode="contain" 
-        />
-        <Text style={[styles.quickActionLabel, { color: iconColor }]}>{label}</Text>
+      <Image
+        source={iconSource}
+        style={[styles.actionImage, { tintColor: iconColor }]}
+        resizeMode="contain"
+      />
+      <Text style={[styles.quickActionLabel, { color: iconColor }]}>{label}</Text>
     </TouchableOpacity>
   );
-  
+
   const formatCurrency = (val: number) => {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={styles.safeArea}>
-        
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.greeting}>Portfolio</Text>
           <View style={styles.headerRight}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigation.navigate('Updates')}
               activeOpacity={0.7}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
               <View>
                 <Bell size={24} color={COLORS.text} />
-                {true && ( 
+                {true && (
                   <View style={styles.unreadDot} />
                 )}
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
-               <View style={[styles.headerIconContainer, styles.avatarContainer]}>
-                 <Image 
-                    source={USER_AVATAR} 
-                    style={{ width: 40, height: 40, borderRadius: 12 }} 
-                 />
-               </View>
+              <View style={[styles.headerIconContainer, styles.avatarContainer]}>
+                <Image
+                  source={USER_AVATAR}
+                  style={{ width: 40, height: 40, borderRadius: 12 }}
+                />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
 
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -210,11 +210,11 @@ export const HomeScreen = () => {
           <View style={{ height: SPACING_CONSTANTS.s24 }} />
 
           {/* Portfolio Hero */}
-          <PortfolioCard 
-             totalValue={hasPositions ? MOCK_PORTFOLIO.totalValue : '$0.00'}
-             dailyChange={hasPositions ? MOCK_PORTFOLIO.dailyChange : '0.00'}
-             dailyPercentage={hasPositions ? MOCK_PORTFOLIO.dailyPercentage : '0%'}
-             isPositive={true}
+          <PortfolioCard
+            totalValue={hasPositions ? MOCK_PORTFOLIO.totalValue : '$0.00'}
+            dailyChange={hasPositions ? MOCK_PORTFOLIO.dailyChange : '0.00'}
+            dailyPercentage={hasPositions ? MOCK_PORTFOLIO.dailyPercentage : '0%'}
+            isPositive={true}
           />
 
           {/* GAP B: Portfolio -> Quick Actions (32px) */}
@@ -222,52 +222,52 @@ export const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
-            <TouchableOpacity 
-                style={styles.quickActionDark} 
-                onPress={() => navigation.navigate('Artists')}
-                activeOpacity={0.7}
+            <TouchableOpacity
+              style={styles.quickActionDark}
+              onPress={() => navigation.navigate('Artists')}
+              activeOpacity={0.7}
             >
-                <View style={{ marginBottom: 8 }}>
-                   <Mic2 size={24} color="#FFF" />
-                </View>
-                <Text style={styles.quickActionLabelDark}>Artists</Text>
+              <View style={{ marginBottom: 8 }}>
+                <Mic2 size={24} color="#FFF" />
+              </View>
+              <Text style={styles.quickActionLabelDark}>Artists</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-                style={styles.quickActionDark} 
-                onPress={() => navigation.navigate('Labels')}
-                activeOpacity={0.7}
+            <TouchableOpacity
+              style={styles.quickActionDark}
+              onPress={() => navigation.navigate('Labels')}
+              activeOpacity={0.7}
             >
-                <View style={{ marginBottom: 8 }}>
-                   <Disc size={24} color="#FFF" />
-                </View>
-                <Text style={styles.quickActionLabelDark}>Labels</Text>
+              <View style={{ marginBottom: 8 }}>
+                <Disc size={24} color="#FFF" />
+              </View>
+              <Text style={styles.quickActionLabelDark}>Labels</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-                style={styles.quickActionDark} 
-                onPress={() => navigation.navigate('Predictions')}
-                activeOpacity={0.7}
+            <TouchableOpacity
+              style={styles.quickActionDark}
+              onPress={() => navigation.navigate('Predictions')}
+              activeOpacity={0.7}
             >
-                <View style={{ marginBottom: 8 }}>
-                   <Image 
-                       source={ICONS.actionPredict} 
-                       style={{ width: 24, height: 24, tintColor: '#FFF' }} 
-                       resizeMode="contain"
-                    />
-                </View>
-                <Text style={styles.quickActionLabelDark}>Predict</Text>
+              <View style={{ marginBottom: 8 }}>
+                <Image
+                  source={ICONS.actionPredict}
+                  style={{ width: 24, height: 24, tintColor: '#FFF' }}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.quickActionLabelDark}>Predict</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-                style={styles.quickActionDark} 
-                onPress={() => navigation.navigate('Withdraw')}
-                activeOpacity={0.7}
+            <TouchableOpacity
+              style={styles.quickActionDark}
+              onPress={() => navigation.navigate('Withdraw')}
+              activeOpacity={0.7}
             >
-                <View style={{ marginBottom: 8 }}>
-                   <Download size={24} color="#FFF" />
-                </View>
-                <Text style={styles.quickActionLabelDark}>Withdraw</Text>
+              <View style={{ marginBottom: 8 }}>
+                <Download size={24} color="#FFF" />
+              </View>
+              <Text style={styles.quickActionLabelDark}>Withdraw</Text>
             </TouchableOpacity>
           </View>
 
@@ -277,141 +277,141 @@ export const HomeScreen = () => {
           {!hasPositions ? (
             /* EMPTY STATE */
             <View style={styles.emptyStateCard}>
-               <Text style={styles.emptyTitle}>You don’t hold any positions yet.</Text>
-               <Text style={styles.emptySubtitle}>Explore artists and predictions to get started.</Text>
-               <TouchableOpacity 
-                  style={styles.exploreButton}
-                  onPress={() => setHasPositions(true)} 
-               >
-                  <Text style={styles.exploreButtonText}>Explore (Toggle State)</Text>
-               </TouchableOpacity>
+              <Text style={styles.emptyTitle}>You don’t hold any positions yet.</Text>
+              <Text style={styles.emptySubtitle}>Explore artists and predictions to get started.</Text>
+              <TouchableOpacity
+                style={styles.exploreButton}
+                onPress={() => setHasPositions(true)}
+              >
+                <Text style={styles.exploreButtonText}>Explore (Toggle State)</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             /* POPULATED STATE */
             <>
               {/* Your Shares */}
               <View style={styles.section}>
-                 <SectionHeader 
-                   title="Your shares" 
-                   onPress={() => navigation.navigate('Shares')}
-                 />
-                 <View style={[styles.card, { paddingVertical: 0 }]}>
-                    {portfolio.slice(0, 3).map((item, index) => {
-                         const artist = getArtistById(item.artistId);
-                         if (!artist) return null;
-                         const metrics = getEntityMetrics(artist.id);
-                         
-                         return (
-                             <EntityRow 
-                                 key={artist.id}
-                                 name={artist.name}
-                                 avatarUrl={artist.avatarUrl}
-                                 symbol={artist.symbol}
-                                 subtitle={`${item.shares} shares`}
-                                 price={formatCurrency(metrics.price)}
-                                 changePct={metrics.changeTodayPct}
-                                 isLast={index === portfolio.length - 1}
-                                 onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
-                             />
-                         );
-                    })}
-                 </View>
+                <SectionHeader
+                  title="Your shares"
+                  onPress={() => navigation.navigate('Shares')}
+                />
+                <View style={[styles.card, { paddingVertical: 0 }]}>
+                  {portfolio.slice(0, 3).map((item, index) => {
+                    const artist = getArtistById(item.artistId);
+                    if (!artist) return null;
+                    const metrics = getEntityMetrics(artist.id);
+
+                    return (
+                      <EntityRow
+                        key={artist.id}
+                        name={artist.name}
+                        avatarUrl={artist.avatarUrl}
+                        symbol={artist.symbol}
+                        subtitle={`${item.shares} shares`}
+                        price={formatCurrency(metrics.price)}
+                        changePct={metrics.changeTodayPct}
+                        isLast={index === portfolio.length - 1}
+                        onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
+                      />
+                    );
+                  })}
+                </View>
               </View>
 
               {/* Your Predictions */}
               <View style={styles.section}>
-                  <SectionHeader 
-                    title="Your predictions" 
-                    onPress={() => navigation.navigate('Predictions')}
-                  />
-                  <ScrollView 
-                    horizontal 
-                    showsHorizontalScrollIndicator={false} 
-                    contentContainerStyle={{ paddingHorizontal: PAGE_X }} 
-                  >
-                      {PREDICTIONS_DATA.slice(0, 2).map(pred => (
-                          <HorizontalCard 
-                            key={pred.id}
-                            title={pred.question}
-                            subtitle={`Ends ${new Date(pred.deadline).toLocaleDateString()}`}
-                            type="prediction"
-                            onPress={() => navigation.navigate('PredictionDetail', { predictionId: pred.id })}
-                          />
-                      ))}
-                  </ScrollView>
+                <SectionHeader
+                  title="Your predictions"
+                  onPress={() => navigation.navigate('Predictions')}
+                />
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: PAGE_X }}
+                >
+                  {PREDICTIONS_DATA.slice(0, 2).map(pred => (
+                    <HorizontalCard
+                      key={pred.id}
+                      title={pred.question}
+                      subtitle={`Ends ${new Date(pred.deadline).toLocaleDateString()}`}
+                      type="prediction"
+                      onPress={() => navigation.navigate('PredictionDetail', { predictionId: pred.id })}
+                    />
+                  ))}
+                </ScrollView>
               </View>
 
               {/* Recent Activity */}
               <View style={styles.section}>
-                 <SectionHeader 
-                    title="Recent activity" 
-                    onPress={() => navigation.navigate('History')}
-                 />
-                  <View style={styles.card}>
-                     {getRecentActivity().slice(0, 5).map((item, index) => {
-                        return (
-                           <TouchableOpacity
-                             key={item.id}
-                             activeOpacity={0.7}
-                             onPress={() => navigation.navigate('TransactionDetail', { activity: item })}
-                           >
-                               <RowItem 
-                                  leftIcon={
-                                    <View style={[styles.feedIconContainer, { backgroundColor: item.isMoneyOut ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }]}>
-                                      {item.isMoneyOut ? (
-                                        <ArrowUpRight size={16} color={COLORS.error} />
-                                      ) : (
-                                        <ArrowDownLeft size={16} color={COLORS.success} />
-                                      )}
-                                    </View>
-                                  } 
-                                  title={item.text}
-                                  subtitle={item.time}
-                                  rightTop={item.amount}
-                                  hasDivider={index < 4}
-                               />
-                           </TouchableOpacity>
-                        );
-                     })}
-                  </View>
+                <SectionHeader
+                  title="Recent activity"
+                  onPress={() => navigation.navigate('History')}
+                />
+                <View style={styles.card}>
+                  {getRecentActivity().slice(0, 5).map((item, index) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        activeOpacity={0.7}
+                        onPress={() => navigation.navigate('TransactionDetail', { activity: item })}
+                      >
+                        <RowItem
+                          leftIcon={
+                            <View style={[styles.feedIconContainer, { backgroundColor: item.isMoneyOut ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }]}>
+                              {item.isMoneyOut ? (
+                                <ArrowUpRight size={16} color={COLORS.error} />
+                              ) : (
+                                <ArrowDownLeft size={16} color={COLORS.success} />
+                              )}
+                            </View>
+                          }
+                          title={item.text}
+                          subtitle={item.time}
+                          rightTop={item.amount}
+                          hasDivider={index < 4}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
               </View>
             </>
           )}
 
-           {/* Learn */}
-           <View style={styles.section}>
-             <SectionHeader title="Learn" />
-             <Text style={styles.learnSubtitle}>
-               Understand how LSTNR works before you make your first move.
-             </Text>
-             <View style={styles.card}>
-                 {MOCK_LEARN.map((item, index) => (
-                    <TouchableOpacity 
-                      key={item.id}
-                      onPress={() => navigation.navigate('LearnDetail', { id: item.id })}
-                      activeOpacity={0.7}
-                    >
-                        <RowItem 
-                          leftIcon={
-                            <Image 
-                              source={item.icon} 
-                              style={styles.learnIcon} 
-                              resizeMode="contain"
-                            />
-                          }
-                          title={item.title}
-                          subtitle={item.subtitle}
-                          
-                          hasDivider={index < MOCK_LEARN.length - 1}
-                        />
-                    </TouchableOpacity>
-                 ))}
-             </View>
-             
-             {/* Footer Disclaimer */}
-             <Text style={styles.footerText}>
-               LSTNR markets reflect community sentiment and publicly verifiable outcomes. Past performance does not guarantee future results.
-             </Text>
+          {/* Learn */}
+          <View style={styles.section}>
+            <SectionHeader title="Learn" />
+            <Text style={styles.learnSubtitle}>
+              Understand how LSTNR works before you make your first move.
+            </Text>
+            <View style={styles.card}>
+              {MOCK_LEARN.map((item, index) => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => navigation.navigate('LearnDetail', { id: item.id })}
+                  activeOpacity={0.7}
+                >
+                  <RowItem
+                    leftIcon={
+                      <Image
+                        source={item.icon}
+                        style={styles.learnIcon}
+                        resizeMode="contain"
+                      />
+                    }
+                    title={item.title}
+                    subtitle={item.subtitle}
+
+                    hasDivider={index < MOCK_LEARN.length - 1}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Footer Disclaimer */}
+            <Text style={styles.footerText}>
+              LSTNR markets reflect community sentiment and publicly verifiable outcomes. Past performance does not guarantee future results.
+            </Text>
           </View>
 
         </ScrollView>
@@ -473,18 +473,18 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.error, 
+    backgroundColor: COLORS.error,
   },
 
   scrollContent: {
     paddingBottom: 120, // BottomNav space
   },
-  
+
   // Quick Actions
   quickActionsContainer: {
     flexDirection: 'row',
     paddingHorizontal: PAGE_X,
-    gap: 12, 
+    gap: 12,
   },
   quickActionDark: {
     flex: 1, // Fill available width
@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
   },
   // Deprecated Styles (Left for safety or remove if unused)
   quickAction: {
-    flex: 1, 
-    aspectRatio: 1, 
+    flex: 1,
+    aspectRatio: 1,
     borderRadius: 16,
     // @ts-ignore
     cornerCurve: 'continuous',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0,
   },
-  
+
   // Sections
   section: {
     marginBottom: 32, // Section spacing
@@ -550,11 +550,11 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface, // Updated from #111111
     borderRadius: 16,
-    marginHorizontal: PAGE_X, 
-    padding: 16, 
+    marginHorizontal: PAGE_X,
+    padding: 16,
     overflow: 'hidden',
   },
-  
+
   // Reusable Row Item
   rowWrapper: {
     width: '100%',
@@ -563,17 +563,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 48, 
+    minHeight: 48,
   },
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 16, 
+    marginRight: 16,
   },
   iconContainer: {
-    width: 40, 
-    alignItems: 'center', 
+    width: 40,
+    alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   learnIcon: {
     width: 40,
     height: 40,
-    borderRadius: 8, 
+    borderRadius: 8,
   },
   // Feed Icons
   feedIconContainer: {
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     letterSpacing: 0,
   },
-  
+
   // Right side
   rowRight: {
     alignItems: 'flex-end',
@@ -630,14 +630,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: 0,
   },
-  
+
   divider: {
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
     marginVertical: 12,
     width: '100%',
   },
- 
+
   // Empty State
   emptyStateCard: {
     margin: PAGE_X,

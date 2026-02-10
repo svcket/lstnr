@@ -15,8 +15,8 @@ export const EditBioScreen = ({ navigation }: any) => {
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={styles.container} 
+        <KeyboardAvoidingView
+            style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     content: {
-        padding: SPACING.l,
+        padding: SPACING.m,
     },
     inputContainer: {
         backgroundColor: COLORS.surface,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         fontFamily: FONT_FAMILY.body,
         fontSize: 16,
-        paddingTop: 0, 
+        paddingTop: 0,
     },
     saveBtn: {
         height: 56,

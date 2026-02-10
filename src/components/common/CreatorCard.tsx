@@ -5,59 +5,59 @@ import { Copy } from 'lucide-react-native';
 import { Creator } from '../../data/catalog';
 
 interface CreatorCardProps {
-  creator: Creator;
+    creator: Creator;
 }
 
 export const CreatorCard = ({ creator }: CreatorCardProps) => {
-  const [isFollowing, setIsFollowing] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
 
-  return (
-    <View style={styles.creatorSection}>
-       <Text style={styles.sectionHeader}>Created by</Text>
-       <View style={styles.creatorCard}>
-          <Image source={{ uri: creator.avatarUrl }} style={styles.creatorAvatar} />
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-              <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
-                 <Text style={styles.creatorName}>{creator.name}</Text>
-                 {creator.isVerified && (
-                    <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#F5A623', alignItems: 'center', justifyContent: 'center' }}>
-                       <Text style={{ fontSize: 8, color: '#000', fontWeight: 'bold' }}>✓</Text>
+    return (
+        <View style={styles.creatorSection}>
+            <Text style={styles.sectionHeader}>Created by</Text>
+            <View style={styles.creatorCard}>
+                <Image source={{ uri: creator.avatarUrl }} style={styles.creatorAvatar} />
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <Text style={styles.creatorName}>{creator.name}</Text>
+                        {creator.isVerified && (
+                            <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: '#F5A623', alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 8, color: '#000', fontWeight: 'bold' }}>✓</Text>
+                            </View>
+                        )}
                     </View>
-                 )}
-              </View>
-              
-              <View style={styles.badgesRow}>
-                 {creator.tokenSymbol && (
-                    <TouchableOpacity style={styles.badgePill}>
-                       <View style={{width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFF', marginRight: 4}} />
-                       <Text style={styles.badgeText}>{creator.tokenSymbol}</Text>
-                       <Copy size={10} color="#999" style={{marginLeft: 4}} />
-                    </TouchableOpacity>
-                 )}
-                 {creator.walletAddress && (
-                    <TouchableOpacity 
-                       style={styles.badgePill}
-                       onPress={() => {
-                           alert('Address copied to clipboard'); // Mock behavior
-                       }}
-                    >
-                       <Text style={styles.badgeText}>{creator.walletAddress}</Text>
-                       <Copy size={10} color="#999" style={{marginLeft: 4}} />
-                    </TouchableOpacity>
-                 )}
-              </View>
-          </View>
-          <TouchableOpacity 
-              style={[styles.followBtn, isFollowing && { backgroundColor: '#333' }]}
-              onPress={() => setIsFollowing(!isFollowing)}
-          >
-            <Text style={[styles.followText, isFollowing && { color: '#FFF' }]}>
-                {isFollowing ? 'Following' : 'Follow'}
-            </Text>
-          </TouchableOpacity>
-       </View>
-    </View>
-  );
+
+                    <View style={styles.badgesRow}>
+                        {creator.tokenSymbol && (
+                            <TouchableOpacity style={styles.badgePill}>
+                                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFF', marginRight: 4 }} />
+                                <Text style={styles.badgeText}>{creator.tokenSymbol}</Text>
+                                <Copy size={10} color="#999" style={{ marginLeft: 4 }} />
+                            </TouchableOpacity>
+                        )}
+                        {creator.walletAddress && (
+                            <TouchableOpacity
+                                style={styles.badgePill}
+                                onPress={() => {
+                                    alert('Address copied to clipboard'); // Mock behavior
+                                }}
+                            >
+                                <Text style={styles.badgeText}>{creator.walletAddress}</Text>
+                                <Copy size={10} color="#999" style={{ marginLeft: 4 }} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={[styles.followBtn, isFollowing && { backgroundColor: '#333' }]}
+                    onPress={() => setIsFollowing(!isFollowing)}
+                >
+                    <Text style={[styles.followText, isFollowing && { color: '#FFF' }]}>
+                        {isFollowing ? 'Following' : 'Follow'}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -71,9 +71,11 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     creatorCard: {
-        backgroundColor: '#111',
+        backgroundColor: COLORS.surface,
         borderRadius: 16,
         padding: 16,
+        borderWidth: 1,
+        borderColor: COLORS.stroke.settings,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,

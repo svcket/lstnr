@@ -18,8 +18,8 @@ export const EditUsernameScreen = ({ navigation }: any) => {
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={styles.container} 
+        <KeyboardAvoidingView
+            style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -48,14 +48,14 @@ export const EditUsernameScreen = ({ navigation }: any) => {
                                 </TouchableOpacity>
                             )}
                         </View>
-                        
+
                         <View style={styles.infoRow}>
                             <Text style={styles.infoText}>Usernames can be changed once every 14 days</Text>
                         </View>
                     </View>
 
-                    <TouchableOpacity 
-                        onPress={handleSave} 
+                    <TouchableOpacity
+                        onPress={handleSave}
                         disabled={username.length === 0}
                         activeOpacity={0.8}
                     >
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     content: {
-        padding: SPACING.l,
+        padding: SPACING.m,
     },
     inputContainer: {
         flexDirection: 'row',
