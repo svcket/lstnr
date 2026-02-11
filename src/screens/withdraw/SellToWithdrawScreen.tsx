@@ -22,24 +22,32 @@ const Tabs = ({ active, onChange }: { active: 'Shares' | 'Predictions', onChange
     </View>
 );
 
+// ... imports
+import { usePortfolio } from '../../hooks/usePortfolio';
+import { USE_SUPABASE } from '../../services/supabase/client';
+
 export const SellToWithdrawScreen = () => {
     const navigation = useNavigation<any>();
     const [activeTab, setActiveTab] = useState<'Shares' | 'Predictions'>('Shares');
     const [selectedItem, setSelectedItem] = useState<any>(null); // For TradeSheet
     const { showToast } = useToast();
 
-    const shares = getPortfolio().map(p => {
-        const artist = getArtistById(p.artistId);
+    // Use Hook
+    const { holdings, loading } = usePortfolio();
+
+    const shares = holdings.map(p => {
         return {
-            id: p.artistId,
+            id: p.id,
             type: 'SHARE',
-            title: artist?.name || 'Unknown Artist',
-            subtitle: `${p.shares} shares • $${(p.shares * 15).toFixed(2)}`, // Mock $15 price
-            avatar: { uri: getDeterministicAvatar(artist?.name || 'A', p.artistId, artist?.avatarUrl) },
-            value: p.shares * 15,
+            title: p.name,
+            subtitle: `${p.shares} shares • $${p.value.toFixed(2)}`,
+            avatar: { uri: p.avatarUrl },
+            value: p.value,
             raw: p,
-            artistId: p.artistId,
-            symbol: artist?.symbol || ''
+            artistId: p.assetId,
+            marketId: p.marketId || undefined, // Pass marketId
+            symbol: p.symbol,
+            currentPrice: p.currentPrice
         };
     });
 
@@ -80,32 +88,36 @@ export const SellToWithdrawScreen = () => {
 
                 <Tabs active={activeTab} onChange={setActiveTab} />
 
-                <FlatList
-                    data={data}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContent}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.row} onPress={() => handleSell(item)}>
-                            <View style={styles.rowLeft}>
-                                {activeTab === 'Shares' ? (
-                                    <Image source={item.avatar} style={styles.avatar} />
-                                ) : (
-                                    <View style={styles.iconBox}><Text style={{ fontSize: 16 }}>🎲</Text></View>
-                                )}
-                                <View>
-                                    <Text style={styles.rowTitle} numberOfLines={1}>{item.title}</Text>
-                                    <Text style={styles.rowSubtitle}>{item.subtitle}</Text>
+                {loading ? (
+                    <Text style={{ color: '#888', textAlign: 'center', marginTop: 20 }}>Loading...</Text>
+                ) : (
+                    <FlatList
+                        data={data}
+                        keyExtractor={item => item.id}
+                        contentContainerStyle={styles.listContent}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity style={styles.row} onPress={() => handleSell(item)}>
+                                <View style={styles.rowLeft}>
+                                    {activeTab === 'Shares' ? (
+                                        <Image source={item.avatar} style={styles.avatar} />
+                                    ) : (
+                                        <View style={styles.iconBox}><Text style={{ fontSize: 16 }}>🎲</Text></View>
+                                    )}
+                                    <View style={{ flex: 1, marginRight: 8 }}>
+                                        <Text style={styles.rowTitle} numberOfLines={1}>{item.title}</Text>
+                                        <Text style={styles.rowSubtitle}>{item.subtitle}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={styles.btn}>
-                                <Text style={styles.btnText}>Sell</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={
-                        <Text style={styles.empty}>No {activeTab.toLowerCase()} available to sell.</Text>
-                    }
-                />
+                                <View style={styles.btn}>
+                                    <Text style={styles.btnText}>Sell</Text>
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                        ListEmptyComponent={
+                            <Text style={styles.empty}>No {activeTab.toLowerCase()} available to sell.</Text>
+                        }
+                    />
+                )}
 
                 {/* Reuse TradeSheet for Shares */}
                 {selectedItem && activeTab === 'Shares' && (
@@ -114,16 +126,20 @@ export const SellToWithdrawScreen = () => {
                         mode={'SELL'}
                         artistName={selectedItem.title || ''}
                         ticker={selectedItem.symbol || ''}
-                        sharePrice={15} // Mock
-                        mcs={85} // Mock
+                        sharePrice={selectedItem.currentPrice || 15}
+                        mcs={85} // Mock or fetch
+                        marketId={selectedItem.marketId}
                         onClose={() => setSelectedItem(null)}
                         onConfirm={(amount: number, _isShares: boolean) => {
-                            // Calculate mock proceeds
-                            const proceeds = amount * 15;
-                            LedgerStore.creditSettlement(proceeds);
+                            // If mock mode, do manual credit, else reliance on Supabase is handled by TradeSheet
+                            if (!USE_SUPABASE) {
+                                const proceeds = amount; // It's passed as USD amount usually? Or TradeSheet handles execution?
+                                // TradeSheet handles execution!
+                                // We just need to refresh or show toast.
+                            }
                             setSelectedItem(null);
-                            showToast(`Sold and credited $${proceeds.toFixed(2)} to withdrawable balance`, 'success');
-                            navigation.goBack();
+                            showToast(`Sell Order Executed`, 'success');
+                            // Ideally refresh portfolio here
                         }}
                     />
                 )}

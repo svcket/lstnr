@@ -7,7 +7,8 @@ import { PX_16, PX_8, PX_12, PX_24, LAYOUT } from '../constants/spacing';
 import { ICONS } from '../constants/assets';
 import { BottomNav } from '../components/home/BottomNav';
 // import { TRENDING_ARTISTS, POPULAR_LABELS, TOP_PREDICTIONS } from '../data/explore'; // REMOVED
-import { getAllArtists, getAllLabels, getAllPredictions } from '../data/catalog';
+import { getAllArtists, getAllLabels, getAllPredictions } from '../data/catalog'; // Keeping types/fallbacks if needed
+import { useExploreData } from '../hooks/useExploreData';
 import { getEntityMetrics } from '../lib/mockMetrics';
 import { EntityRow } from '../components/common/EntityRow';
 import { PredictionCard } from '../components/artist/PredictionCard'; // Unified Card
@@ -25,48 +26,48 @@ type FilterType = 'All' | 'Artists' | 'Labels' | 'Predictions' | 'Ending soon';
 
 // 1. Search Bar
 const SearchBar = ({ value, onChange }: { value: string, onChange: (t: string) => void }) => (
-  <View style={styles.searchContainer}>
-    <Search size={20} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
-    <TextInput 
-      style={styles.searchInput}
-      placeholder="Artists, labels, predictions, URL"
-      placeholderTextColor={COLORS.textSecondary}
-      value={value}
-      onChangeText={onChange}
-    />
-  </View>
+    <View style={styles.searchContainer}>
+        <Search size={20} color={COLORS.textSecondary} style={{ marginRight: 8 }} />
+        <TextInput
+            style={styles.searchInput}
+            placeholder="Artists, labels, predictions, URL"
+            placeholderTextColor={COLORS.textSecondary}
+            value={value}
+            onChangeText={onChange}
+        />
+    </View>
 );
 
 // 2. Chip
 const FilterChip = ({ label, isActive, onPress }: { label: FilterType, isActive: boolean, onPress: () => void }) => (
-  <TouchableOpacity 
-    style={[styles.chip, isActive ? styles.chipActive : styles.chipInactive]}
-    onPress={onPress}
-    activeOpacity={0.8}
-  >
-    <Text style={[styles.chipText, isActive ? styles.chipTextActive : styles.chipTextInactive]}>
-      {label}
-    </Text>
-  </TouchableOpacity>
+    <TouchableOpacity
+        style={[styles.chip, isActive ? styles.chipActive : styles.chipInactive]}
+        onPress={onPress}
+        activeOpacity={0.8}
+    >
+        <Text style={[styles.chipText, isActive ? styles.chipTextActive : styles.chipTextInactive]}>
+            {label}
+        </Text>
+    </TouchableOpacity>
 );
 
 // 3. Section Header
 const SectionHeader = ({ title, onPress }: { title: string, onPress?: () => void }) => (
-  <TouchableOpacity style={styles.sectionHeader} activeOpacity={0.7} onPress={onPress}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <Image 
-      source={ICONS.chevronRight} 
-      style={{ width: 16, height: 16, tintColor: COLORS.text }} 
-      resizeMode="contain"
-    />
-  </TouchableOpacity>
+    <TouchableOpacity style={styles.sectionHeader} activeOpacity={0.7} onPress={onPress}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <Image
+            source={ICONS.chevronRight}
+            style={{ width: 16, height: 16, tintColor: COLORS.text }}
+            resizeMode="contain"
+        />
+    </TouchableOpacity>
 );
 
 // 4. Large Card Container
 const BigCard = ({ children }: { children: React.ReactNode }) => (
-  <View style={styles.bigCard}>
-    {children}
-  </View>
+    <View style={styles.bigCard}>
+        {children}
+    </View>
 );
 
 
@@ -87,15 +88,15 @@ export const ExploreScreen = () => {
 
     React.useEffect(() => {
         const interval = setInterval(() => {
-            setLangIndex(prev => (prev + 1) % 6); 
-        }, 20000); 
+            setLangIndex(prev => (prev + 1) % 6);
+        }, 20000);
         return () => clearInterval(interval);
     }, []);
 
     const greeting = useMemo(() => {
         const hour = new Date().getHours();
         const timeOfDay = (hour >= 5 && hour < 12) ? 'morning' : (hour >= 12 && hour < 17) ? 'afternoon' : 'evening';
-        
+
         const greetings = [
             { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' }, // EN
             { morning: 'Buenos días', afternoon: 'Buenas tardes', evening: 'Buenas noches' }, // ES
@@ -104,15 +105,18 @@ export const ExploreScreen = () => {
             { morning: 'おはよう', afternoon: 'こんにちは', evening: 'こんばんは' }, // JP
             { morning: 'Buongiorno', afternoon: 'Buon pomeriggio', evening: 'Buonasera' }, // IT
         ];
-        
+
         const lang = greetings[langIndex % greetings.length];
         return lang[timeOfDay];
     }, [langIndex]);
 
     // Data Sources
-    const allArtists = getAllArtists();
-    const allLabels = getAllLabels();
-    const allPredictions = getAllPredictions();
+    const { artists: allArtists, labels: allLabels, predictions: allPredictions, loading } = useExploreData();
+
+    // Data Sources - REPLACED BY HOOK
+    // const allArtists = getAllArtists();
+    // const allLabels = getAllLabels();
+    // const allPredictions = getAllPredictions();
 
     // Helper to format currency
     const formatCurrency = (val: number) => {
@@ -121,10 +125,10 @@ export const ExploreScreen = () => {
 
     // Filtering Logic
     const filteredArtists = useMemo(() => {
-         if (filter === 'Predictions') return [];
-         let results = allArtists;
-         if (search) results = results.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
-         return results;
+        if (filter === 'Predictions') return [];
+        let results = allArtists;
+        if (search) results = results.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
+        return results;
     }, [search, filter, allArtists]);
 
     const filteredLabels = useMemo(() => {
@@ -132,7 +136,7 @@ export const ExploreScreen = () => {
         let results = allLabels;
         if (search) results = results.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
         return results;
-   }, [search, filter, allLabels]);
+    }, [search, filter, allLabels]);
 
     const filteredPredictions = useMemo(() => {
         if (filter === 'Artists') return [];
@@ -145,75 +149,75 @@ export const ExploreScreen = () => {
         }
         return preds;
     }, [search, filter, allPredictions]);
-    
+
 
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" />
             <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-                
+
                 {/* Header (From Wallet) */}
                 <View style={styles.header}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 24, marginRight: 4 }}>👋🏾</Text>
-                      <View style={{ height: 32, width: 220, justifyContent: 'center' }}>
-                          <Svg height="32" width="100%">
-                              <Defs>
-                                  <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
-                                      <Stop offset="0" stopColor="#C99315" stopOpacity="1" />
-                                      <Stop offset="1" stopColor="#F53636" stopOpacity="1" />
-                                  </LinearGradient>
-                              </Defs>
-                              <SvgText
-                                  fill="url(#grad)"
-                                  fontSize="24"
-                                  fontWeight="600"
-                                  fontFamily={FONT_FAMILY.balance}
-                                  x="0"
-                                  y="24"
-                              >
-                                  {greeting}!
-                              </SvgText>
-                          </Svg>
-                      </View>
-                  </View>
-                  <View style={styles.headerRight}>
-                    <TouchableOpacity 
-                      onPress={() => navigation.navigate('Updates')}
-                      activeOpacity={0.7}
-                    >
-                      <View>
-                        <Bell size={24} color={COLORS.text} />
-                        <View style={styles.unreadDot} />
-                      </View>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 24, marginRight: 4 }}>👋🏾</Text>
+                        <View style={{ height: 32, width: 220, justifyContent: 'center' }}>
+                            <Svg height="32" width="100%">
+                                <Defs>
+                                    <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+                                        <Stop offset="0" stopColor="#C99315" stopOpacity="1" />
+                                        <Stop offset="1" stopColor="#F53636" stopOpacity="1" />
+                                    </LinearGradient>
+                                </Defs>
+                                <SvgText
+                                    fill="url(#grad)"
+                                    fontSize="24"
+                                    fontWeight="600"
+                                    fontFamily={FONT_FAMILY.balance}
+                                    x="0"
+                                    y="24"
+                                >
+                                    {greeting}!
+                                </SvgText>
+                            </Svg>
+                        </View>
+                    </View>
+                    <View style={styles.headerRight}>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Updates')}
+                            activeOpacity={0.7}
+                        >
+                            <View>
+                                <Bell size={24} color={COLORS.text} />
+                                <View style={styles.unreadDot} />
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
-                       <View style={[styles.headerIconContainer, styles.avatarContainer]}>
-                         <Image 
-                            source={USER_AVATAR} 
-                            style={{ width: 40, height: 40, borderRadius: 12 }} 
-                         />
-                       </View>
-                    </TouchableOpacity>
-                  </View>
+                        <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.7}>
+                            <View style={[styles.headerIconContainer, styles.avatarContainer]}>
+                                <Image
+                                    source={USER_AVATAR}
+                                    style={{ width: 40, height: 40, borderRadius: 12 }}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 {/* Content */}
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    
+
                     {/* Search & Chips */}
                     <View style={{ paddingHorizontal: PX_16, marginBottom: 16 }}>
-                         <SearchBar value={search} onChange={setSearch} />
+                        <SearchBar value={search} onChange={setSearch} />
                     </View>
 
                     <View style={{ marginBottom: 24 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: PX_16, gap: PX_8 }}>
                             {(['All', 'Artists', 'Labels', 'Predictions', 'Ending soon'] as FilterType[]).map(f => (
-                                <FilterChip 
-                                    key={f} 
-                                    label={f} 
-                                    isActive={filter === f} 
+                                <FilterChip
+                                    key={f}
+                                    label={f}
+                                    isActive={filter === f}
                                     onPress={() => {
                                         if (f === 'Artists') {
                                             navigation.navigate('Artists');
@@ -226,7 +230,7 @@ export const ExploreScreen = () => {
                                         } else {
                                             setFilter(f);
                                         }
-                                    }} 
+                                    }}
                                 />
                             ))}
                         </ScrollView>
@@ -235,26 +239,27 @@ export const ExploreScreen = () => {
                     {/* SECTION 1: ARTISTS */}
                     {filteredArtists.length > 0 && (
                         <View style={styles.section}>
-                            <SectionHeader 
-                                title="Trending Artists" 
+                            <SectionHeader
+                                title="Trending Artists"
                                 onPress={() => navigation.navigate('TrendingArtists')}
                             />
                             <BigCard>
                                 {filteredArtists.slice(0, 6).map((artist, index, arr) => {
                                     const metrics = getEntityMetrics(artist.id);
                                     return (
-                                    <EntityRow 
-                                      key={artist.id} 
-                                      name={artist.name}
-                                      avatarUrl={artist.avatarUrl}
-                                      symbol={artist.symbol}
-                                      price={formatCurrency(metrics.price)}
-                                      changePct={metrics.changeTodayPct}
-                                      volume={formatCompact(metrics.volume24h)}
-                                      isLast={index === arr.length - 1} 
-                                      onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
-                                    />
-                                )})}
+                                        <EntityRow
+                                            key={artist.id}
+                                            name={artist.name}
+                                            avatarUrl={artist.avatarUrl}
+                                            symbol={artist.symbol}
+                                            price={formatCurrency(metrics.price)}
+                                            changePct={metrics.changeTodayPct}
+                                            volume={formatCompact(metrics.volume24h)}
+                                            isLast={index === arr.length - 1}
+                                            onPress={() => navigation.navigate('ArtistDetail', { artistId: artist.id })}
+                                        />
+                                    )
+                                })}
                             </BigCard>
                         </View>
                     )}
@@ -262,26 +267,27 @@ export const ExploreScreen = () => {
                     {/* SECTION 2: LABELS */}
                     {filteredLabels.length > 0 && (
                         <View style={styles.section}>
-                            <SectionHeader 
-                                title="Popular Record Labels" 
+                            <SectionHeader
+                                title="Popular Record Labels"
                                 onPress={() => navigation.navigate('PopularLabels')}
                             />
                             <BigCard>
                                 {filteredLabels.slice(0, 6).map((label, index, arr) => {
                                     const metrics = getEntityMetrics(label.id);
                                     return (
-                                    <EntityRow 
-                                      key={label.id} 
-                                      name={label.name}
-                                      avatarUrl={label.avatarUrl}
-                                      symbol={label.symbol}
-                                      price={formatCurrency(metrics.price)} // Using Price for consistency, could be MCap
-                                      changePct={metrics.changeTodayPct}
-                                      volume={formatCompact(metrics.volume24h)}
-                                      isLast={index === arr.length - 1} 
-                                      onPress={() => navigation.navigate('LabelDetail', { labelId: label.id })} 
-                                    />
-                                )})}
+                                        <EntityRow
+                                            key={label.id}
+                                            name={label.name}
+                                            avatarUrl={label.avatarUrl}
+                                            symbol={label.symbol}
+                                            price={formatCurrency(metrics.price)} // Using Price for consistency, could be MCap
+                                            changePct={metrics.changeTodayPct}
+                                            volume={formatCompact(metrics.volume24h)}
+                                            isLast={index === arr.length - 1}
+                                            onPress={() => navigation.navigate('LabelDetail', { labelId: label.id })}
+                                        />
+                                    )
+                                })}
                             </BigCard>
                         </View>
                     )}
@@ -289,20 +295,20 @@ export const ExploreScreen = () => {
                     {/* SECTION 3: PREDICTIONS */}
                     {filteredPredictions.length > 0 && (
                         <View style={styles.section}>
-                             <SectionHeader 
-                                title="Top Predictions" 
+                            <SectionHeader
+                                title="Top Predictions"
                                 onPress={() => navigation.navigate('TopPredictions')}
-                             />
-                             {/* Gutter 16px enforced via padding. Spacing handled by card component margin (will set to 12px) */}
-                             <View style={{ paddingHorizontal: PX_16, gap: 12 }}>
-                                 {filteredPredictions.map(item => (
-                                     <PredictionCard key={item.id} prediction={item} />
-                                 ))}
-                             </View>
+                            />
+                            {/* Gutter 16px enforced via padding. Spacing handled by card component margin (will set to 12px) */}
+                            <View style={{ paddingHorizontal: PX_16, gap: 12 }}>
+                                {filteredPredictions.map(item => (
+                                    <PredictionCard key={item.id} prediction={item} />
+                                ))}
+                            </View>
                         </View>
                     )}
-                    
-                    <View style={{ height: 100 }} /> 
+
+                    <View style={{ height: 100 }} />
                 </ScrollView>
 
                 <BottomNav activeTab="Explore" />
@@ -330,7 +336,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: PX_16,
         paddingTop: 16,
-        paddingBottom: 16, 
+        paddingBottom: 16,
     },
     greeting: {
         fontFamily: FONT_FAMILY.balance,
@@ -365,7 +371,7 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: COLORS.error, 
+        backgroundColor: COLORS.error,
     },
     scrollContent: {
         paddingTop: 0,
@@ -389,7 +395,7 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     chip: {
-        height: 40, 
+        height: 40,
         paddingHorizontal: 16,
         borderRadius: LAYOUT.chipRadius,
         alignItems: 'center',
@@ -433,14 +439,14 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.surface,
         marginHorizontal: PX_16,
         borderRadius: 16,
-        paddingHorizontal: PX_16, 
+        paddingHorizontal: PX_16,
         overflow: 'hidden',
     },
 
     // Prediction Cards
     predCard: {
         backgroundColor: COLORS.surface,
-        borderRadius: 16, 
+        borderRadius: 16,
         padding: 16,
         marginHorizontal: 16,
         borderWidth: 1,

@@ -5,6 +5,8 @@ import { ChevronLeft, Settings2, ChevronDown, X, Check, DollarSign, ArrowRight, 
 import { LinearGradient } from 'expo-linear-gradient';
 import { DepositSheet, PaymentMethod } from '../common/DepositSheet';
 import { LedgerStore } from '../../lib/ledgerStore'; // Added import
+import { TradeRepository } from '../../services/supabase/repositories/tradeRepo';
+import { USE_SUPABASE, checkSupabaseConnection } from '../../services/supabase/client';
 
 // --- Session Persistence (Simple In-Memory) ---
 const SESSION_SETTINGS = {
@@ -24,6 +26,7 @@ interface TradeSheetProps {
     avatarUrl?: string;
     onClose: () => void;
     onConfirm: (amount: number, isShares: boolean) => void;
+    marketId?: string; // Added for Supabase trading
 }
 
 const { width } = Dimensions.get('window');
@@ -44,7 +47,7 @@ const PAYMENT_METHODS: PaymentMethod[] = [
     { id: 'revolut', name: 'Revolut Pay', section: 'fiat', iconType: 'revolut', badge: 'Instant' },
     { id: 'card', name: 'Debit Card', section: 'fiat', iconType: 'card', badge: 'Instant' },
     { id: 'phantom', name: 'Phantom', section: 'crypto', iconType: 'ghost', badge: 'detected' },
-    { id: 'phantom', name: 'Phantom', section: 'crypto', iconType: 'ghost', badge: 'detected' },
+
     { id: 'manual', name: 'Manual transfer', section: 'crypto', iconType: 'qr' },
     { id: 'ledger', name: 'Available Balance', section: 'fiat', iconType: 'wallet' }, // Added Ledger
 ];
@@ -66,7 +69,7 @@ const GradientSwitch = ({ value, onValueChange }: { value: boolean, onValueChang
     </TouchableOpacity>
 );
 
-export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onClose, onConfirm, marketType = 'binary', outcomeName, avatarUrl }: TradeSheetProps) => {
+export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onClose, onConfirm, marketType = 'binary', outcomeName, avatarUrl, marketId }: TradeSheetProps) => {
     const isMulti = marketType === 'multi-range';
 
     const [amount, setAmount] = useState('0');
@@ -147,23 +150,101 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
         setShowReview(true);
     };
 
-    const handleExecuteTrade = () => {
-        setIsProcessing(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsProcessing(false);
-            setIsSuccess(true);
-
-            // Activity Mock would go here
-
-            setTimeout(() => {
-                onConfirm(numAmount, false);
-            }, 1500); // Show success for 1.5s then close
-        }, 2000);
-    };
+    // Quote State
+    const [quote, setQuote] = useState<{ total: number, newPrice: number, fee: number, shares: number } | null>(null);
+    const [quoteLoading, setQuoteLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const numAmount = parseFloat(amount);
+
+    // Fetch Quote when amount changes (Debounced ideally, but simple effect for now)
+    useEffect(() => {
+        if (!visible || !marketId || !USE_SUPABASE || numAmount <= 0) {
+            setQuote(null);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setQuoteLoading(true);
+            setErrorMsg(null);
+            try {
+                if (mode === 'BUY') {
+                    // Input is USD amount usually, but RPC takes SHARES.
+                    // IMPORTANT: The UI currently asks for USD Amount. 
+                    // But the Bonding Curve RPCs take SHARES as input. 
+                    // We need to estimate shares from USD or change UI to Buy Shares.
+                    // For MVP: Let's assume we estimate shares based on current price 
+                    // and call getQuote. 
+                    // Actually, exact reversing of bonding curve to get shares for exact USD is complex math.
+                    // Simplified approach: Calculate approx shares = USD / currentSharePrice.
+                    // Then ask backend exact cost for that many shares.
+                    const approxShares = numAmount / (sharePrice || 1);
+                    const q = await TradeRepository.getBuyQuote(marketId, approxShares);
+
+                    setQuote({
+                        total: q.total_cost,
+                        newPrice: q.new_price,
+                        fee: q.fee,
+                        shares: approxShares
+                    });
+                } else {
+                    // Sell
+                    // Same issue. If selling USD amount, we need to convert to shares first.
+                    const approxShares = numAmount / (sharePrice || 1);
+                    const q = await TradeRepository.getSellQuote(marketId, approxShares);
+
+                    setQuote({
+                        total: q.total_proceeds, // This is what we get out
+                        newPrice: q.new_price,
+                        fee: q.fee,
+                        shares: approxShares
+                    });
+                }
+            } catch (err) {
+                console.error('Quote Error', err);
+                setErrorMsg('Failed to get quote');
+            } finally {
+                setQuoteLoading(false);
+            }
+        }, 500); // 500ms debounce
+
+        return () => clearTimeout(timer);
+    }, [amount, mode, marketId, sharePrice, visible]);
+
+    const handleExecuteTrade = async () => {
+        setIsProcessing(true);
+        setErrorMsg(null);
+
+        try {
+            if (USE_SUPABASE && marketId) {
+                // Real Execution
+                // Use the shares from the quote or re-calculate
+                const sharesToTrade = quote?.shares || (numAmount / (sharePrice || 1));
+
+                if (mode === 'BUY') {
+                    await TradeRepository.buyShares(marketId, sharesToTrade);
+                } else {
+                    await TradeRepository.sellShares(marketId, sharesToTrade);
+                }
+            } else {
+                // Mock Execution (Simulated delay)
+                await new Promise(r => setTimeout(r, 2000));
+            }
+
+            setIsProcessing(false);
+            setIsSuccess(true);
+            setTimeout(() => {
+                onConfirm(numAmount, false);
+            }, 1500);
+
+        } catch (err: any) {
+            console.error('Trade Execution Error:', err);
+            setErrorMsg(err.message || 'Trade failed');
+            setIsProcessing(false);
+        }
+    };
+
+    // const numAmount = parseFloat(amount); // Removed duplicate
     const isValid = numAmount > 0;
 
     // Share Equivalence Logic
@@ -254,14 +335,26 @@ export const TradeSheet = ({ visible, mode, artistName, ticker, sharePrice, onCl
 
                                     <View style={styles.reviewCard}>
                                         <View style={styles.reviewRow}>
-                                            <Text style={styles.reviewLabel}>Pay</Text>
+                                            <Text style={styles.reviewLabel}>{mode === 'BUY' ? 'Pay' : 'Sell Value'}</Text>
                                             <Text style={styles.reviewValue}>${numAmount.toFixed(2)}</Text>
                                         </View>
                                         <View style={styles.reviewDivider} />
                                         <View style={styles.reviewRow}>
-                                            <Text style={styles.reviewLabel}>Receive (Est.)</Text>
-                                            <Text style={styles.reviewValue}>≈ {displayShares} {ticker}</Text>
+                                            <Text style={styles.reviewLabel}>{mode === 'BUY' ? 'Receive (Est.)' : 'Receive (Est.)'}</Text>
+                                            <Text style={styles.reviewValue}>
+                                                {mode === 'BUY'
+                                                    ? `≈ ${(quote?.shares ? quote.shares.toFixed(2) : displayShares)} ${ticker}`
+                                                    : `$${(quote?.total || numAmount).toFixed(2)}`}
+                                            </Text>
                                         </View>
+                                        {quote && (
+                                            <View style={{ marginTop: 12 }}>
+                                                <Text style={{ color: COLORS.textSecondary, fontSize: 12 }}>
+                                                    Includes fee: ${quote.fee.toFixed(2)}
+                                                </Text>
+                                            </View>
+                                        )}
+                                        {errorMsg && <Text style={{ color: COLORS.error, marginTop: 8 }}>{errorMsg}</Text>}
                                     </View>
 
                                     <View style={styles.reviewDetails}>
