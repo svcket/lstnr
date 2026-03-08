@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import {
   View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,11 +11,8 @@ import { GENRES } from '../constants/genres';
 import { GradientButton } from '../components/common/GradientButton';
 
 // 2) Metrics defined here
-const { width } = Dimensions.get('window');
 const GAP = 14;
 const HPAD = 20; // Horizontal Padding
-// Calculate card width for 3 columns with consistent spacing
-const CARD_W = (width - (HPAD * 2) - (GAP * 2)) / 3;
 const FOOTER_HEIGHT = 120; // Estimated footer height for padding
 
 export const GenreSelectionScreen = () => {
@@ -36,10 +33,6 @@ export const GenreSelectionScreen = () => {
     setIsLoading(true);
     try {
       await completeOnboarding();
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }], 
-      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -49,7 +42,7 @@ export const GenreSelectionScreen = () => {
 
   const renderItem = ({ item, index }: { item: string, index: number }) => {
     const isSelected = selectedGenres.includes(item);
-    
+
     // Rotation logic
     const colIndex = index % 3;
     let rotation = '0deg';
@@ -60,7 +53,7 @@ export const GenreSelectionScreen = () => {
       topOffset = 12; // Push down to align visual top peak
     }
     if (colIndex === 2) {
-      rotation = '8deg'; 
+      rotation = '8deg';
       topOffset = 12; // Push down to align visual top peak
     }
 
@@ -68,7 +61,7 @@ export const GenreSelectionScreen = () => {
       <TouchableOpacity
         style={[
           styles.genreItem,
-          { 
+          {
             transform: [{ rotate: rotation }],
             marginTop: topOffset,
             marginBottom: GAP,
@@ -114,7 +107,7 @@ export const GenreSelectionScreen = () => {
 
       {/* 3) Footer Zone (Static) */}
       <View style={styles.footer}>
-        <GradientButton 
+        <GradientButton
           title="Continue"
           onPress={handleContinue}
           disabled={!hasSelection}
@@ -168,11 +161,12 @@ const styles = StyleSheet.create({
   },
   // Item Styles
   genreItem: {
-    width: CARD_W,
-    height: 70, 
+    flex: 1,
+    maxWidth: '31%', // Allows 3 columns gracefully on Web
+    height: 70,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1A1A1A', 
+    backgroundColor: '#1A1A1A',
     borderWidth: 1,
     borderColor: '#333',
     borderRadius: 16,
@@ -193,10 +187,6 @@ const styles = StyleSheet.create({
   },
   // Footer
   footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     padding: SPACING.l,
     backgroundColor: '#000', // Solid background
     paddingBottom: Platform.OS === 'ios' ? 0 : 20, // Adjust for safe area if needed

@@ -1,0 +1,46 @@
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+export const Storage = {
+    getItemAsync: async (key: string): Promise<string | null> => {
+        if (Platform.OS === 'web') {
+            try {
+                if (typeof window !== 'undefined') {
+                    return window.localStorage.getItem(key);
+                }
+            } catch (e) {
+                console.error('Local storage error', e);
+            }
+            return null;
+        }
+        return await SecureStore.getItemAsync(key);
+    },
+
+    setItemAsync: async (key: string, value: string): Promise<void> => {
+        if (Platform.OS === 'web') {
+            try {
+                if (typeof window !== 'undefined') {
+                    window.localStorage.setItem(key, value);
+                }
+            } catch (e) {
+                console.error('Local storage error', e);
+            }
+            return;
+        }
+        await SecureStore.setItemAsync(key, value);
+    },
+
+    deleteItemAsync: async (key: string): Promise<void> => {
+        if (Platform.OS === 'web') {
+            try {
+                if (typeof window !== 'undefined') {
+                    window.localStorage.removeItem(key);
+                }
+            } catch (e) {
+                console.error('Local storage error', e);
+            }
+            return;
+        }
+        await SecureStore.deleteItemAsync(key);
+    }
+};

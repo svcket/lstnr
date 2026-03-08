@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, StatusBar, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
@@ -161,24 +161,30 @@ export const ExploreScreen = () => {
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{ fontSize: 24, marginRight: 4 }}>👋🏾</Text>
                         <View style={{ height: 32, width: 220, justifyContent: 'center' }}>
-                            <Svg height="32" width="100%">
-                                <Defs>
-                                    <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
-                                        <Stop offset="0" stopColor="#C99315" stopOpacity="1" />
-                                        <Stop offset="1" stopColor="#F53636" stopOpacity="1" />
-                                    </LinearGradient>
-                                </Defs>
-                                <SvgText
-                                    fill="url(#grad)"
-                                    fontSize="24"
-                                    fontWeight="600"
-                                    fontFamily={FONT_FAMILY.balance}
-                                    x="0"
-                                    y="24"
-                                >
+                            {Platform.OS === 'web' ? (
+                                <Text style={{ fontSize: 24, fontWeight: '600', fontFamily: FONT_FAMILY.balance, color: '#C99315' }}>
                                     {greeting}!
-                                </SvgText>
-                            </Svg>
+                                </Text>
+                            ) : (
+                                <Svg height="32" width="100%">
+                                    <Defs>
+                                        <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+                                            <Stop offset="0" stopColor="#C99315" stopOpacity="1" />
+                                            <Stop offset="1" stopColor="#F53636" stopOpacity="1" />
+                                        </LinearGradient>
+                                    </Defs>
+                                    <SvgText
+                                        fill="url(#grad)"
+                                        fontSize="24"
+                                        fontWeight="600"
+                                        fontFamily={FONT_FAMILY.balance}
+                                        x="0"
+                                        y="24"
+                                    >
+                                        {greeting}!
+                                    </SvgText>
+                                </Svg>
+                            )}
                         </View>
                     </View>
                     <View style={styles.headerRight}>

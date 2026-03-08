@@ -1,7 +1,9 @@
 import React from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { COLORS } from '../constants/theme';
 
 import TestScreen from '../screens/TestScreen';
 import { LandingScreen } from '../screens/LandingScreen';
@@ -17,73 +19,72 @@ import { ResetPasswordScreen } from '../screens/ResetPasswordScreen';
 import { GenreSelectionScreen } from '../screens/GenreSelectionScreen';
 import AppNavigator from './AppNavigator';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   const { splashLoading, user, onboarded } = useAuth();
-  
-  if (__DEV__) {
-    console.log('[RootNavigator] onboarded:', onboarded, '(', typeof onboarded, ')');
-    console.log('[RootNavigator] splashLoading:', splashLoading, '(', typeof splashLoading, ')');
-    
-    if (typeof onboarded !== 'boolean') console.error('CRITICAL: onboarded is NOT boolean (actual: ' + typeof onboarded + ')');
-    if (typeof splashLoading !== 'boolean') console.error('CRITICAL: splashLoading is NOT boolean (actual: ' + typeof splashLoading + ')');
-  }
-  
+
   if (splashLoading) {
     return <SplashScreen />;
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName={user && Boolean(onboarded) ? 'MainTabs' : 'Landing'}
-        detachInactiveScreens={false}
-        screenOptions={{
-           headerShown: false,
-        }}
-      >
-        {/* Auth Flow */}
-        <Stack.Screen name="Landing" component={LandingScreen} />
-        <Stack.Screen 
-          name="AuthEntry" 
-          component={AuthEntryScreen} 
-          options={{ presentation: 'transparentModal', animation: 'fade' }}
-        />
-        <Stack.Screen name="Otp" component={OtpScreen} />
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={{ presentation: 'transparentModal', animation: 'fade' }}
-        />
-        <Stack.Screen 
-          name="CreateAccount" 
-          component={CreateAccountScreen} 
-          options={{ presentation: 'transparentModal', animation: 'fade' }}
-        />
-        <Stack.Screen 
-          name="ForgotPassword" 
-          component={ForgotPasswordScreen} 
-          options={{ presentation: 'transparentModal', animation: 'fade' }}
-        />
-        <Stack.Screen 
-          name="ResetPassword" 
-          component={ResetPasswordScreen} 
-          options={{ presentation: 'transparentModal', animation: 'fade' }}
-        />
+    <View style={{ flex: 1, width: '100%', height: '100%' }}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName={'Landing'}
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: COLORS.background, flex: 1, width: '100%', height: '100%' },
+            animation: 'none'
+          }}
+        >
+          {user && onboarded ? (
+            /* Main App */
+            <Stack.Screen
+              name="MainTabs"
+              component={AppNavigator}
+            />
+          ) : (
+            /* Auth Flow */
+            <>
+              <Stack.Screen name="Landing" component={LandingScreen} />
+              <Stack.Screen
+                name="AuthEntry"
+                component={AuthEntryScreen}
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
+              <Stack.Screen name="Otp" component={OtpScreen} />
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
+              <Stack.Screen
+                name="CreateAccount"
+                component={CreateAccountScreen}
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
+              <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPasswordScreen}
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
+              <Stack.Screen
+                name="ResetPassword"
+                component={ResetPasswordScreen}
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
 
-        {/* Onboarding Flow */}
-        <Stack.Screen 
-          name="GenreSelection" 
-          component={GenreSelectionScreen}
-        />
-
-        {/* Main App */}
-        <Stack.Screen 
-           name="MainTabs" 
-           component={AppNavigator} 
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+              {/* Onboarding Flow */}
+              <Stack.Screen
+                name="GenreSelection"
+                component={GenreSelectionScreen}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 }

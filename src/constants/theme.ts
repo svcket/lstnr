@@ -1,3 +1,7 @@
+import { Platform } from 'react-native';
+
+const isWeb = Platform.OS === 'web';
+
 export const COLORS = {
   primary: '#F53636', // Red (Gradient End)
   primaryGradient: ['#C99315', '#F53636'] as const, // Gold -> Red Gradient
@@ -19,26 +23,26 @@ export const COLORS = {
 
 // High-saturation neon palette for icons
 export const VIBRANT_COLORS = [
-    '#D946EF', // Neon Purple (Fuchsia)
-    '#3B82F6', // Bright Blue
-    '#F472B6', // Hot Pink
-    '#F97316', // Bright Orange
-    '#22C55E', // Neon Green
-    '#EAB308', // Bright Yellow/Gold
-    '#06B6D4', // Cyan
-    '#8B5CF6', // Violet
+  '#D946EF', // Neon Purple (Fuchsia)
+  '#3B82F6', // Bright Blue
+  '#F472B6', // Hot Pink
+  '#F97316', // Bright Orange
+  '#22C55E', // Neon Green
+  '#EAB308', // Bright Yellow/Gold
+  '#06B6D4', // Cyan
+  '#8B5CF6', // Violet
 ];
 
 // Pastel palette for bright icon backgrounds (Black foreground)
 export const LIGHT_PASTELS = [
-    '#D1E8FF', // Sky Blue
-    '#FFD1DC', // Light Pink
-    '#D1FFD6', // Light Green
-    '#FFFACD', // Lemon Chiffon
-    '#E6E6FA', // Lavender
-    '#FFE4B5', // Moccasin
-    '#E0FFFF', // Light Cyan
-    '#FFDAB9', // Peach Puff
+  '#D1E8FF', // Sky Blue
+  '#FFD1DC', // Light Pink
+  '#D1FFD6', // Light Green
+  '#FFFACD', // Lemon Chiffon
+  '#E6E6FA', // Lavender
+  '#FFE4B5', // Moccasin
+  '#E0FFFF', // Light Cyan
+  '#FFDAB9', // Peach Puff
 ];
 
 export const SPACING = {
@@ -62,18 +66,18 @@ export const FONT_SIZE = {
 
 export const FONT_FAMILY = {
   // Raw Weights
-  regular: 'ClashDisplay-Regular',
-  medium: 'ClashDisplay-Medium',
-  bold: 'ClashDisplay-Bold',
+  regular: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Regular',
+  medium: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Medium',
+  bold: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Bold',
 
   // Semantics
-  body: 'ClashDisplay-Regular',   // Body + Microcopy
-  header: 'ClashDisplay-Medium',  // Section Headers
-  balance: 'ClashDisplay-Bold',   // Key numeric values
-  mono: 'ClashDisplay-Medium',    // Tickers/Code (Alias to Medium for now)
-  
+  body: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Regular',   // Body + Microcopy
+  header: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Medium',  // Section Headers
+  balance: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Bold',   // Key numeric values
+  mono: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Medium',    // Tickers/Code (Alias to Medium for now)
+
   // Legacy/Helpers
-  bodyBold: 'ClashDisplay-Bold', // Ensure this maps to Bold
+  bodyBold: isWeb ? 'Inter, sans-serif' : 'ClashDisplay-Bold', // Ensure this maps to Bold
 };
 
 export const BORDER_RADIUS = {

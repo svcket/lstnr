@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import { Storage as SecureStore } from '../utils/storage';
 import { User } from './mockApi';
 
 // Mock User Database
@@ -21,10 +21,10 @@ export const AuthService = {
     await delay(600); // Simulate network
     const usersJson = await SecureStore.getItemAsync(USERS_STORAGE_KEY);
     const users: User[] = usersJson ? JSON.parse(usersJson) : [];
-    
+
     // Check local mock DB
     const exists = users.some(u => u.email === identifier || u.handle === identifier);
-    
+
     // Mock "nigerianeagle@seka.io" as existing user for testing if strictly needed,
     // otherwise relies on what's in SecureStore.
     // Let's force true for a specific demo email if DB is empty for easier testing.
@@ -73,7 +73,7 @@ export const AuthService = {
     users.push(newUser);
     await SecureStore.setItemAsync(USERS_STORAGE_KEY, JSON.stringify(users));
     await SecureStore.setItemAsync(CURRENT_USER_KEY, JSON.stringify(newUser));
-    
+
     return newUser;
   },
 
@@ -88,7 +88,7 @@ export const AuthService = {
     // In a real app we'd check password. Here we just return the user if found.
     // If not found in DB but is "demo", return mock demo user.
     const user = users.find(u => u.email === identifier || u.handle === identifier);
-    
+
     if (user) {
       await SecureStore.setItemAsync(CURRENT_USER_KEY, JSON.stringify(user));
       return user;

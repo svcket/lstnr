@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, StyleSheet, TextInput, TouchableOpacity, 
-  KeyboardAvoidingView, Platform, Dimensions, TouchableWithoutFeedback, Keyboard 
+import {
+  View, Text, StyleSheet, TextInput, TouchableOpacity,
+  KeyboardAvoidingView, Platform, Dimensions, TouchableWithoutFeedback, Keyboard
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONT_FAMILY, SPACING } from '../constants/theme';
@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get('window');
 export const AuthEntryScreen = () => {
   const navigation = useNavigation<any>();
   const { setAuthMethod, authMethod, checkUserExists } = useAuth();
-  
+
   const [inputValue, setInputValue] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [error, setError] = useState('');
@@ -40,40 +40,40 @@ export const AuthEntryScreen = () => {
 
   const handleContinue = async () => {
     if (!inputValue) return;
-    
+
     // Basic validation
     if (authMethod === 'email') {
-       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-       if (!emailRegex.test(inputValue)) {
-         setError('Enter a valid email address like name@email.com');
-         return;
-       }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(inputValue)) {
+        setError('Enter a valid email address like name@email.com');
+        return;
+      }
     } else {
-       // Phone validation (simple length check for now)
-       if (inputValue.length < 5) {
-         setError('Enter a valid phone number');
-         return;
-       }
+      // Phone validation (simple length check for now)
+      if (inputValue.length < 5) {
+        setError('Enter a valid phone number');
+        return;
+      }
     }
-    
+
     setError('');
-    
+
     // Combine country code if phone
     const fullIdentifier = authMethod === 'whatsapp' ? `${selectedCountry.code}${inputValue}` : inputValue;
 
     try {
       // 2. Check if user exists
       const exists = await checkIdentifierExists(fullIdentifier);
-      
+
       if (exists) {
         navigation.replace('Login', { identifier: fullIdentifier });
       } else {
         const otpResult = await requestOtp(fullIdentifier);
         if (otpResult.success) {
-           // Ensure booleans are passed as booleans, not strings
-           navigation.navigate('Otp', { identifier: fullIdentifier, isNewUser: true });
+          // Ensure booleans are passed as booleans, not strings
+          navigation.navigate('Otp', { identifier: fullIdentifier, isNewUser: true });
         } else {
-           setError('Failed to request OTP. Try again.');
+          setError('Failed to request OTP. Try again.');
         }
       }
     } catch (e) {
@@ -97,7 +97,7 @@ export const AuthEntryScreen = () => {
           keyExtractor={(item) => item.label + item.code}
           style={{ maxHeight: 300 }}
           renderItem={({ item }) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.countryItem}
               onPress={() => {
                 setSelectedCountry(item);
@@ -117,7 +117,7 @@ export const AuthEntryScreen = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-       navigation.navigate('Landing', { slide: 2 });
+      navigation.navigate('Landing', { slide: 2 });
     }
   };
 
@@ -133,9 +133,9 @@ export const AuthEntryScreen = () => {
         style={styles.keyboardAvoid}
       >
         <View style={[
-          styles.modalContent, 
-          // Maintain consistent height: if keyboard is hidden, simulate its height with padding
-          !isKeyboardVisible ? { paddingBottom: height * 0.45 } : {} 
+          styles.modalContent,
+          // Maintain consistent height only on Native to avoid pushing CTA off-screen on Web
+          (!isKeyboardVisible && Platform.OS !== 'web') ? { paddingBottom: height * 0.45 } : {}
         ]}>
           {/* Handle Bar */}
           <View style={styles.handleBar} />
@@ -143,15 +143,15 @@ export const AuthEntryScreen = () => {
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-               <Ionicons name="close" size={24} color="#666" />
+              <Ionicons name="close" size={24} color="#666" />
             </TouchableOpacity>
             <Text style={styles.title}>Continue Email or WhatsApp</Text>
-            <View style={{ width: 40 }} /> 
+            <View style={{ width: 40 }} />
           </View>
 
           {/* Toggle */}
           <View style={styles.toggleContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               activeOpacity={1}
               style={[styles.toggleBtn, authMethod === 'email' && styles.toggleBtnActive]}
               onPress={() => {
@@ -163,8 +163,8 @@ export const AuthEntryScreen = () => {
             >
               <Text style={[styles.toggleText, authMethod === 'email' && styles.toggleTextActive]}>Email address</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               activeOpacity={1}
               style={[styles.toggleBtn, authMethod === 'whatsapp' && styles.toggleBtnActive]}
               onPress={() => {
@@ -179,49 +179,49 @@ export const AuthEntryScreen = () => {
           </View>
 
           {/* Input */}
-          <View style={[styles.inputContainer, { zIndex: 10 }]}> 
+          <View style={[styles.inputContainer, { zIndex: 10 }]}>
             <Text style={styles.label}>
               {authMethod === 'email' ? 'Email address' : 'WhatsApp number'}
             </Text>
-            
-            <View style={styles.inputWrapper}>
-               {authMethod === 'whatsapp' && (
-                 <TouchableOpacity 
-                    style={styles.countryCodeButton}
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      setShowCountryPicker(!showCountryPicker);
-                    }}
-                 >
-                   <Text style={styles.countryCodeText}>{selectedCountry.flag} {selectedCountry.code}</Text>
-                   <Ionicons name="chevron-down" size={16} color="#666" />
-                 </TouchableOpacity>
-               )}
 
-               <TextInput
-                 style={[styles.input, authMethod === 'whatsapp' && styles.inputWithPrefix]}
-                 placeholder={authMethod === 'email' ? "name@example.com" : "800 123 4567"}
-                 placeholderTextColor="#555"
-                 value={inputValue}
-                 onChangeText={setInputValue}
-                 autoCapitalize="none"
-                 keyboardType={authMethod === 'email' ? 'email-address' : 'phone-pad'}
-                 autoCorrect={false}
-                 returnKeyType="go"
-                 onSubmitEditing={handleContinue}
-                 autoFocus
-                 onFocus={() => setShowCountryPicker(false)}
-               />
-               
-               {/* Dropdown Positioned Absolute */}
-               {renderCountryPicker()}
+            <View style={styles.inputWrapper}>
+              {authMethod === 'whatsapp' && (
+                <TouchableOpacity
+                  style={styles.countryCodeButton}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setShowCountryPicker(!showCountryPicker);
+                  }}
+                >
+                  <Text style={styles.countryCodeText}>{selectedCountry.flag} {selectedCountry.code}</Text>
+                  <Ionicons name="chevron-down" size={16} color="#666" />
+                </TouchableOpacity>
+              )}
+
+              <TextInput
+                style={[styles.input, authMethod === 'whatsapp' && styles.inputWithPrefix]}
+                placeholder={authMethod === 'email' ? "name@example.com" : "800 123 4567"}
+                placeholderTextColor="#555"
+                value={inputValue}
+                onChangeText={setInputValue}
+                autoCapitalize="none"
+                keyboardType={authMethod === 'email' ? 'email-address' : 'phone-pad'}
+                autoCorrect={false}
+                returnKeyType="go"
+                onSubmitEditing={handleContinue}
+                autoFocus
+                onFocus={() => setShowCountryPicker(false)}
+              />
+
+              {/* Dropdown Positioned Absolute */}
+              {renderCountryPicker()}
             </View>
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
 
           {/* Continue Button */}
-          <GradientButton 
+          <GradientButton
             title="Continue"
             onPress={handleContinue}
             disabled={!inputValue}
@@ -229,13 +229,13 @@ export const AuthEntryScreen = () => {
           />
 
           {/* Fallback Login Link */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.fallbackButton}
             onPress={handleLoginFallback}
           >
             <Text style={styles.fallbackText}>Already have an account? <Text style={styles.fallbackLink}>Log in</Text></Text>
           </TouchableOpacity>
-          
+
           <View style={{ height: isKeyboardVisible ? 20 : 40 }} />
         </View>
       </KeyboardAvoidingView>
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   closeButton: {
-    width: 40, 
+    width: 40,
     height: 40,
     borderRadius: 12,
     backgroundColor: '#1A1A1A',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     padding: 0,
     width: 250, // Wider for full names
-    height: 300, 
+    height: 300,
     zIndex: 100,
     elevation: 5,
     shadowColor: '#000',

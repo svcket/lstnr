@@ -73,6 +73,11 @@ export const useAssetDetail = (id: string, type: 'ARTIST' | 'LABEL') => {
                             ath: price * 1.5 // Placeholder
                         });
                     }
+                } else if (mounted) {
+                    console.warn('Asset not found in Supabase (or error swallowed), falling back to mock');
+                    const mock = type === 'ARTIST' ? getArtistById(id) : getLabelById(id);
+                    setAsset(mock);
+                    if (mock) setMetrics(getEntityMetrics(id));
                 }
             } catch (err) {
                 console.warn('Error fetching asset detail:', err);

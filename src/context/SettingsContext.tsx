@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import { Storage as SecureStore } from '../utils/storage';
 
 export interface UserSettings {
     theme: 'system' | 'dark' | 'light';
@@ -11,13 +11,13 @@ export interface UserSettings {
     };
     security: {
         biometricLock: boolean;
-        autoLockMins: number; 
+        autoLockMins: number;
         profileVisibility: 'public' | 'private';
     };
     payments: {
         defaultMethod: string;
         walletConnected: boolean;
-        paymentMethods: Array<{ id: string; name: string; type: 'card'|'paypal'|'venmo'; last4?: string; }>;
+        paymentMethods: Array<{ id: string; name: string; type: 'card' | 'paypal' | 'venmo'; last4?: string; }>;
     };
 }
 
@@ -102,17 +102,17 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const toggleSecurity = (key: keyof UserSettings['security']) => {
         setSettings(s => {
-             // @ts-ignore
-             const val = s.security[key];
-             if (typeof val === 'boolean') {
-                 return { ...s, security: { ...s.security, [key]: !val } };
-             }
-             return s;
+            // @ts-ignore
+            const val = s.security[key];
+            if (typeof val === 'boolean') {
+                return { ...s, security: { ...s.security, [key]: !val } };
+            }
+            return s;
         });
     };
 
     const setAutoLock = (mins: number) => setSettings(s => ({ ...s, security: { ...s.security, autoLockMins: mins } }));
-    
+
     const setProfileVisibility = (vis: 'public' | 'private') => setSettings(s => ({ ...s, security: { ...s.security, profileVisibility: vis } }));
 
     return (

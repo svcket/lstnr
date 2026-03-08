@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import { Storage as SecureStore } from '../utils/storage';
 import { User } from '../services/mockApi';
 import { AuthService } from '../services/authService';
 
@@ -9,14 +9,14 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   splashLoading: boolean;
-  
+
   // Auth Flow State
   authIdentifier: string;
   setAuthIdentifier: (val: string) => void;
   authMethod: AuthMethod;
   setAuthMethod: (val: AuthMethod) => void;
   userExists: boolean;
-  
+
   // Actions
   checkUserExists: (identifier: string) => Promise<boolean>;
   requestOtp: () => Promise<void>;
@@ -24,7 +24,7 @@ interface AuthContextType {
   createAccount: (name: string, password?: string) => Promise<void>;
   signIn: (password?: string) => Promise<void>;
   logout: () => Promise<void>;
-  
+
   onboarded: boolean;
   completeOnboarding: () => Promise<void>;
 }
@@ -50,10 +50,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (typeof onboarded !== 'boolean') {
-       console.error('AuthContext: onboarded is not boolean!', typeof onboarded, onboarded);
+      console.error('AuthContext: onboarded is not boolean!', typeof onboarded, onboarded);
     }
     if (typeof splashLoading !== 'boolean') {
-       console.error('AuthContext: splashLoading is not boolean!', typeof splashLoading, splashLoading);
+      console.error('AuthContext: splashLoading is not boolean!', typeof splashLoading, splashLoading);
     }
   }, [onboarded, splashLoading]);
 
@@ -70,10 +70,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Strict boolean parsing: ONLY "true" string becomes true boolean
       const isOnboardedBool = hasOnboarded === 'true';
       setOnboarded(isOnboardedBool);
-      
-      console.log('[AuthContext] Loaded storage:', { 
-        hasOnboardedRaw: hasOnboarded, 
-        isOnboardedBool 
+
+      console.log('[AuthContext] Loaded storage:', {
+        hasOnboardedRaw: hasOnboarded,
+        isOnboardedBool
       });
 
     } catch (e) {
@@ -154,26 +154,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isLoading, 
-      splashLoading, 
-      
+    <AuthContext.Provider value={{
+      user,
+      isLoading,
+      splashLoading,
+
       authIdentifier,
       setAuthIdentifier,
       authMethod,
       setAuthMethod,
       userExists,
-      
+
       checkUserExists,
       requestOtp,
       verifyOtp,
       createAccount,
       signIn,
-      logout, 
-      
-      onboarded, 
-      completeOnboarding 
+      logout,
+
+      onboarded,
+      completeOnboarding
     }}>
       {children}
     </AuthContext.Provider>
